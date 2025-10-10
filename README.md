@@ -3,7 +3,11 @@ Group Project for TCSS 460 @ UWT
 
 ### Alpha Sprint Contributions
 Patrick: 
+
 Linda: 
+
 Shiannel: 
+
 Bao: 
+
 Shiraz: 
