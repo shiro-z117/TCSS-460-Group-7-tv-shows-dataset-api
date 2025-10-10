@@ -1,0 +1,58 @@
+﻿Suggested Task Division for 5 Group Members
+
+
+Group Member 1: Project Lead & Documentation : Shiraz
+Responsibilities:
+Create and manage the GitHub repository
+Add collaborator (cfb3) to the repository
+Write the Project Planning Document (already created above - just needs to be added to repo)
+Coordinate team meetings and communication
+Write the README.md with all sections (contributions, meetings, comments)
+Ensure all deliverables are submitted on time
+Estimated Time: 6-8 hours
+
+
+Group Member 2: Database Designer: Linda
+Responsibilities:
+Create the Entity-Relationship (ER) diagram (already created above)
+Write the SQL initialization script (already created above)
+Test the SQL script to ensure it creates tables correctly
+Document the database schema
+Add SQL files to /project_files directory
+Estimated Time: 5-7 hours
+
+
+Group Member 3: API Designer & Swagger Documentation: Coco
+Responsibilities: 
+Design the API endpoints based on the dataset
+Create the Swagger/OpenAPI YAML file (I'll create this next)
+Document all API endpoints, request/response formats
+Ensure Swagger spec is valid and complete
+Add Swagger YAML to /project_files directory
+Estimated Time: 6-8 hours
+
+
+Group Member 4: Cloud Hosting Research & Testing: B
+Responsibilities:
+Research cloud hosting options (Render, Railway, others)
+Write the technical hosting document (I'm creating this)
+Deploy HelloWorld API to 2+ platforms for testing
+Document pros/cons of each platform
+Take screenshots/gather demo URLs
+Add hosting document to /project_files directory
+Estimated Time: 5-7 hours
+
+
+Group Member 5: Data Analysis & Quality Assurance: Patrick
+Responsibilities:
+Analyze the TV shows dataset thoroughly
+Verify data quality and identify any issues
+Review all project documentation for accuracy
+Test that SQL script matches the ER diagram
+Verify Swagger documentation matches project plan
+Create test queries to validate database design
+Help other team members as needed
+Estimated Time: 4-6 hours
+
+
+Make sure when doing stuff for project we are basing the database on postgris
