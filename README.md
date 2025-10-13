@@ -34,7 +34,11 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 [To be added]
 
 ### Shiraz
-[To be added]
+**Project Plan**
+Wrote the Project Plan:
+- Describes how the API, once completed, should function and behave
+- Provides information useful to a user of the API, but does not provide details about the underlying technicalities
+-**Files:** `project_files/Project_Plan.pdf`
 
 ---
 
@@ -51,6 +55,10 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Added API key authentication requirements across all endpoints
 - File pushed to GitHub at project_files/swagger.yaml and ready for implementation
 
+**Project Plan (Shiraz)**
+- The document in its current form describes the complete API.
+- However, it the specifications only describe the essential functions that such an API should have.
+- Additional functions may be added later, if time permits. Therefore, the document (and final product) is subject to change. 
 
 [Other team members can add their comments here]
 
