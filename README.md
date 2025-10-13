@@ -58,9 +58,9 @@ Wrote the Project Plan:
 - Performance: Database optimized with indexes on frequently queried columns. Average query time <100ms.
 
 **Hosting Options**
-- Tried several options for hosting web service
-- Some services are not sucessfull deployed
-- Render and Koyeb are the easiest deployment that I found
+- Tried several options for hosting web service.
+- Some services are not sucessfull deployed.
+- Render and Koyeb are the easiest deployments so far.
 
 **API Documentation (Shiannel/Coco):**
 - Swagger/OpenAPI specification completed and validated
