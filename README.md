@@ -35,7 +35,11 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - **Files:** `project_files/swagger.yaml`
 
 ### Bao
-[To be added]
+**Investigate hosting options**
+- Research several hosting options for the Helloword API
+- Try to deploy the Helloword API on different hosting services like Render, Railway and Koyeb
+- Describe the information of the deployments
+- **Files:** `project_files/TCSS460-Group7-Hosting Options.docx`
 
 ### Shiraz
 **Project Plan**
