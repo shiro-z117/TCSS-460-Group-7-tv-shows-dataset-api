@@ -57,6 +57,11 @@ Wrote the Project Plan:
 - Data Quality: 99.1% import success rate (7,316 of 7,382 shows). 66 records failed due to VARCHAR length constraints (can be fixed if needed).
 - Performance: Database optimized with indexes on frequently queried columns. Average query time <100ms.
 
+**Hosting Options**
+- Tried several options for hosting web service
+- Some services are not sucessfull deployed
+- Render and Koyeb are the easiest deployment that I found
+
 **API Documentation (Shiannel/Coco):**
 - Swagger/OpenAPI specification completed and validated
 - Documented 11 endpoints, including CRUD operations and search/filter features
