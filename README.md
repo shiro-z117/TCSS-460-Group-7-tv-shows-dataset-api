@@ -22,7 +22,13 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - **Files:** `project_files/er_diagram.png`, `init_database.sql`, `import_tv_shows.py`, `database_README.md`
 
 ### Shiannel
-[To be added]
+**API Designer & Swagger Documentation**
+- Analyzed the TV shows dataset and designed the API endpoint structure
+- Created Swagger/OpenAPI YAML documentation file for the entire API
+- Documented all endpoints with their request/response formats and examples
+- Defined data schemas for TV shows, pagination, and error handling
+- Added API key security requirements to protect all endpoints
+- **Files:** 'project_files/swagger.yaml'
 
 ### Bao
 [To be added]
@@ -38,6 +44,13 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Successfully designed and implemented. All tables created and populated with production data.
 - Data Quality: 99.1% import success rate (7,316 of 7,382 shows). 66 records failed due to VARCHAR length constraints (can be fixed if needed).
 - Performance: Database optimized with indexes on frequently queried columns. Average query time <100ms.
+
+**API Documentation (Shiannel/Coco):**
+- Swagger/OpenAPI specification completed and validated
+- Documented 11 endpoints, including CRUD operations and search/filter features
+- Added API key authentication requirements across all endpoints
+- File pushed to GitHub at project_files/swagger.yaml and ready for implementation
+
 
 [Other team members can add their comments here]
 
