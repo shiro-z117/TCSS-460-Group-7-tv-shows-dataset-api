@@ -9,7 +9,11 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ## Alpha Sprint Contributions
 
 ### Patrick
-[To be added]
+**Data Analysis & Quality Assurance**
+- Analyze the TV shows dataset thoroughly 
+- Verify data quality and identify any issues
+- Review all project documentation for accuracy
+- Verify Swagger documentation matches project plan
 
 ### Linda Miao
 **Database Design & Implementation**
