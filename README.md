@@ -28,7 +28,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Documented all endpoints with their request/response formats and examples
 - Defined data schemas for TV shows, pagination, and error handling
 - Added API key security requirements to protect all endpoints
-- **Files:** 'project_files/swagger.yaml'
+- **Files:** `project_files/swagger.yaml`
 
 ### Bao
 [To be added]
