@@ -289,7 +289,11 @@ paths:
       parameters:
         - name: genre
           in: query
-          description: Genre to filter by (e.g., Drama, Comedy, Action)
+          description: Genre to filter by (e.g., Drama, Comedy, Sci-Fi & Fantasy, Animation,
+            Action & Adventure, Crime, Mystery, Family,
+            Kids, Documentary, Reality, Soap,
+            War & Politics, Talk, Western, News,
+            Romance, History)
           required: true
           schema:
             type: string
@@ -348,7 +352,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [Ended, Returning Series, Canceled, In Production, Planned]
+            enum: [Ended, Returning Series, Canceled, Pilot]
             example: "Returning Series"
         - name: page
           in: query
