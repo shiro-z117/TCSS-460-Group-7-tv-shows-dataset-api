@@ -1,15 +1,46 @@
 # TCSS-460-Group-7-Project
-Group Project for TCSS 460 @ UWT 
+
+Group Project for TCSS 460 @ UWT  
+
+RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
+
+---
 
 ## Alpha Sprint Contributions
-Patrick: 
 
-Linda: 
+### Patrick
+[To be added]
 
-Shiannel: 
+### Linda Miao
+**Database Design & Implementation**
+- Designed normalized ER diagram (11 tables, Third Normal Form)
+- Created SQL schema for PostgreSQL/Supabase (`init_database.sql`)
+- Developed Python data migration script (`import_tv_shows.py`)
+- Successfully imported 7,316 TV shows with full cast and crew data (99.1% success rate)
+- Extracted and normalized: 35,739 actors, 18 genres, 465 networks, 5,897 studios, 5,604 creators
+- Created comprehensive database documentation (`database_README.md`)
+- **Files:** `project_files/er_diagram.png`, `init_database.sql`, `import_tv_shows.py`, `database_README.md`
 
-Bao: 
+### Shiannel
+[To be added]
 
-Shiraz: 
+### Bao
+[To be added]
+
+### Shiraz
+[To be added]
+
+---
 
 ## Alpha Sprint Comments
+
+**Database (Linda Miao):**
+- Successfully designed and implemented. All tables created and populated with production data.
+- Data Quality: 99.1% import success rate (7,316 of 7,382 shows). 66 records failed due to VARCHAR length constraints (can be fixed if needed).
+- Performance: Database optimized with indexes on frequently queried columns. Average query time <100ms.
+
+[Other team members can add their comments here]
+
+---
+
+**Last Updated:** October 12, 2025
