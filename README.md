@@ -72,8 +72,11 @@ Wrote the Project Plan:
 - The document in its current form describes the complete API.
 - However, it the specifications only describe the essential functions that such an API should have.
 - Additional functions may be added later, if time permits. Therefore, the document (and final product) is subject to change. 
+**Testing and review**
+- Made Dataset doc outlining the different datatypes in the .csv.
+- Reviewed ER diagram and sql initialization script for accuracy.
+- Reviewed and edited swagger yaml file to fit csv types.
 
-[Other team members can add their comments here]
 
 ---
 
