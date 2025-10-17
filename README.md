@@ -19,8 +19,6 @@ Each member document:
 - Challenges faced
 - Status of deliverables
 - Notes for next sprint
-  
-========================================================================
 
 ---
 
@@ -91,7 +89,6 @@ Sample data verified Done!
 
 ### Shiraz
 
-========================================================================
 
 ## Alpha Sprint Contributions
 
