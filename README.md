@@ -30,6 +30,7 @@ Location: Discord
 
 - **Discussion:**
   - we contribution the role
+    
     Patrick: API Development (member 1)
     
     Linda: Database & Integration (Member 2)
