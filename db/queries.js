@@ -127,7 +127,32 @@ const getShowById = async (showId) => {
     throw error;
   }
 };
+// ===================================================
+// QUERY 6: GET 10 RANDOM SHOWS
+// ===================================================
+// Purpose: Retrieve 10 random TV shows from the database
+// Returns: Array of 10 randomly selected shows
 
+const getRandomShows = async (limit = 10) => {
+    try {
+        // RANDOM(): randomly orders rows in PostgreSQL
+        // LIMIT $1: only return 'limit' number of rows (default 10)
+        const result = await pool.query(
+            `SELECT id, name, original_name, first_air_date, last_air_date,
+              seasons, episodes, status, overview, popularity,
+              tmdb_rating, vote_count, poster_url, backdrop_url
+       FROM tv_shows
+       ORDER BY RANDOM()
+       LIMIT $1;`,
+            [limit] // use parameter to make it flexible (prevents SQL injection)
+        );
+
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getRandomShows:', error);
+        throw error;
+    }
+};
 // ===================================================
 // EXPORT ALL QUERY FUNCTIONS
 // ===================================================
@@ -135,9 +160,10 @@ const getShowById = async (showId) => {
 // const { getAllShows, getShowsByGenre } = require('./db/queries');
 
 module.exports = {
-  getAllShows,
-  getShowsByName,
-  getShowsByGenre,
-  getShowsByStatus,
-  getShowById
+    getAllShows,
+    getShowsByName,
+    getShowsByGenre,
+    getShowsByStatus,
+    getShowById,
+    getRandomShows // ✅ add this
 };
