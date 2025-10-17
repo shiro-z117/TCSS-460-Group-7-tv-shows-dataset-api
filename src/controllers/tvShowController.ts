@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../core/utilities/database';
 import { paginateMeta } from '../core/utilities/responseUtils';
-import { getRandomShows } from '../db/queries'; // ✅ import from your queries file
+import { getRandomShows } from '../db/queries.js'; // ✅ import from your queries file
 const TABLE = 'tv_shows';
 
 // GET /tvshows

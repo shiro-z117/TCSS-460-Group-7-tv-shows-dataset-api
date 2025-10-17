@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "Minimal Express + Supabase/Render TV Shows API (TCSS 460)",
   "main": "dist/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
-    "dev": "project_files/node_modules/.bin/ts-node app.ts",
-    "build": "project_files/node_modules/.bin/tsc",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js"
   },
   "dependencies": {
