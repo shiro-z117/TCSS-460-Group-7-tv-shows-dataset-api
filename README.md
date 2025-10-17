@@ -5,8 +5,6 @@ Group Project for TCSS 460 @ UWT
 RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
 
 
-## Beta Sprint Documentation
-
 ### Beta Sprint Contributions (What member created/did)
 Each member document:
 - Tasks completed
@@ -19,7 +17,10 @@ Each member document:
 - Challenges faced
 - Status of deliverables
 - Notes for next sprint
+  
+---
 
+## Beta Sprint Documentation
 ---
 
 ## Beta Sprint Meetings
