@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../core/utilities/database';
 import { paginateMeta } from '../core/utilities/responseUtils';
-
+import { getRandomShows } from '../db/queries'; // ✅ import from your queries file
 const TABLE = 'tv_shows';
 
 // GET /tvshows
@@ -64,18 +64,16 @@ export async function filterByYearRange(req: Request, res: Response, next: NextF
 }
 export async function randomTen(_req: Request, res: Response, next: NextFunction) {
     try {
-        // simple, safe random sample in Postgres
-        const q = `
-            SELECT id, name, original_name, first_air_date, last_air_date, 
-                 seasons, episodes, status, genres, overview,
-                 popularity, tmdb_rating, vote_count
-            FROM tv_shows
-            ORDER BY RANDOM()
-            LIMIT 10;
-        `;
-        const r = await db.query(q);
-        res.json({ success: true, data: r.rows });
+        // ✅ call the shared query function instead of writing SQL here
+        const data = await getRandomShows(10);
+
+        // ✅ return structured JSON, same as other routes
+        res.status(200).json({
+            success: true,
+            count: data.length,
+            data
+        });
     } catch (e) {
-        next(e);
+        next(e); // handles errors with your global error middleware
     }
 }
