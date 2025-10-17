@@ -6,6 +6,38 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ---
 
+## Beta Sprint Contributions
+
+### Patrick
+
+### Linda Miao
+
+### Shiannel
+
+### Bao
+
+### Shiraz
+
+---
+
+## Beta Sprint Meetings
+
+---
+
+## Beta Sprint Comments
+
+### Patrick
+
+### Linda Miao
+
+### Shiannel
+
+### Bao
+
+### Shiraz
+
+---
+
 ## Alpha Sprint Contributions
 
 ### Patrick
@@ -81,4 +113,4 @@ Wrote the Project Plan:
 
 ---
 
-**Last Updated:** October 12, 2025
+**Last Updated:** October 16, 2025
