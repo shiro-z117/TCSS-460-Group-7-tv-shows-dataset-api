@@ -31,10 +31,15 @@ Location: Discord
 - **Discussion:**
   - we contribution the role
     Patrick: API Development (member 1)
+    
     Linda: Database & Integration (Member 2)
+    
     Coco: Documentation & GitHub Pages (member 3)
+    
     Bao: Testing & Quality Assurance (member 4)
+    
     Shiro: Deployment & DevOps (member 5)
+    
   - Decided deployment tool: **Render**
   - Next meeting: 8:00PM On Sunday
 ---
