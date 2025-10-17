@@ -4,23 +4,69 @@ Group Project for TCSS 460 @ UWT
 
 RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
 
+
+## Beta Sprint Documentation
+
+### Beta Sprint Contributions (What member created/did)
+Each member document:
+- Tasks completed
+- Files created
+- Key accomplishments
+- Testing results
+
+### Beta Sprint Comments (what we met: worked, challenges, notes)
+- What worked well
+- Challenges faced
+- Status of deliverables
+- Notes for next sprint
+  
+========================================================================
+
+---
+
+## Beta Sprint Meetings
+Meeting time: Thursday, October 17, 2025
+Time: 12:30 PM - 1:00 PM (30 minutes)
+Location: Discord
+
+- **Discussion:**
+  - we contribution the role
+    Patrick: API Development (member 1)
+    Linda: Database & Integration (Member 2)
+    Coco: Documentation & GitHub Pages (member 3)
+    Bao: Testing & Quality Assurance (member 4)
+    Shiro: Deployment & DevOps (member 5)
+  - Decided deployment tool: **Render**
+  - Next meeting: 8:00PM On Sunday
 ---
 
 ## Beta Sprint Contributions
 
 ### Patrick
 
-### Linda Miao
+### Linda Miao - Database & API Integration
+**Responsibilities:**
+- Set up Supabase PostgreSQL database with 11 tables
+- Created db/connection.js for secure database connections
+- Wrote 5 query functions in db/queries.js
+- Tested database connection and verified queries work
+- Populated sample data: 10 TV shows linked to genres
+
+**Files Created:**
+- db/connection.js
+- db/queries.js
+- .env (local only, not on GitHub)
+
+**Testing:**
+Connection works Done!
+Queries return variable results Done!
+Sample data verified Done!
 
 ### Shiannel
 
 ### Bao
 
 ### Shiraz
-
----
-
-## Beta Sprint Meetings
 
 ---
 
@@ -29,6 +75,15 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ### Patrick
 
 ### Linda Miao
+**Challenges:**
+- Did not clone GitHub repository initially
+- Setting up .env file: Understanding Supabase password and host information took time
+- Understanding full assignment scope was challenging
+
+**Learning:**
+- Based on previous week's confusion about "contributions" vs "comments"
+- This week understood better: Contributions = what I created, Comments = process and meetings
+
 
 ### Shiannel
 
@@ -36,7 +91,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ### Shiraz
 
----
+========================================================================
 
 ## Alpha Sprint Contributions
 
