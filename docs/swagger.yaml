@@ -1,0 +1,444 @@
+openapi: 3.0.0
+info:
+  title: TV Shows API
+  description: |
+    API for querying and managing TV shows dataset.
+    
+    ## Features
+    - Retrieve all TV shows with pagination
+    - Filter shows by year range
+    - Get random TV show recommendations
+    
+    ## Base URL
+    All endpoints are prefixed with `/api`
+    
+  version: 1.0.0
+  contact:
+    name: TCSS 460 Group 7
+    email: support7@tvshowapi.com
+
+servers:
+  - url: https://YOUR-RENDER-URL.onrender.com
+    description: Production server (Render)
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: TV Shows
+    description: Operations for retrieving TV show information
+  - name: Health
+    description: API health check endpoints
+
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      description: Check if the API is running
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /readyz:
+    get:
+      summary: Readiness check
+      description: Check if the API is ready to serve requests
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+
+  /api/tvshows:
+    get:
+      summary: List all TV shows
+      description: |
+        Retrieves a paginated list of all TV shows in the database.
+        
+        **Pagination:**
+        - Default page size: 20
+        - Maximum page size: 100
+        - Minimum page size: 1
+      tags:
+        - TV Shows
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+          example: 20
+      responses:
+        '200':
+          description: Successfully retrieved TV shows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TVShow'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: 1
+                        name: "Breaking Bad"
+                        original_name: "Breaking Bad"
+                        first_air_date: "2008-01-20"
+                        last_air_date: "2013-09-29"
+                        seasons: 5
+                        episodes: 62
+                        status: "Ended"
+                        genres: ["Drama", "Crime"]
+                        overview: "A high school chemistry teacher turned methamphetamine producer..."
+                        popularity: 234.5
+                        tmdb_rating: 9.3
+                        vote_count: 15234
+                      - id: 2
+                        name: "Game of Thrones"
+                        original_name: "Game of Thrones"
+                        first_air_date: "2011-04-17"
+                        last_air_date: "2019-05-19"
+                        seasons: 8
+                        episodes: 73
+                        status: "Ended"
+                        genres: ["Drama", "Fantasy"]
+                        overview: "Nine noble families fight for control..."
+                        popularity: 456.7
+                        tmdb_rating: 9.2
+                        vote_count: 28456
+                    pagination:
+                      current_page: 1
+                      per_page: 20
+                      total_items: 150
+                      total_pages: 8
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/tvshows/filter/year:
+    get:
+      summary: Filter TV shows by year range
+      description: |
+        Retrieves TV shows that first aired within the specified year range.
+        
+        **Required Parameters:**
+        - `start_year`: Starting year (inclusive)
+        - `end_year`: Ending year (inclusive)
+        
+        Results are ordered by first air date (ascending).
+      tags:
+        - TV Shows
+      parameters:
+        - in: query
+          name: start_year
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+          description: Start year of the range (inclusive)
+          example: 2008
+        - in: query
+          name: end_year
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+          description: End year of the range (inclusive)
+          example: 2013
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        '200':
+          description: Successfully retrieved filtered TV shows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TVShow'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: 1
+                        name: "Breaking Bad"
+                        original_name: "Breaking Bad"
+                        first_air_date: "2008-01-20"
+                        last_air_date: "2013-09-29"
+                        seasons: 5
+                        episodes: 62
+                        status: "Ended"
+                        genres: ["Drama", "Crime"]
+                        overview: "A high school chemistry teacher..."
+                        popularity: 234.5
+                        tmdb_rating: 9.3
+                        vote_count: 15234
+                    pagination:
+                      current_page: 1
+                      per_page: 20
+                      total_items: 45
+                      total_pages: 3
+        '400':
+          description: Invalid year parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingParams:
+                  value:
+                    success: false
+                    error: "Bad Request"
+                    message: "start_year and end_year are required"
+                invalidRange:
+                  value:
+                    success: false
+                    error: "Bad Request"
+                    message: "start_year must be less than or equal to end_year"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/tvshows/random:
+    get:
+      summary: Get 10 random TV shows
+      description: |
+        Retrieves 10 randomly selected TV shows from the database.
+        
+        **Use Cases:**
+        - Discover new shows
+        - Show recommendations
+        - Random browsing
+        
+        Each request returns a different random selection.
+      tags:
+        - TV Shows
+      responses:
+        '200':
+          description: Successfully retrieved random TV shows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    maxItems: 10
+                    items:
+                      $ref: '#/components/schemas/TVShow'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: 42
+                        name: "Stranger Things"
+                        original_name: "Stranger Things"
+                        first_air_date: "2016-07-15"
+                        last_air_date: "2022-07-01"
+                        seasons: 4
+                        episodes: 34
+                        status: "Returning Series"
+                        genres: ["Drama", "Sci-Fi", "Horror"]
+                        overview: "When a young boy vanishes..."
+                        popularity: 567.8
+                        tmdb_rating: 8.7
+                        vote_count: 12456
+                      - id: 87
+                        name: "The Wire"
+                        original_name: "The Wire"
+                        first_air_date: "2002-06-02"
+                        last_air_date: "2008-03-09"
+                        seasons: 5
+                        episodes: 60
+                        status: "Ended"
+                        genres: ["Crime", "Drama"]
+                        overview: "The Baltimore drug scene..."
+                        popularity: 123.4
+                        tmdb_rating: 9.3
+                        vote_count: 8765
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    TVShow:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the TV show
+          example: 1
+        name:
+          type: string
+          description: Display name of the TV show
+          example: "Breaking Bad"
+        original_name:
+          type: string
+          description: Original name of the TV show
+          example: "Breaking Bad"
+        first_air_date:
+          type: string
+          format: date
+          description: Date when the show first aired
+          example: "2008-01-20"
+        last_air_date:
+          type: string
+          format: date
+          description: Date of the last aired episode
+          example: "2013-09-29"
+        seasons:
+          type: integer
+          description: Total number of seasons
+          example: 5
+        episodes:
+          type: integer
+          description: Total number of episodes
+          example: 62
+        status:
+          type: string
+          description: Current status of the show
+          enum: ["Returning Series", "Ended", "Canceled", "In Production"]
+          example: "Ended"
+        genres:
+          type: array
+          items:
+            type: string
+          description: List of genres
+          example: ["Drama", "Crime", "Thriller"]
+        overview:
+          type: string
+          description: Brief description of the show
+          example: "A high school chemistry teacher diagnosed with cancer turns to cooking meth."
+        popularity:
+          type: number
+          format: float
+          description: Popularity score from TMDB
+          example: 234.567
+        tmdb_rating:
+          type: number
+          format: float
+          description: Rating from The Movie Database
+          minimum: 0
+          maximum: 10
+          example: 9.3
+        vote_count:
+          type: integer
+          description: Number of votes on TMDB
+          example: 15234
+
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          description: Current page number
+          example: 1
+        per_page:
+          type: integer
+          description: Number of items per page
+          example: 20
+        total_items:
+          type: integer
+          description: Total number of items
+          example: 150
+        total_pages:
+          type: integer
+          description: Total number of pages
+          example: 8
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error type
+          example: "Bad Request"
+        message:
+          type: string
+          description: Detailed error message
+          example: "Invalid query parameters"
