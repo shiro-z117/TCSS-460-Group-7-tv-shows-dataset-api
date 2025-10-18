@@ -1,6 +1,5 @@
 const express = require('express');
-const { getAllShows, getShowsByGenre, getShowsByName, getShowsByStatus, getShowById } = require('./db/queries');
-
+const { getAllShows, getShowsByGenre, getShowsByName, getShowsByStatus, getShowById } = require('./src/db/queries');
 const app = express();
 
 // Middleware
