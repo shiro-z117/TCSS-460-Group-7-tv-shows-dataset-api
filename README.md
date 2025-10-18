@@ -68,6 +68,22 @@ Queries return variable results Done!
 Sample data verified Done!
 
 ### Shiannel
+**Responsibilities:**
+- Created comprehensive Swagger/OpenAPI specification for Beta Sprint endpoints
+- Designed and developed an interactive API documentation website with Swagger UI
+- Set up GitHub Pages documentation structure in `/docs` folder
+- Documented all three implemented endpoints with request/response examples
+- Added query parameter validation and error response documentation
+- Created a quick start guide and usage examples for developers
+
+**Files Created:**
+- `docs/swagger.yaml` - Complete OpenAPI 3.0 specification for implemented endpoints
+- `docs/index.html` - Interactive documentation website with Swagger UI integration
+
+**Endpoints Documented:**
+- `GET /api/tvshows` - List all TV shows with pagination
+- `GET /api/tvshows/filter/year` - Filter the shows by year range
+- `GET /api/tvshows/random` - Gets 10 random TV shows
 
 ### Bao
 
@@ -91,6 +107,15 @@ Sample data verified Done!
 
 
 ### Shiannel
+**What Worked Well:**
+- Created comprehensive API documentation with implemented endpoints from group member
+- Swagger UI integration provides interactive testing capabilities
+- GitHub Pages deployed successfully, and documentation is live
+- Coordination with team members to understand API structure
+
+**Challenges:**
+- Initially did not have admin access to enable GitHub Pages (resolved with admin's help)
+- Learning new Swagger/OpenAPI specification syntax
 
 ### Bao
 
