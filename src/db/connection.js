@@ -6,12 +6,15 @@
 // Date: Oct 17, 2025
 
 // Import the 'pg' (PostgreSQL) library for database connections
-// This library lets us talk to PostgreSQL databases
-const { Pool } = require('pg');
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first'); // prefer IPv4 to avoid ENETUNREACH on Render
 
 // Import dotenv to read environment variables from .env file
 // This allows us to use DATABASE_URL from .env file
 require('dotenv').config();
+// This library lets us talk to PostgreSQL databases
+const { Pool } = require('pg');
+
 
 // ===================================================
 // CREATE DATABASE CONNECTION POOL
@@ -42,6 +45,16 @@ pool.on('error', (err) => {
   // console.error() prints the error message to the terminal
 });
 
+// Optional: basic connection test (logs once on boot)
+pool.connect()
+    .then(c => { console.log('✅ Connected to Supabase'); c.release(); })
+    .catch(err => console.error('❌ DB connect error:', err.message));
+
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+});
+
+module.exports = pool;
 // ===================================================
 // EXPORT THE POOL
 // ===================================================
