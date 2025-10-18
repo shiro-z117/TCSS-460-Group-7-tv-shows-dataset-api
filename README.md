@@ -21,6 +21,7 @@ Each member document:
 ---
 
 ## Beta Sprint Documentation
+Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 ---
 
 ## Beta Sprint Meetings
@@ -50,22 +51,28 @@ Location: Discord
 ### Patrick
 
 ### Linda Miao - Database & API Integration
-**Responsibilities:**
-- Set up Supabase PostgreSQL database with 11 tables
-- Created db/connection.js for secure database connections
-- Wrote 5 query functions in db/queries.js
-- Tested database connection and verified queries work
-- Populated sample data: 10 TV shows linked to genres
 
-**Files Created:**
-- db/connection.js
-- db/queries.js
-- .env (local only, not on GitHub)
+**Responsibilities:**
+- Set up Supabase database and created connection/query functions
+- Fixed IPv4/IPv6 compatibility issue using Session pooler
+- Created Express server with working API routes
+- Built and tested endpoints locally
+- Created Postman test collection
+
+**Files Created:** 
+- db/connection.js, db/queries.js
+- server.js - Express server with API routes
+- testing/postman/postman.json - Postman tests
 
 **Testing:**
-Connection works Done!
-Queries return variable results Done!
-Sample data verified Done!
+- All routes tested and return variable data 
+- Database queries working correctly 
+
+**Routes Implemented:**
+- `GET /health` - Health check endpoint
+- `GET /api/shows` - Returns all TV shows
+- `GET /api/shows/by-genre/:genre` - Filter shows by genre
+
 
 ### Shiannel
 **Responsibilities:**
@@ -97,14 +104,13 @@ Sample data verified Done!
 
 ### Linda Miao
 **Challenges:**
-- Did not clone GitHub repository initially
-- Setting up .env file: Understanding Supabase password and host information took time
-- Understanding full assignment scope was challenging
+- IPv4/IPv6 compatibility issue required research and testing
+- Infrastructure issues discovered through collaborative troubleshooting
 
 **Learning:**
-- Based on previous week's confusion about "contributions" vs "comments"
-- This week understood better: Contributions = what I created, Comments = process and meetings
-
+- Testing locally caught issues early
+- Team adapted quickly to problems
+- Session pooler solved the connection issue
 
 ### Shiannel
 **What Worked Well:**
