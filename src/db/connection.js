@@ -6,15 +6,14 @@
 // Date: Oct 17, 2025
 
 // Import the 'pg' (PostgreSQL) library for database connections
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first'); // prefer IPv4 to avoid ENETUNREACH on Render
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first"); // prefer IPv4 to avoid ENETUNREACH on Render
 
 // Import dotenv to read environment variables from .env file
 // This allows us to use DATABASE_URL from .env file
-require('dotenv').config();
+require("dotenv").config();
 // This library lets us talk to PostgreSQL databases
-const { Pool } = require('pg');
-
+const { Pool } = require("pg");
 
 // ===================================================
 // CREATE DATABASE CONNECTION POOL
@@ -26,11 +25,12 @@ const pool = new Pool({
   // connectionString: gets the database URL from .env file
   // Format: postgresql://username:password@host:port/database
   connectionString: process.env.DATABASE_URL,
-  
+
   // ssl: required for Supabase cloud databases
   // rejectUnauthorized: false allows self-signed certificates
   // (needed for secure connection to Supabase)
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  family: 4 // force IPv4
 });
 
 // ===================================================
@@ -39,19 +39,23 @@ const pool = new Pool({
 // This code runs if an error occurs with an idle database connection
 // It logs the error so we know something went wrong
 
-pool.on('error', (err) => {
+pool.on("error", (err) => {
   // 'err' is the error object that contains error information
-  console.error('Unexpected error on idle client', err);
+  console.error("Unexpected error on idle client", err);
   // console.error() prints the error message to the terminal
 });
 
 // Optional: basic connection test (logs once on boot)
-pool.connect()
-    .then(c => { console.log('✅ Connected to Supabase'); c.release(); })
-    .catch(err => console.error('❌ DB connect error:', err.message));
+pool
+  .connect()
+  .then((c) => {
+    console.log("✅ Connected to Supabase");
+    c.release();
+  })
+  .catch((err) => console.error("❌ DB connect error:", err.message));
 
-pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
 });
 
 module.exports = pool;
@@ -64,14 +68,12 @@ module.exports = pool;
 
 module.exports = pool;
 
-
-
 // EXPLANATION FOR TEAMMATES
-// module.exports = pool; 
+// module.exports = pool;
 // ```
-// **Analogy:** You're telling team (other files): 
-// "Here's the phone system you can use to take customer orders." 
-// When Patrick needs to query the database, 
+// **Analogy:** You're telling team (other files):
+// "Here's the phone system you can use to take customer orders."
+// When Patrick needs to query the database,
 // he imports this and uses the ready-to-use connection.
 
 // ---
