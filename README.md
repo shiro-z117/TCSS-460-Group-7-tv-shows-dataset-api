@@ -9,28 +9,26 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ---
 
 ## Beta Sprint Meetings
-- **Discussion 1**
-  Meeting time: Thursday, October 17, 2025
-  Time: 12:30 PM - 1:00 PM (30 minutes)
-  Location: Discord
-  - Roles for this week decided:
-    
-    Patrick: API Development (member 1)
-    
-    Linda: Database & Integration (Member 2)
-    
-    Coco: Documentation & GitHub Pages (member 3)
-    
-    Bao: Testing & Quality Assurance (member 4)
-    
-    Shiraz: Deployment & DevOps (member 5)
-    
-  - Decided deployment tool: Render
+### Discussion 1
+- **Date:** Thursday, October 17, 2025
+- **Time:** 12:30 PM - 1:00 PM (30 minutes)
+- **Location:** Discord
 
-- **Discussion 2**
-  Meeting time: Sunday, October 19, 2025
-  Time: 8:00 PM - XX:XX PM (X minutes)
-  Location: Discord
+**Roles assigned for this week:**
+- Patrick: API Development
+- Linda: Database & Integration
+- Coco: Documentation & GitHub Pages
+- Bao: Testing & Quality Assurance
+- Shiraz: Deployment & DevOps
+
+**Decisions made:**
+- Deployment tool: Render
+
+### Discussion 2
+- **Date:** Sunday, October 19, 2025
+- **Time:** 8:00 PM - X:XX PM (X minutes)
+- **Location:** Discord
+
 ---
 
 ## Beta Sprint Contributions
@@ -208,7 +206,7 @@ Wrote the Project Plan:
 - The document in its current form describes the complete API.
 - However, it the specifications only describe the essential functions that such an API should have.
 - Additional functions may be added later, if time permits. Therefore, the document (and final product) is subject to change.
-- 
+
 **Testing and review (Patrick Quaidoo)** 
 - Made Dataset doc outlining the different datatypes in the .csv.
 - Reviewed ER diagram and sql initialization script for accuracy.
