@@ -93,6 +93,16 @@ Location: Discord
 - `GET /api/tvshows/random` - Gets 10 random TV shows
 
 ### Bao
+**Responsibilities:**
+- Testing the endpoints of the API
+- Make sure the data return is correct
+- Making Postman collection for testing API endpoints
+- Create Readme file for the testing
+- Investigate the deployment issues on Render with other team members
+
+**Files Created:**
+- `testing/postman/postman.json` - JSON file to import the postman collection for testing
+- `testing/postman/README.md` - The readme file of postman testing collection
 
 ### Shiraz
 
@@ -124,6 +134,12 @@ Location: Discord
 - Learning new Swagger/OpenAPI specification syntax
 
 ### Bao
+- We had conflicts on the tasks between team member
+- The deployment had some issues that took time to fix
+- The test cases will need to be updated when the data is fully inserted in the database
+
+**Challenges:**
+- Testing task need to wait until the API is deployed
 
 ### Shiraz
 
