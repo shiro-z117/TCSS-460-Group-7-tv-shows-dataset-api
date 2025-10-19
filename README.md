@@ -4,35 +4,17 @@ Group Project for TCSS 460 @ UWT
 
 RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
 
-
-### Beta Sprint Contributions (What member created/did)
-Each member document:
-- Tasks completed
-- Files created
-- Key accomplishments
-- Testing results
-
-### Beta Sprint Comments (what we met: worked, challenges, notes)
-- What worked well
-- Challenges faced
-- Status of deliverables
-- Notes for next sprint
-  
----
-
-## Beta Sprint Documentation
 Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 
-**API Documentation:** https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
+Documentation: https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
 ---
 
 ## Beta Sprint Meetings
-Meeting time: Thursday, October 17, 2025
-Time: 12:30 PM - 1:00 PM (30 minutes)
-Location: Discord
-
-- **Discussion:**
-  - we contribution the role
+- **Discussion 1**
+  Meeting time: Thursday, October 17, 2025
+  Time: 12:30 PM - 1:00 PM (30 minutes)
+  Location: Discord
+  - Roles for this week decided:
     
     Patrick: API Development (member 1)
     
@@ -42,10 +24,14 @@ Location: Discord
     
     Bao: Testing & Quality Assurance (member 4)
     
-    Shiro: Deployment & DevOps (member 5)
+    Shiraz: Deployment & DevOps (member 5)
     
-  - Decided deployment tool: **Render**
-  - Next meeting: 8:00PM On Sunday
+  - Decided deployment tool: Render
+
+- **Discussion 2**
+  Meeting time: Sunday, October 19, 2025
+  Time: 8:00 PM - XX:XX PM (X minutes)
+  Location: Discord
 ---
 
 ## Beta Sprint Contributions
@@ -107,7 +93,10 @@ Location: Discord
 - `testing/postman/README.md` - The readme file of postman testing collection
 
 ### Shiraz
-
+**Responsibilities:**
+- Testing API endpoints
+- Deploying API to Render
+- Investigating deployment issues (failure to connect, IPv mismatch, etc)
 ---
 
 ## Beta Sprint Comments
@@ -144,7 +133,15 @@ Location: Discord
 - Testing task need to wait until the API is deployed
 
 ### Shiraz
+**Challenges:**
+- Successful deployment took several hours.
+- Codebase is kind of messy.
+  
+**Learning:**
+- The functions of different start commands.
+- How to implement and test endpoints. 
 
+---
 
 ## Alpha Sprint Contributions
 
