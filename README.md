@@ -2,7 +2,7 @@
 
 Group Project for TCSS 460 @ UWT  
 
-RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
+RESTful API for TV Shows Dataset providing access to comprehensive television show data including ratings, genre, cast, crew, producers, studios, and broadcasters.
 
 ### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 ### Documentation: https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
