@@ -22,6 +22,7 @@ Each member document:
 
 ## Beta Sprint Documentation
 Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
+
 **API Documentation:** https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
 ---
 
