@@ -158,7 +158,7 @@ Tests data integrity across the dataset:
 
 ## 📚 Available Genres
 
-Based on the sample data (`genres_rows.sql`), the following genres are available:
+Based on the sample data, the following genres are available:
 
 | Genre ID | Genre Name |
 |----------|------------|
@@ -182,7 +182,7 @@ Based on the sample data (`genres_rows.sql`), the following genres are available
 
 ## 📊 Sample TV Shows Data
 
-The API contains 10 TV shows (from `tv_shows_rows.sql`):
+The API contains 10 TV shows:
 
 | ID | Show Name | First Air Date | Seasons | Episodes | Status | Rating |
 |----|-----------|----------------|---------|----------|--------|--------|
@@ -197,7 +197,7 @@ The API contains 10 TV shows (from `tv_shows_rows.sql`):
 | 9 | Westworld | 2016-10-02 | 4 | 36 | Ended | 8.5 |
 | 10 | The Mandalorian | 2019-11-12 | 3 | 24 | Returning Series | 8.7 |
 
-**Genre Associations** (from `show_genres_rows.sql`):
+**Genre Associations**:
 - Breaking Bad: Drama
 - Game of Thrones: Drama, Animation
 - Stranger Things: Drama, Sci-Fi & Fantasy
