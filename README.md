@@ -17,7 +17,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 **Roles assigned for this week:**
 - Patrick: API Development
 - Linda: Database & Integration
-- Coco: Documentation & GitHub Pages
+- Shiannel: Documentation & GitHub Pages
 - Bao: Testing & Quality Assurance
 - Shiraz: Deployment & DevOps
 
