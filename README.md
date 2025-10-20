@@ -34,7 +34,9 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ## Beta Sprint Contributions
 
 ### Patrick
-
+- Completed 3 API endpoints
+- Connect API to Supabase database
+- Helped fix Pv4/IPv6 compatibility issue
 ### Linda Miao - Database & API Integration
 
 **Responsibilities:**
