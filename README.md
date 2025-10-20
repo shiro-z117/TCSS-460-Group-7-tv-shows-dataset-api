@@ -75,9 +75,9 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - `docs/index.html` - Interactive documentation website with Swagger UI integration
 
 **Endpoints Documented:**
-- `GET /api/tvshows` - List all TV shows with pagination
-- `GET /api/tvshows/filter/year` - Filter the shows by year range
-- `GET /api/tvshows/random` - Gets 10 random TV shows
+- `GET /health` - Health check endpoint to verify API status
+- `GET /api/shows` - Retrieve all TV shows from the dataset
+- `GET /api/shows/by-genre/{genre}` - Filter TV shows by specific genre (e.g., Drama)
 
 ### Bao
 **Responsibilities:**
