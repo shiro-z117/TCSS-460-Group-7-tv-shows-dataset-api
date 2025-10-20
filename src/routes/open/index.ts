@@ -2,8 +2,12 @@
 import { Router } from 'express';
 import { apiKeyAuth } from '../../core/middleware/apiKeyAuth';
 import { tvShowRoutes } from './tvShowRoutes';
+import { docsRoutes } from './docsRoutes';
 
 
 export const openRouter = Router();
 openRouter.use(tvShowRoutes);
-openRouter.use('/closed', apiKeyAuth, tvShowRoutes); // protected area
+
+openRouter.use(docsRoutes);
+
+openRouter.use('/api', tvShowRoutes);
