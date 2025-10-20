@@ -13,21 +13,22 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - **Date:** Thursday, October 17, 2025
 - **Time:** 12:30 PM - 1:00 PM (30 minutes)
 - **Location:** Discord
-
-**Roles assigned for this week:**
-- Patrick: API Development
-- Linda: Database & Integration
-- Shiannel: Documentation & GitHub Pages
-- Bao: Testing & Quality Assurance
-- Shiraz: Deployment & DevOps
-
-**Decisions made:**
-- Deployment tool: Render
+#### Actions:
+-Deployment tool decided: Render
+- Assigned roles for this week:
+- - Patrick: API Development
+- - Linda: Database & Integration
+- - Shiannel: Documentation & GitHub Pages
+- - Bao: Testing & Quality Assurance
+- - Shiraz: Deployment & DevOps
 
 ### Discussion 2
 - **Date:** Sunday, October 19, 2025
-- **Time:** 8:00 PM - X:XX PM (X minutes)
+- **Time:** 8:00 PM - 9:15 PM (75 minutes)
 - **Location:** Discord
+#### Actions:
+- Fixed /api-docs endpoint
+- Planned ahead for Beta Sprint II
 
 ---
 
