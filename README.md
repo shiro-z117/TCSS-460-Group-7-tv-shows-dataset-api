@@ -2,47 +2,33 @@
 
 Group Project for TCSS 460 @ UWT  
 
-RESTful API for TV Shows Dataset providing access to comprehensive television show data including cast, crew, production companies, and ratings.
+RESTful API for TV Shows Dataset providing access to comprehensive television show data including ratings, genre, cast, crew, producers, studios, and broadcasters.
 
-
-### Beta Sprint Contributions (What member created/did)
-Each member document:
-- Tasks completed
-- Files created
-- Key accomplishments
-- Testing results
-
-### Beta Sprint Comments (what we met: worked, challenges, notes)
-- What worked well
-- Challenges faced
-- Status of deliverables
-- Notes for next sprint
-  
----
-
-## Beta Sprint Documentation
+### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
+### Documentation: https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
 ---
 
 ## Beta Sprint Meetings
-Meeting time: Thursday, October 17, 2025
-Time: 12:30 PM - 1:00 PM (30 minutes)
-Location: Discord
+### Discussion 1
+- **Date:** Thursday, October 17, 2025
+- **Time:** 12:30 PM - 1:00 PM (30 minutes)
+- **Location:** Discord
 
-- **Discussion:**
-  - we contribution the role
-    
-    Patrick: API Development (member 1)
-    
-    Linda: Database & Integration (Member 2)
-    
-    Coco: Documentation & GitHub Pages (member 3)
-    
-    Bao: Testing & Quality Assurance (member 4)
-    
-    Shiro: Deployment & DevOps (member 5)
-    
-  - Decided deployment tool: **Render**
-  - Next meeting: 8:00PM On Sunday
+**Roles assigned for this week:**
+- Patrick: API Development
+- Linda: Database & Integration
+- Coco: Documentation & GitHub Pages
+- Bao: Testing & Quality Assurance
+- Shiraz: Deployment & DevOps
+
+**Decisions made:**
+- Deployment tool: Render
+
+### Discussion 2
+- **Date:** Sunday, October 19, 2025
+- **Time:** 8:00 PM - X:XX PM (X minutes)
+- **Location:** Discord
+
 ---
 
 ## Beta Sprint Contributions
@@ -50,22 +36,28 @@ Location: Discord
 ### Patrick
 
 ### Linda Miao - Database & API Integration
-**Responsibilities:**
-- Set up Supabase PostgreSQL database with 11 tables
-- Created db/connection.js for secure database connections
-- Wrote 5 query functions in db/queries.js
-- Tested database connection and verified queries work
-- Populated sample data: 10 TV shows linked to genres
 
-**Files Created:**
-- db/connection.js
-- db/queries.js
-- .env (local only, not on GitHub)
+**Responsibilities:**
+- Set up Supabase database and created connection/query functions
+- Fixed IPv4/IPv6 compatibility issue using Session pooler
+- Created Express server with working API routes
+- Built and tested endpoints locally
+- Created Postman test collection
+
+**Files Created:** 
+- db/connection.js, db/queries.js
+- server.js - Express server with API routes
+- testing/postman/postman.json - Postman tests
 
 **Testing:**
-Connection works Done!
-Queries return variable results Done!
-Sample data verified Done!
+- All routes tested and return variable data 
+- Database queries working correctly 
+
+**Routes Implemented:**
+- `GET /health` - Health check endpoint
+- `GET /api/shows` - Returns all TV shows
+- `GET /api/shows/by-genre/:genre` - Filter shows by genre
+
 
 ### Shiannel
 **Responsibilities:**
@@ -86,9 +78,22 @@ Sample data verified Done!
 - `GET /api/tvshows/random` - Gets 10 random TV shows
 
 ### Bao
+**Responsibilities:**
+- Testing the endpoints of the API
+- Make sure the data return is correct
+- Making Postman collection for testing API endpoints
+- Create Readme file for the testing
+- Investigate the deployment issues on Render with other team members
+
+**Files Created:**
+- `testing/postman/postman.json` - JSON file to import the postman collection for testing
+- `testing/postman/README.md` - The readme file of postman testing collection
 
 ### Shiraz
-
+**Responsibilities:**
+- Testing API endpoints
+- Deploying API to Render
+- Investigating deployment issues (failure to connect, IPv mismatch, etc)
 ---
 
 ## Beta Sprint Comments
@@ -97,14 +102,13 @@ Sample data verified Done!
 
 ### Linda Miao
 **Challenges:**
-- Did not clone GitHub repository initially
-- Setting up .env file: Understanding Supabase password and host information took time
-- Understanding full assignment scope was challenging
+- IPv4/IPv6 compatibility issue required research and testing
+- Infrastructure issues discovered through collaborative troubleshooting
 
 **Learning:**
-- Based on previous week's confusion about "contributions" vs "comments"
-- This week understood better: Contributions = what I created, Comments = process and meetings
-
+- Testing locally caught issues early
+- Team adapted quickly to problems
+- Session pooler solved the connection issue
 
 ### Shiannel
 **What Worked Well:**
@@ -118,9 +122,23 @@ Sample data verified Done!
 - Learning new Swagger/OpenAPI specification syntax
 
 ### Bao
+- We had conflicts on the tasks between team member
+- The deployment had some issues that took time to fix
+- The test cases will need to be updated when the data is fully inserted in the database
+
+**Challenges:**
+- Testing task need to wait until the API is deployed
 
 ### Shiraz
+**Challenges:**
+- Successful deployment took several hours.
+- Codebase is kind of messy.
+  
+**Learning:**
+- The functions of different start commands.
+- How to implement and test endpoints. 
 
+---
 
 ## Alpha Sprint Contributions
 
@@ -188,7 +206,7 @@ Wrote the Project Plan:
 - The document in its current form describes the complete API.
 - However, it the specifications only describe the essential functions that such an API should have.
 - Additional functions may be added later, if time permits. Therefore, the document (and final product) is subject to change.
-- 
+
 **Testing and review (Patrick Quaidoo)** 
 - Made Dataset doc outlining the different datatypes in the .csv.
 - Reviewed ER diagram and sql initialization script for accuracy.
