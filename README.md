@@ -6,6 +6,55 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 ### Documentation: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs
+
+---
+
+## Beta Ⅱ Sprint Contributions
+### Patrick
+
+### Linda Miao - Database & API Integration
+### What Was Completed
+- Imported 7,382 TV shows from professor's CSV file (100% of data)
+- Created normalized database schema matching ER diagram
+- Extracted and populated reference tables:
+  - Genres: 18 unique
+  - Creators: 5,628 unique
+  - Networks: 466 unique
+  - Studios: 5,930 unique
+  - Actors: 35,915 unique
+- All data cleaned, validated, and type-converted
+- Database is production-ready for API development
+
+### Testing Instructions
+See SQL queries above in this document for how to verify the data.
+
+### Shiannel
+
+### Shiraz
+
+### Bao
+---
+
+## Beta Sprint Comments
+
+### Patrick
+
+### Linda Miao - Database & API Integration
+### Known Issues
+- Relationship table population (show_genres, show_cast, etc.) needs final sync
+- This is non-blocking - all data remains accessible via direct queries
+
+### How to Verify
+Run these SQL queries in Supabase to test:
+- `SELECT COUNT(*) FROM tv_shows;` → Should return 7,382
+- `SELECT COUNT(*) FROM genres;` → Should return 18
+- `SELECT * FROM tv_shows LIMIT 10;` → View sample data
+### Shiannel
+
+### Shiraz
+
+### Bao
+
 ---
 
 ## Beta Sprint Meetings
