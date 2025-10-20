@@ -64,6 +64,110 @@
 			"description": "Health monitoring endpoint for API availability checking."
 		},
 		{
+			"name": "API Documentation",
+			"item": [
+				{
+					"name": "GET API Documentation Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing API documentation endpoint",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Content-Type is HTML', function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/html');",
+									"});",
+									"",
+									"pm.test('Response contains Swagger UI', function () {",
+									"    pm.expect(pm.response.text()).to.include('swagger-ui');",
+									"});",
+									"",
+									"pm.test('Response contains API title', function () {",
+									"    pm.expect(pm.response.text()).to.include('TV Shows API');",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-docs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-docs"
+							]
+						},
+						"description": "Retrieves the API documentation page with Swagger UI."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Swagger YAML Specification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing Swagger YAML endpoint",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Content-Type is YAML', function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/yaml');",
+									"});",
+									"",
+									"pm.test('Response contains OpenAPI specification', function () {",
+									"    pm.expect(pm.response.text()).to.include('openapi:');",
+									"});",
+									"",
+									"pm.test('Response contains API info', function () {",
+									"    const yamlText = pm.response.text();",
+									"    pm.expect(yamlText).to.include('title: TV Shows API');",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-docs/swagger.yaml",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-docs",
+								"swagger.yaml"
+							]
+						},
+						"description": "Retrieves the raw OpenAPI/Swagger YAML specification file."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for the API documentation endpoints."
+		},
+		{
 			"name": "TV Shows - List",
 			"item": [
 				{
