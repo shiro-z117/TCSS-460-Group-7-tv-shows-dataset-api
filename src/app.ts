@@ -1,19 +1,19 @@
-// app.ts
+// src/app.ts
+import path from 'path'
 import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import morgan from 'morgan';
-import { openRouter } from './routes/open';
+import { tvShowRoutes } from './routes/open/tvShowRoutes';
+import { docsRoutes } from './routes/open/docsRoutes';
 
 const app = express();
-app.use(helmet());
-app.use(cors());
 app.use(express.json());
-app.use(morgan('dev'));
 
-app.get('/healthz', (_req, res) => res.json({ status: 'ok' }));
-app.get('/readyz', (_req, res) => res.json({ status: 'ready' }));
 
-app.use('/api', openRouter);
+// Health (GET /health)
+app.get('/health', (_req, res) => res.json({ status: 'API is running' }));
+app.use(docsRoutes, express.static(path.join(__dirname, './docs')));
+
+// Mount open routes
+app.use('/api', tvShowRoutes);
+
 
 export default app;

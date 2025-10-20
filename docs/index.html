@@ -224,66 +224,58 @@
 
     <div class="info-section">
         <div class="api-url">
-            🔗 Production API: <a href="https://YOUR-RENDER-URL.onrender.com" target="_blank">https://YOUR-RENDER-URL.onrender.com</a>
+            🔗 Live API: <a href="https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com" target="_blank">https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com</a>
         </div>
 
         <div class="quick-start">
             <h2>🚀 Quick Start Guide</h2>
             
             <h3>Base URL</h3>
-            <p><strong>Production:</strong> <code>https://YOUR-RENDER-URL.onrender.com/api</code></p>
-            <p><strong>Local Development:</strong> <code>http://localhost:3000/api</code></p>
+            <p><strong>Production:</strong> <code>https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com</code></p>
+            <p><strong>Local Development:</strong> <code>http://localhost:3000</code></p>
             
             <h3>Getting Started</h3>
             <ol>
                 <li>No authentication required for Beta Sprint</li>
-                <li>All endpoints return JSON responses with <code>success</code> field</li>
-                <li>Pagination is supported on list endpoints</li>
+                <li>All endpoints return JSON responses</li>
+                <li>Health check endpoint available for monitoring</li>
                 <li>Use the interactive documentation below to test endpoints</li>
             </ol>
 
             <h3>Example Request</h3>
-            <pre><code>curl https://YOUR-RENDER-URL.onrender.com/api/tvshows?page=1&limit=10</code></pre>
+            <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows</code></pre>
             
             <h3>Example Response</h3>
-            <pre><code>{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Breaking Bad",
-      "first_air_date": "2008-01-20",
-      "seasons": 5,
-      "tmdb_rating": 9.3
-    }
-  ],
-  "pagination": {
-    "current_page": 1,
-    "per_page": 10,
-    "total_items": 150,
-    "total_pages": 15
+            <pre><code>[
+  {
+    "id": 1,
+    "name": "Breaking Bad",
+    "genres": "Drama, Crime, Thriller",
+    "first_air_date": "2008-01-20",
+    "seasons": 5,
+    "tmdb_rating": 9.3
   }
-}</code></pre>
+]</code></pre>
         </div>
 
         <div class="quick-start">
             <h2>✨ API Features</h2>
             <div class="feature-grid">
                 <div class="feature-box">
-                    <h4>📄 Pagination</h4>
-                    <p>Efficient data retrieval with customizable page sizes (1-100 items)</p>
+                    <h4>🏥 Health Check</h4>
+                    <p>Monitor API status and uptime</p>
                 </div>
                 <div class="feature-box">
-                    <h4>🔍 Year Filtering</h4>
-                    <p>Search shows by air date year range</p>
+                    <h4>📋 All Shows</h4>
+                    <p>Retrieve complete TV shows database</p>
                 </div>
                 <div class="feature-box">
-                    <h4>🎲 Random Discovery</h4>
-                    <p>Get 10 random shows for recommendations</p>
+                    <h4>🔍 Genre Filtering</h4>
+                    <p>Find shows by specific genres</p>
                 </div>
                 <div class="feature-box">
                     <h4>⚡ Fast Performance</h4>
-                    <p>Optimized database queries with PostgreSQL</p>
+                    <p>Optimized queries with PostgreSQL</p>
                 </div>
             </div>
         </div>
@@ -294,59 +286,47 @@
             <div class="endpoint-card">
                 <h3>
                     <span class="method">GET</span>
-                    <span class="path">/api/tvshows</span>
+                    <span class="path">/health</span>
                 </h3>
-                <p><strong>Description:</strong> Retrieve all TV shows with pagination support</p>
-                <p><strong>Query Parameters:</strong></p>
-                <ul>
-                    <li><code>page</code> (optional, default: 1) - Page number</li>
-                    <li><code>limit</code> (optional, default: 20, max: 100) - Items per page</li>
-                </ul>
-                <p><strong>Example:</strong> <code>/api/tvshows?page=1&limit=20</code></p>
+                <p><strong>Description:</strong> Health check endpoint to verify API is running</p>
+                <p><strong>Response:</strong> Returns API status</p>
+                <p><strong>Example:</strong></p>
+                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/health</code></pre>
+                <p><strong>Response:</strong></p>
+                <pre><code>{
+  "status": "healthy",
+  "message": "API is running"
+}</code></pre>
             </div>
 
             <div class="endpoint-card">
                 <h3>
                     <span class="method">GET</span>
-                    <span class="path">/api/tvshows/filter/year</span>
+                    <span class="path">/api/shows</span>
                 </h3>
-                <p><strong>Description:</strong> Filter TV shows by year range (first air date)</p>
-                <p><strong>Query Parameters:</strong></p>
-                <ul>
-                    <li><code>start_year</code> (required) - Starting year (inclusive)</li>
-                    <li><code>end_year</code> (required) - Ending year (inclusive)</li>
-                    <li><code>page</code> (optional) - Page number</li>
-                    <li><code>limit</code> (optional) - Items per page</li>
-                </ul>
-                <p><strong>Example:</strong> <code>/api/tvshows/filter/year?start_year=2008&end_year=2013</code></p>
+                <p><strong>Description:</strong> Retrieve all TV shows from the database</p>
+                <p><strong>Returns:</strong> Array of TV show objects</p>
+                <p><strong>Example:</strong></p>
+                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows</code></pre>
             </div>
 
             <div class="endpoint-card">
                 <h3>
                     <span class="method">GET</span>
-                    <span class="path">/api/tvshows/random</span>
+                    <span class="path">/api/shows/by-genre/{genre}</span>
                 </h3>
-                <p><strong>Description:</strong> Get 10 randomly selected TV shows</p>
-                <p><strong>Query Parameters:</strong> None</p>
-                <p><strong>Example:</strong> <code>/api/tvshows/random</code></p>
+                <p><strong>Description:</strong> Filter TV shows by genre</p>
+                <p><strong>Path Parameter:</strong> <code>genre</code> - The genre to filter by (e.g., Drama, Comedy, Action)</p>
+                <p><strong>Example:</strong></p>
+                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows/by-genre/Drama</code></pre>
+                <p><strong>Common Genres:</strong> Drama, Comedy, Action, Sci-Fi, Horror, Thriller, Romance, Crime</p>
             </div>
         </div>
 
         <div class="quick-start">
             <h2>📊 Response Format</h2>
-            <p>All successful responses follow this structure:</p>
-            <pre><code>{
-  "success": true,
-  "data": [...],           // Array of TV shows
-  "pagination": {          // Only on paginated endpoints
-    "current_page": 1,
-    "per_page": 20,
-    "total_items": 150,
-    "total_pages": 8
-  }
-}</code></pre>
-
-            <h3>TV Show Object Schema</h3>
+            
+            <h3>TV Show Object</h3>
             <pre><code>{
   "id": 1,
   "name": "Breaking Bad",
@@ -356,7 +336,7 @@
   "seasons": 5,
   "episodes": 62,
   "status": "Ended",
-  "genres": ["Drama", "Crime"],
+  "genres": "Drama, Crime, Thriller",
   "overview": "A high school chemistry teacher...",
   "popularity": 234.5,
   "tmdb_rating": 9.3,
@@ -366,17 +346,16 @@
 
         <div class="quick-start">
             <h2>⚠️ Error Responses</h2>
-            <p>Errors return with appropriate HTTP status codes:</p>
+            <p>If something goes wrong, the API returns an error:</p>
             <pre><code>{
-  "success": false,
-  "error": "Bad Request",
-  "message": "start_year and end_year are required"
+  "error": "Genre not found",
+  "message": "No TV shows found for the specified genre"
 }</code></pre>
 
             <h3>Common Status Codes</h3>
             <ul>
                 <li><code>200 OK</code> - Request successful</li>
-                <li><code>400 Bad Request</code> - Invalid parameters</li>
+                <li><code>404 Not Found</code> - Resource not found</li>
                 <li><code>500 Internal Server Error</code> - Server error</li>
             </ul>
         </div>
@@ -384,11 +363,10 @@
         <div class="quick-start">
             <h2>💡 Usage Tips</h2>
             <ul>
-                <li>Use pagination to avoid loading too much data at once</li>
-                <li>Year filtering is great for discovering shows from specific eras</li>
-                <li>Random endpoint is perfect for "surprise me" features</li>
-                <li>All responses include <code>success</code> field for easy error checking</li>
-                <li>Check the interactive documentation below to test endpoints live!</li>
+                <li>Use the health endpoint to check if the API is up before making requests</li>
+                <li>Genre filtering is case-sensitive (use "Drama" not "drama")</li>
+                <li>The API returns all shows at once (no pagination in Beta Sprint)</li>
+                <li>Try the interactive documentation below to test endpoints live!</li>
             </ul>
         </div>
     </div>
