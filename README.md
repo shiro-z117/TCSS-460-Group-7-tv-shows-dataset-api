@@ -31,6 +31,8 @@ See SQL queries above in this document for how to verify the data.
 ### Shiannel
 
 ### Shiraz
+- Imported all remaining data to tables on Supabase
+- Implemented junction tables to handle relationships between rows on different tables
 
 ### Bao
 ---
@@ -52,6 +54,7 @@ Run these SQL queries in Supabase to test:
 ### Shiannel
 
 ### Shiraz
+
 
 ### Bao
 
