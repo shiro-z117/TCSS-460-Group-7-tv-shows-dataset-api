@@ -9,6 +9,38 @@ export async function list(_req: Request, res: Response, next: NextFunction) {
     } catch (err) { next(err); }
 }
 
+export async function getShows(req: Request, res: Response, next: NextFunction) {
+    try {
+        const filters = {
+            q: req.query.q as string,
+            genre: req.query.genre as string,
+            network: req.query.network as string,
+            status: req.query.status as string,
+            studio: req.query.studio as string,
+            actor: req.query.actor as string,
+            genre_id: req.query.genre_id as string,
+            network_id: req.query.network_id as string,
+            studio_id: req.query.studio_id as string,
+            actor_id: req.query.actor_id as string,
+            match: req.query.match as string || 'all',
+            page: parseInt(req.query.page as string) || 1,
+            limit: parseInt(req.query.limit as string) || 20,
+            sort: req.query.sort as string || 'id',
+            order: req.query.order as string || 'asc'
+        };
+
+        const { shows, total, page, limit } = await db.getShows(filters);
+
+        res.json({
+            success: true,
+            data: shows,
+            page,
+            limit,
+            total
+        });
+    } catch (err) { next(err); }
+}
+
 export async function getByGenre(req: Request, res: Response, next: NextFunction) {
     try {
         const data = await db.getShowsByGenre(req.params.genre);

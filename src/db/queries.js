@@ -223,6 +223,203 @@ const getStatuses = async () => {
 };
 
 // ===================================================
+// QUERY 10: ADVANCED SHOW SEARCH WITH FILTERS, PAGINATION, AND SORTING
+// ===================================================
+const getShows = async (filters = {}) => {
+    try {
+        const {
+            q = '',
+            genre = '',
+            network = '',
+            status = '',
+            studio = '',
+            actor = '',
+            genre_id = '',
+            network_id = '',
+            studio_id = '',
+            actor_id = '',
+            match = 'all', // 'all' or 'any'
+            page = 1,
+            limit = 20,
+            sort = 'id',
+            order = 'asc'
+        } = filters;
+
+        const offset = (page - 1) * limit;
+        const params = [];
+        let paramIndex = 1;
+
+        // Build WHERE conditions
+        const conditions = [];
+
+        // Search query (matches name or original_name)
+        if (q) {
+            params.push(`%${q}%`);
+            conditions.push(`(tv.name ILIKE $${paramIndex} OR tv.original_name ILIKE $${paramIndex})`);
+            paramIndex++;
+        }
+
+        // Status filter (exact match)
+        if (status) {
+            params.push(status);
+            conditions.push(`tv.status = $${paramIndex}`);
+            paramIndex++;
+        }
+
+        // Genre filter (name-based or ID-based)
+        if (genre || genre_id) {
+            const genreValues = genre_id ? genre_id.split(',').map(g => g.trim()) : genre.split(',').map(g => g.trim());
+            const isIdBased = !!genre_id;
+
+            if (isIdBased) {
+                const genrePlaceholders = genreValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sg.tv_show_id FROM show_genres sg
+                    WHERE sg.genre_id IN (${genrePlaceholders})
+                )`);
+                params.push(...genreValues);
+                paramIndex += genreValues.length;
+            } else {
+                const genrePlaceholders = genreValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sg.tv_show_id FROM show_genres sg
+                    JOIN genres g ON sg.genre_id = g.id
+                    WHERE g.genre_name IN (${genrePlaceholders})
+                )`);
+                params.push(...genreValues);
+                paramIndex += genreValues.length;
+            }
+        }
+
+        // Network filter (name-based or ID-based)
+        if (network || network_id) {
+            const networkValues = network_id ? network_id.split(',').map(n => n.trim()) : network.split(',').map(n => n.trim());
+            const isIdBased = !!network_id;
+
+            if (isIdBased) {
+                const networkPlaceholders = networkValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sn.tv_show_id FROM show_networks sn
+                    WHERE sn.network_id IN (${networkPlaceholders})
+                )`);
+                params.push(...networkValues);
+                paramIndex += networkValues.length;
+            } else {
+                const networkPlaceholders = networkValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sn.tv_show_id FROM show_networks sn
+                    JOIN networks n ON sn.network_id = n.id
+                    WHERE n.network_name IN (${networkPlaceholders})
+                )`);
+                params.push(...networkValues);
+                paramIndex += networkValues.length;
+            }
+        }
+
+        // Studio filter (name-based or ID-based)
+        if (studio || studio_id) {
+            const studioValues = studio_id ? studio_id.split(',').map(s => s.trim()) : studio.split(',').map(s => s.trim());
+            const isIdBased = !!studio_id;
+
+            if (isIdBased) {
+                const studioPlaceholders = studioValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT ss.tv_show_id FROM show_studios ss
+                    WHERE ss.studio_id IN (${studioPlaceholders})
+                )`);
+                params.push(...studioValues);
+                paramIndex += studioValues.length;
+            } else {
+                const studioPlaceholders = studioValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT ss.tv_show_id FROM show_studios ss
+                    JOIN studios s ON ss.studio_id = s.id
+                    WHERE s.studio_name IN (${studioPlaceholders})
+                )`);
+                params.push(...studioValues);
+                paramIndex += studioValues.length;
+            }
+        }
+
+        // Actor filter (name-based or ID-based)
+        if (actor || actor_id) {
+            const actorValues = actor_id ? actor_id.split(',').map(a => a.trim()) : actor.split(',').map(a => a.trim());
+            const isIdBased = !!actor_id;
+
+            if (isIdBased) {
+                const actorPlaceholders = actorValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sa.tv_show_id FROM show_actors sa
+                    WHERE sa.actor_id IN (${actorPlaceholders})
+                )`);
+                params.push(...actorValues);
+                paramIndex += actorValues.length;
+            } else {
+                const actorPlaceholders = actorValues.map((_, i) => `$${paramIndex + i}`).join(',');
+                conditions.push(`tv.id IN (
+                    SELECT sa.tv_show_id FROM show_actors sa
+                    JOIN actors a ON sa.actor_id = a.id
+                    WHERE a.actor_name IN (${actorPlaceholders})
+                )`);
+                params.push(...actorValues);
+                paramIndex += actorValues.length;
+            }
+        }
+
+        // Build WHERE clause based on match logic
+        let whereClause = '';
+        if (conditions.length > 0) {
+            const connector = match === 'any' ? ' OR ' : ' AND ';
+            whereClause = `WHERE ${conditions.join(connector)}`;
+        }
+
+        // Validate and build ORDER BY clause
+        const validSortFields = {
+            'id': 'tv.id',
+            'title': 'tv.name',
+            'popularity': 'tv.popularity',
+            'rating': 'tv.tmdb_rating',
+            'first_air_date': 'tv.first_air_date',
+            'last_air_date': 'tv.last_air_date',
+            'episodes': 'tv.episodes'
+        };
+        const sortField = validSortFields[sort] || 'tv.id';
+        const sortOrder = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+        const orderByClause = `ORDER BY ${sortField} ${sortOrder}`;
+
+        // Get total count
+        const countQuery = `
+            SELECT COUNT(DISTINCT tv.id) as total
+            FROM tv_shows tv
+            ${whereClause}
+        `;
+        const countResult = await pool.query(countQuery, params);
+        const total = parseInt(countResult.rows[0].total);
+
+        // Get paginated data
+        params.push(limit, offset);
+        const dataQuery = `
+            SELECT DISTINCT tv.*
+            FROM tv_shows tv
+            ${whereClause}
+            ${orderByClause}
+            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+        `;
+        const dataResult = await pool.query(dataQuery, params);
+
+        return {
+            shows: dataResult.rows,
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        };
+    } catch (error) {
+        console.error('Database error in getShows:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -235,4 +432,5 @@ module.exports = {
     getGenres,
     getNetworks,
     getStatuses,
+    getShows,
 };
