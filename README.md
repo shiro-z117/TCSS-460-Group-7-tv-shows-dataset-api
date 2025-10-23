@@ -5,7 +5,56 @@ Group Project for TCSS 460 @ UWT
 RESTful API for TV Shows Dataset providing access to comprehensive television show data including ratings, genre, cast, crew, producers, studios, and broadcasters.
 
 ### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
-### Documentation: https://shiro-z117.github.io/TCSS-460-Group-7-tv-shows-dataset-api/
+### Documentation: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs
+
+---
+
+## Beta Ⅱ Sprint Contributions
+### Patrick
+
+### Linda Miao - Database & API Integration
+### What Was Completed
+- Imported 7,382 TV shows from professor's CSV file (100% of data)
+- Created normalized database schema matching ER diagram
+- Extracted and populated reference tables:
+  - Genres: 18 unique
+  - Creators: 5,628 unique
+  - Networks: 466 unique
+  - Studios: 5,930 unique
+  - Actors: 35,915 unique
+- All data cleaned, validated, and type-converted
+- Database is production-ready for API development
+
+### Testing Instructions
+See SQL queries above in this document for how to verify the data.
+
+### Shiannel
+
+### Shiraz
+
+### Bao
+---
+
+## Beta Sprint Comments
+
+### Patrick
+
+### Linda Miao - Database & API Integration
+### Known Issues
+- Relationship table population (show_genres, show_cast, etc.) needs final sync
+- This is non-blocking - all data remains accessible via direct queries
+
+### How to Verify
+Run these SQL queries in Supabase to test:
+- `SELECT COUNT(*) FROM tv_shows;` → Should return 7,382
+- `SELECT COUNT(*) FROM genres;` → Should return 18
+- `SELECT * FROM tv_shows LIMIT 10;` → View sample data
+### Shiannel
+
+### Shiraz
+
+### Bao
+
 ---
 
 ## Beta Sprint Meetings
@@ -13,28 +62,31 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - **Date:** Thursday, October 17, 2025
 - **Time:** 12:30 PM - 1:00 PM (30 minutes)
 - **Location:** Discord
-
-**Roles assigned for this week:**
-- Patrick: API Development
-- Linda: Database & Integration
-- Coco: Documentation & GitHub Pages
-- Bao: Testing & Quality Assurance
-- Shiraz: Deployment & DevOps
-
-**Decisions made:**
-- Deployment tool: Render
+#### Actions:
+-Deployment tool decided: Render
+- Assigned roles for this week:
+- - Patrick: API Development
+- - Linda: Database & Integration
+- - Shiannel: Documentation & GitHub Pages
+- - Bao: Testing & Quality Assurance
+- - Shiraz: Deployment & DevOps
 
 ### Discussion 2
 - **Date:** Sunday, October 19, 2025
-- **Time:** 8:00 PM - X:XX PM (X minutes)
+- **Time:** 8:00 PM - 9:15 PM (75 minutes)
 - **Location:** Discord
+#### Actions:
+- Fixed /api-docs endpoint
+- Planned ahead for Beta Sprint II
 
 ---
 
 ## Beta Sprint Contributions
 
 ### Patrick
-
+- Completed 3 API endpoints
+- Connect API to Supabase database
+- Helped fix Pv4/IPv6 compatibility issue
 ### Linda Miao - Database & API Integration
 
 **Responsibilities:**
@@ -73,9 +125,9 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - `docs/index.html` - Interactive documentation website with Swagger UI integration
 
 **Endpoints Documented:**
-- `GET /api/tvshows` - List all TV shows with pagination
-- `GET /api/tvshows/filter/year` - Filter the shows by year range
-- `GET /api/tvshows/random` - Gets 10 random TV shows
+- `GET /health` - Health check endpoint to verify API status
+- `GET /api/shows` - Retrieve all TV shows from the dataset
+- `GET /api/shows/by-genre/{genre}` - Filter TV shows by specific genre (e.g., Drama)
 
 ### Bao
 **Responsibilities:**

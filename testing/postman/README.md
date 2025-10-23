@@ -6,11 +6,12 @@ Comprehensive Postman collection for testing the TCSS-460 TV Shows Dataset API. 
 
 ### **Test Categories:**
 - ✅ **Health Check** - API availability monitoring (1 request)
+- ✅ **API Documentation** - Documentation endpoints (2 requests)
 - ✅ **TV Shows List** - Show retrieval (1 request)
 - ✅ **Genre Filtering** - Filter shows by genre (5 requests)
 - ✅ **Data Validation** - Sample data verification and integrity checks (3 requests)
 
-### **Total Test Cases:** 10 requests with 45+ individual test assertions
+### **Total Test Cases:** 12 requests with 55+ individual test assertions
 
 ## 🌐 Live API Information
 
@@ -66,7 +67,43 @@ Tests basic API availability:
 }
 ```
 
-### **2. TV Shows List**
+### **2. API Documentation**
+
+**Endpoint:** `GET /api-docs`
+
+Retrieves the interactive API documentation page with Swagger UI:
+- Full HTML documentation page
+- Interactive endpoint testing
+- OpenAPI specification viewer
+- Comprehensive API reference
+
+**Browser Access:** Open `https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs` in your browser
+
+**Endpoint:** `GET /api-docs/swagger.yaml`
+
+Retrieves the raw OpenAPI/Swagger YAML specification:
+- Machine-readable API specification
+- OpenAPI 3.0 format
+- Complete endpoint definitions
+- Schema documentation
+
+**Sample Response (YAML):**
+```yaml
+openapi: 3.0.0
+info:
+  title: TV Shows API
+  description: API for querying TV shows dataset
+  version: 1.0.0
+servers:
+  - url: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      ...
+```
+
+### **3. TV Shows List**
 
 **Endpoint:** `GET /api/shows`
 
@@ -104,7 +141,7 @@ Tests show retrieval:
 - Data types are correct
 - Response time is acceptable
 
-### **3. Filter by Genre**
+### **4. Filter by Genre**
 
 **Endpoint:** `GET /api/shows/by-genre/{genreName}`
 
@@ -147,7 +184,7 @@ Tests genre-based filtering:
 - Empty array for non-existent genres
 - Response structure consistency
 
-### **4. Data Validation**
+### **5. Data Validation**
 
 Tests data integrity across the dataset:
 - **Breaking Bad Verification**: Confirms 5 seasons, 62 episodes, first aired in 2008
@@ -251,10 +288,11 @@ With the live API:
 | Test Category | Requests | Test Assertions | Expected Result |
 |---------------|----------|-----------------|-----------------|
 | Health Check | 1 | ~5 tests | ✅ All Pass |
+| API Documentation | 2 | ~10 tests | ✅ All Pass |
 | TV Shows List | 1 | ~5 tests | ✅ All Pass |
 | Genre Filtering | 5 | ~20 tests | ✅ All Pass |
 | Data Validation | 3 | ~15 tests | ✅ All Pass |
-| **TOTAL** | **10** | **~45 tests** | **✅ All Pass** |
+| **TOTAL** | **12** | **~55 tests** | **✅ All Pass** |
 
 ### **Understanding Test Results**
 
@@ -392,7 +430,6 @@ jobs:
 This collection demonstrates:
 - **RESTful API Design**: Proper use of HTTP GET method and status codes
 - **Resource Filtering**: Genre-based filtering with clean URL structure
-- **Pagination Support**: Optional page and limit parameters
 - **Consistent Responses**: Uniform `{success, data}` structure
 - **Error Handling**: Graceful handling of invalid genres (empty array, not 404)
 - **Data Validation**: Comprehensive assertions for data integrity
@@ -403,11 +440,11 @@ This collection demonstrates:
 
 1. **Consistent Response Format**:
    ```json
-   {
-     "success": true,
-     "data": [...]
-   }
-   ```
+{
+  "success": true,
+  "data": ["..."]
+}
+```
 
 2. **Descriptive Endpoints**:
    - `/health` - Clear health check
@@ -430,6 +467,24 @@ Health check endpoint
   "status": "API is running"
 }
 ```
+
+### **GET /api-docs**
+Retrieve interactive API documentation page
+
+**Response:**
+- HTML page with Swagger UI interface
+- Interactive endpoint testing
+- Complete API reference documentation
+
+**Browser Access:** Best viewed in a web browser at `https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs`
+
+### **GET /api-docs/swagger.yaml**
+Retrieve OpenAPI specification file
+
+**Response:**
+- YAML format OpenAPI 3.0 specification
+- Machine-readable API definition
+- Complete endpoint schemas and descriptions
 
 ### **GET /api/shows**
 Retrieve all TV shows
@@ -514,6 +569,7 @@ To add new endpoint tests:
 ## 📞 Support & Resources
 
 - **Live API**: [https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com](https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com)
+- **API Documentation**: [/api-docs](https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs) - Interactive Swagger UI
 - **API Health Check**: [/health](https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/health)
 - **Sample Endpoint**: [/api/shows](https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows)
 - **Postman Documentation**: [docs.postman.com](https://learning.postman.com/docs/)

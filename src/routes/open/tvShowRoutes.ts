@@ -4,6 +4,7 @@ import * as TV from '../../controllers/tvShowController';
 
 export const tvShowRoutes = Router();
 
+
 // GET /api/shows
 tvShowRoutes.get('/shows', TV.list);
 
