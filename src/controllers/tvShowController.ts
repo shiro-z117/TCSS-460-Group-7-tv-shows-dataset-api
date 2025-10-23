@@ -33,3 +33,21 @@ export async function getGenres(req: Request, res: Response, next: NextFunction)
         });
     } catch (err) { next(err); }
 }
+
+export async function getNetworks(req: Request, res: Response, next: NextFunction) {
+    try {
+        const searchQuery = req.query.q as string || '';
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
+
+        const { networks, total } = await db.getNetworks(searchQuery, page, limit);
+
+        res.json({
+            success: true,
+            data: networks,
+            page,
+            limit,
+            total
+        });
+    } catch (err) { next(err); }
+}

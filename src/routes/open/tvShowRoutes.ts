@@ -13,3 +13,6 @@ tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
 
 // GET /api/genres
 tvShowRoutes.get('/genres', TV.getGenres);
+
+// GET /api/networks
+tvShowRoutes.get('/networks', TV.getNetworks);

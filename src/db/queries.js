@@ -159,6 +159,48 @@ const getGenres = async (searchQuery = '', page = 1, limit = 50) => {
 };
 
 // ===================================================
+// QUERY 8: GET NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getNetworks = async (searchQuery = '', page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+
+        // Build the WHERE clause for optional search
+        const whereClause = searchQuery
+            ? 'WHERE network_name ILIKE $1'
+            : '';
+        const searchParam = searchQuery ? `%${searchQuery}%` : null;
+
+        // Get total count
+        const countQuery = `SELECT COUNT(*) as total FROM networks ${whereClause}`;
+        const countParams = searchQuery ? [searchParam] : [];
+        const countResult = await pool.query(countQuery, countParams);
+        const total = parseInt(countResult.rows[0].total);
+
+        // Get paginated networks
+        const dataQuery = `
+            SELECT network_name
+            FROM networks
+            ${whereClause}
+            ORDER BY network_name ASC
+            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
+        `;
+        const dataParams = searchQuery
+            ? [searchParam, limit, offset]
+            : [limit, offset];
+        const dataResult = await pool.query(dataQuery, dataParams);
+
+        // Extract just the network names into an array
+        const networks = dataResult.rows.map(row => row.network_name);
+
+        return { networks, total };
+    } catch (error) {
+        console.error('Database error in getNetworks:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -169,4 +211,5 @@ module.exports = {
     getShowById,
     getRandomShows,
     getGenres,
+    getNetworks,
 };
