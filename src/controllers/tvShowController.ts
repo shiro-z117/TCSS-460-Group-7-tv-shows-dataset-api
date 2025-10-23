@@ -105,3 +105,27 @@ export async function getRandomShow(_req: Request, res: Response, next: NextFunc
         res.json({ success: true, data: show });
     } catch (err) { next(err); }
 }
+
+export async function getShowById(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id = parseInt(req.params.id);
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid show ID'
+            });
+        }
+
+        const show = await db.getShowById(id);
+
+        if (!show) {
+            return res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+        }
+
+        res.json({ success: true, data: show });
+    } catch (err) { next(err); }
+}
