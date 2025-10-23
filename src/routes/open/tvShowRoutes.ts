@@ -8,6 +8,9 @@ export const tvShowRoutes = Router();
 // GET /api/shows - Advanced search with filters, pagination, and sorting
 tvShowRoutes.get('/shows', TV.getShows);
 
+// GET /api/shows/random - Get one random show with optional filters
+tvShowRoutes.get('/shows/random', TV.getRandomShow);
+
 // GET /api/shows/by-genre/:genre
 tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
 

@@ -420,6 +420,21 @@ const getShows = async (filters = {}) => {
 };
 
 // ===================================================
+// QUERY 11: GET ONE RANDOM SHOW
+// ===================================================
+const getRandomShow = async () => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1'
+        );
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error('Database error in getRandomShow:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -433,4 +448,5 @@ module.exports = {
     getNetworks,
     getStatuses,
     getShows,
+    getRandomShow,
 };

@@ -90,3 +90,18 @@ export async function getStatuses(_req: Request, res: Response, next: NextFuncti
         res.json({ success: true, data });
     } catch (err) { next(err); }
 }
+
+export async function getRandomShow(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const show = await db.getRandomShow();
+
+        if (!show) {
+            return res.status(404).json({
+                success: false,
+                message: 'No shows found'
+            });
+        }
+
+        res.json({ success: true, data: show });
+    } catch (err) { next(err); }
+}
