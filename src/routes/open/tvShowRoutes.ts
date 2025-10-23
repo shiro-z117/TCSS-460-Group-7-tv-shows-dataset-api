@@ -16,3 +16,6 @@ tvShowRoutes.get('/genres', TV.getGenres);
 
 // GET /api/networks
 tvShowRoutes.get('/networks', TV.getNetworks);
+
+// GET /api/statuses
+tvShowRoutes.get('/statuses', TV.getStatuses);

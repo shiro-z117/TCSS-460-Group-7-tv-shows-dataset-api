@@ -201,6 +201,28 @@ const getNetworks = async (searchQuery = '', page = 1, limit = 50) => {
 };
 
 // ===================================================
+// QUERY 9: GET DISTINCT STATUSES
+// ===================================================
+const getStatuses = async () => {
+    try {
+        const result = await pool.query(
+            `SELECT DISTINCT status
+             FROM tv_shows
+             WHERE status IS NOT NULL
+             ORDER BY status ASC`
+        );
+
+        // Extract just the status values into an array
+        const statuses = result.rows.map(row => row.status);
+
+        return statuses;
+    } catch (error) {
+        console.error('Database error in getStatuses:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -212,4 +234,5 @@ module.exports = {
     getRandomShows,
     getGenres,
     getNetworks,
+    getStatuses,
 };
