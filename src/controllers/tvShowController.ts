@@ -15,3 +15,21 @@ export async function getByGenre(req: Request, res: Response, next: NextFunction
         res.json({ success: true, data });
     } catch (err) { next(err); }
 }
+
+export async function getGenres(req: Request, res: Response, next: NextFunction) {
+    try {
+        const searchQuery = req.query.q as string || '';
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
+
+        const { genres, total } = await db.getGenres(searchQuery, page, limit);
+
+        res.json({
+            success: true,
+            data: genres,
+            page,
+            limit,
+            total
+        });
+    } catch (err) { next(err); }
+}
