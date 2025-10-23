@@ -9,25 +9,16 @@ Comprehensive Postman collection for testing the TCSS-460 TV Shows Dataset API. 
 - ✅ **API Documentation** - Documentation endpoints (2 requests)
 - ✅ **TV Shows List** - Show retrieval (1 request)
 - ✅ **Genre Filtering** - Filter shows by genre (5 requests)
+- ✅ **Genres List** - Genre list with search and pagination (3 requests)
 - ✅ **Data Validation** - Sample data verification and integrity checks (3 requests)
 
-### **Total Test Cases:** 12 requests with 55+ individual test assertions
+### **Total Test Cases:** 15 requests with 65+ individual test assertions
 
 ## 🌐 Live API Information
 
 **Live API URL:** `https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com`
 
-The API is deployed on Render and provides access to a curated dataset of 10 popular TV shows including:
-- Breaking Bad
-- Game of Thrones
-- Stranger Things
-- The Office
-- The Crown
-- Narcos
-- Chernobyl
-- The Witcher
-- Westworld
-- The Mandalorian
+The API is deployed on Render and provides access to a comprehensive dataset of **7,382+ TV shows** from various genres, including popular shows like Breaking Bad, Game of Thrones, Stranger Things, The Office, and thousands more.
 
 ## 🚀 Quick Start
 
@@ -57,7 +48,6 @@ The API is deployed on Render and provides access to a curated dataset of 10 pop
 
 Tests basic API availability:
 - API running status verification
-- Response time monitoring
 - JSON content type validation
 
 **Sample Response:**
@@ -174,17 +164,50 @@ Tests genre-based filtering:
 **Note:** Genre filter responses return fewer fields than the full list endpoint (no overview, popularity, vote_count, poster_url, backdrop_url).
 
 **Key Validations:**
-- **All returned shows belong to the specified genre** (validates every show ID)
-- **All shows of that genre are returned** (validates count matches expected)
-- Genre-specific validations:
-  - Drama: 7 shows (Breaking Bad, Game of Thrones, Stranger Things, The Crown, Narcos, Chernobyl, Westworld)
-  - Comedy: 1 show (The Office)
-  - Sci-Fi & Fantasy: 3 shows (Stranger Things, Westworld, The Mandalorian)
-  - Crime: 2 shows (The Witcher, The Mandalorian)
+- **Sample shows from each genre are verified** (checks for well-known shows in large dataset)
+- Genre-specific validations check for presence of popular shows:
+  - Drama: Checks for Breaking Bad, Game of Thrones, The Sopranos, Mad Men, The Wire
+  - Comedy: Checks for The Office, Friends, Seinfeld, Parks and Recreation, Brooklyn Nine-Nine
+  - Sci-Fi & Fantasy: Checks for Stranger Things, Game of Thrones, The Mandalorian, Westworld
+  - Crime: Checks for Breaking Bad, The Sopranos, True Detective, Mindhunter, Narcos
 - Empty array for non-existent genres
 - Response structure consistency
 
-### **5. Data Validation**
+### **5. Genres List**
+
+**Endpoint:** `GET /api/genres`
+
+Tests the genres list endpoint with search and pagination capabilities:
+
+**Basic Request** - Returns all available genres:
+```json
+{
+  "success": true,
+  "data": ["Action & Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", ...],
+  "page": 1,
+  "limit": 50,
+  "total": 18
+}
+```
+
+**Search Request** - `GET /api/genres?q=dram`:
+- Tests case-insensitive genre search
+- Returns genres matching the query substring
+- Example: searching "dram" returns ["Drama"]
+
+**Pagination Request** - `GET /api/genres?page=1&limit=5`:
+- Tests pagination functionality
+- Limits results to specified number
+- Returns proper pagination metadata
+
+**Key Validations:**
+- Response structure includes `success`, `data`, `page`, `limit`, `total`
+- Data array contains strings (genre names)
+- Search results match the query
+- Pagination respects page and limit parameters
+- Total count is accurate
+
+### **6. Data Validation**
 
 Tests data integrity across the dataset:
 - **Breaking Bad Verification**: Confirms 5 seasons, 62 episodes, first aired in 2008
@@ -219,32 +242,15 @@ Based on the sample data, the following genres are available:
 
 ## 📊 Sample TV Shows Data
 
-The API contains 10 TV shows:
+The API contains **7,382+ TV shows** covering a wide range of genres from classic to modern series. The dataset includes popular shows like:
 
-| ID | Show Name | First Air Date | Seasons | Episodes | Status | Rating |
-|----|-----------|----------------|---------|----------|--------|--------|
-| 1 | Breaking Bad | 2008-01-20 | 5 | 62 | Ended | 9.5 |
-| 2 | Game of Thrones | 2011-04-17 | 8 | 73 | Ended | 9.2 |
-| 3 | Stranger Things | 2016-07-15 | 4 | 42 | Returning Series | 8.7 |
-| 4 | The Office | 2005-03-24 | 9 | 201 | Ended | 9.0 |
-| 5 | The Crown | 2016-11-04 | 6 | 50 | Ended | 8.6 |
-| 6 | Narcos | 2015-08-28 | 3 | 30 | Ended | 8.9 |
-| 7 | Chernobyl | 2019-05-06 | 1 | 5 | Ended | 9.3 |
-| 8 | The Witcher | 2019-12-20 | 3 | 30 | Ended | 8.2 |
-| 9 | Westworld | 2016-10-02 | 4 | 36 | Ended | 8.5 |
-| 10 | The Mandalorian | 2019-11-12 | 3 | 24 | Returning Series | 8.7 |
-
-**Genre Associations**:
-- Breaking Bad: Drama
-- Game of Thrones: Drama, Animation
-- Stranger Things: Drama, Sci-Fi & Fantasy
-- The Office: Comedy
-- The Crown: Drama
-- Narcos: Drama
-- Chernobyl: Drama
-- The Witcher: Animation, Crime
-- Westworld: Drama, Sci-Fi & Fantasy
-- The Mandalorian: Sci-Fi & Fantasy, Crime
+- **Breaking Bad** (5 seasons, 62 episodes) - Drama
+- **Game of Thrones** (8 seasons, 73 episodes) - Drama, Sci-Fi & Fantasy
+- **Stranger Things** (4 seasons, 42 episodes) - Drama, Sci-Fi & Fantasy
+- **The Office** (9 seasons, 201 episodes) - Comedy
+- **Friends** - Comedy
+- **The Sopranos** - Drama, Crime
+- And thousands more...
 
 ## 🌐 Environment Variables
 
@@ -287,12 +293,13 @@ With the live API:
 
 | Test Category | Requests | Test Assertions | Expected Result |
 |---------------|----------|-----------------|-----------------|
-| Health Check | 1 | ~5 tests | ✅ All Pass |
-| API Documentation | 2 | ~10 tests | ✅ All Pass |
-| TV Shows List | 1 | ~5 tests | ✅ All Pass |
-| Genre Filtering | 5 | ~20 tests | ✅ All Pass |
+| Health Check | 1 | ~4 tests | ✅ All Pass |
+| API Documentation | 2 | ~8 tests | ✅ All Pass |
+| TV Shows List | 1 | ~4 tests | ✅ All Pass |
+| Genre Filtering | 5 | ~15 tests | ✅ All Pass |
+| Genres List | 3 | ~15 tests | ✅ All Pass |
 | Data Validation | 3 | ~15 tests | ✅ All Pass |
-| **TOTAL** | **12** | **~55 tests** | **✅ All Pass** |
+| **TOTAL** | **15** | **~65 tests** | **✅ All Pass** |
 
 ### **Understanding Test Results**
 
@@ -316,16 +323,6 @@ Error: ETIMEDOUT or Could not get any response
 - Check Postman proxy settings (Settings → Proxy - try disabling)
 - Wait 1 minute and retry - Render spins down inactive services
 
-**🔴 Tests Failing - Response Time Too Slow**
-```
-Response time exceeded threshold
-```
-**Solutions:**
-- First request after idle may be slow (cold start)
-- Subsequent requests should be faster
-- Increase timeout thresholds if needed
-- Run collection again after service warms up
-
 **🔴 Environment Not Set**
 ```
 Error: base_url is not defined
@@ -340,9 +337,10 @@ Error: base_url is not defined
 data: []
 ```
 **Solutions:**
-- For `/api/shows`: Indicates no shows in database (should have 10)
+- For `/api/shows`: Indicates no shows in database (should have 7,382+)
 - For `/api/shows/by-genre/SomeGenre`: Normal for invalid genres
-- Verify database was initialized with sample data
+- For `/api/genres`: Indicates no genres in database (should have 18)
+- Verify database was initialized with data
 
 ### **Debug Mode**
 
@@ -534,6 +532,36 @@ Filter shows by genre
 - Use exact names including spaces and special characters (e.g., "Sci-Fi & Fantasy")
 - Invalid genres return `{success: true, data: []}`
 
+### **GET /api/genres**
+Retrieve list of all available genres with search and pagination
+
+**Query Parameters:**
+- `q` (optional): Search query for filtering genres (case-insensitive substring match)
+- `page` (optional): Page number for pagination (default: 1)
+- `limit` (optional): Number of results per page (default: 50)
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "data": ["Action & Adventure", "Animation", "Comedy", ...],
+  "page": 1,
+  "limit": 50,
+  "total": 18
+}
+```
+
+**Examples:**
+- `GET /api/genres` - Returns all genres
+- `GET /api/genres?q=com` - Returns genres matching "com" (Comedy)
+- `GET /api/genres?page=1&limit=5` - Returns first 5 genres
+- `GET /api/genres?q=sci&page=1&limit=10` - Search "sci" with pagination
+
+**Notes:**
+- Data array contains genre names as strings
+- Search is case-insensitive
+- Pagination metadata included in response (page, limit, total)
+
 ## 🔄 Collection Maintenance
 
 ### **Updating Tests**
@@ -560,7 +588,7 @@ To add new endpoint tests:
 
 **Quick 2-Step Setup:**
 1. **Import** `postman.json` into Postman
-2. **Run** the collection and watch all 45+ tests pass!
+2. **Run** the collection and watch all 65+ tests pass!
 
 
 

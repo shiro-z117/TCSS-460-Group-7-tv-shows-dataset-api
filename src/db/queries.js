@@ -39,7 +39,7 @@ const getShowsByName = async (showName) => {
 // ===================================================
 // QUERY 3: GET SHOWS BY GENRE
 // ===================================================
-// For exact match: pass [genreName] and use "g.name ILIKE $1"
+// For exact match: pass [genreName] and use "g.genre_name ILIKE $1"
 // For partial match: pass [`%${genreName}%`] and keep the wildcards
 const getShowsByGenre = async (genreName) => {
     try {
@@ -47,9 +47,9 @@ const getShowsByGenre = async (genreName) => {
             `SELECT DISTINCT tv.id, tv.name, tv.original_name, tv.first_air_date,
               tv.seasons, tv.episodes, tv.status, tv.tmdb_rating
        FROM tv_shows tv
-       JOIN show_genres sg ON tv.id = sg.show_id
+       JOIN show_genres sg ON tv.id = sg.tv_show_id
        JOIN genres g ON sg.genre_id = g.id
-       WHERE g.name ILIKE $1
+       WHERE g.genre_name ILIKE $1
        ORDER BY tv.id`,
             [genreName] // use [`%${genreName}%`] if you want partials
         );
@@ -117,6 +117,48 @@ const getRandomShows = async (limit = 10) => {
 };
 
 // ===================================================
+// QUERY 7: GET GENRES WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getGenres = async (searchQuery = '', page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+
+        // Build the WHERE clause for optional search
+        const whereClause = searchQuery
+            ? 'WHERE genre_name ILIKE $1'
+            : '';
+        const searchParam = searchQuery ? `%${searchQuery}%` : null;
+
+        // Get total count
+        const countQuery = `SELECT COUNT(*) as total FROM genres ${whereClause}`;
+        const countParams = searchQuery ? [searchParam] : [];
+        const countResult = await pool.query(countQuery, countParams);
+        const total = parseInt(countResult.rows[0].total);
+
+        // Get paginated genres
+        const dataQuery = `
+            SELECT genre_name
+            FROM genres
+            ${whereClause}
+            ORDER BY genre_name ASC
+            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
+        `;
+        const dataParams = searchQuery
+            ? [searchParam, limit, offset]
+            : [limit, offset];
+        const dataResult = await pool.query(dataQuery, dataParams);
+
+        // Extract just the genre names into an array
+        const genres = dataResult.rows.map(row => row.genre_name);
+
+        return { genres, total };
+    } catch (error) {
+        console.error('Database error in getGenres:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -126,4 +168,5 @@ module.exports = {
     getShowsByStatus,
     getShowById,
     getRandomShows,
+    getGenres,
 };
