@@ -90,3 +90,75 @@ export async function getStatuses(_req: Request, res: Response, next: NextFuncti
         res.json({ success: true, data });
     } catch (err) { next(err); }
 }
+
+export async function createShow(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showData = {
+            id: req.body.id,
+            name: req.body.name,
+            original_name: req.body.original_name || null,
+            first_air_date: req.body.first_air_date || null,
+            last_air_date: req.body.last_air_date || null,
+            seasons: req.body.seasons || null,
+            episodes: req.body.episodes || null,
+            status: req.body.status || null,
+            overview: req.body.overview || null,
+            popularity: req.body.popularity || null,
+            tmdb_rating: req.body.tmdb_rating || null,
+            vote_count: req.body.vote_count || null,
+            poster_url: req.body.poster_url || null,
+            backdrop_url: req.body.backdrop_url || null
+        };
+
+        const newShow = await db.createShow(showData);
+
+        res.status(201)
+            .location(`/api/shows/${newShow.id}`)
+            .json({
+                success: true,
+                data: newShow,
+                message: 'Show created successfully'
+            });
+    } catch (err: any) {
+        if (err.message === 'SHOW_EXISTS') {
+            res.status(409).json({
+                success: false,
+                message: 'A show with this ID already exists'
+            });
+            return;
+        }
+        next(err);
+    }
+}
+
+export async function deleteShow(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+
+        // Validate ID is a valid number
+        if (isNaN(showId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid show ID'
+            });
+            return;
+        }
+
+        const deletedShow = await db.deleteShow(showId);
+
+        res.status(200).json({
+            success: true,
+            data: { id: deletedShow.id },
+            message: 'Show deleted successfully'
+        });
+    } catch (err: any) {
+        if (err.message === 'SHOW_NOT_FOUND') {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+        next(err);
+    }
+}

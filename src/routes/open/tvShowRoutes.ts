@@ -1,9 +1,16 @@
 // src/routes/open/tvShowRoutes.ts
 import { Router } from 'express';
 import * as TV from '../../controllers/tvShowController';
+import { validateCreateShow } from '../../core/middleware/tvShowValidation';
+import { apiKeyAuth } from '../../core/middleware/apiKeyAuth';
 
 export const tvShowRoutes = Router();
 
+// POST /api/shows - Create a new show (Admin only - requires API key)
+tvShowRoutes.post('/shows', apiKeyAuth, validateCreateShow, TV.createShow);
+
+// DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
+tvShowRoutes.delete('/shows/:id', apiKeyAuth, TV.deleteShow);
 
 // GET /api/shows - Advanced search with filters, pagination, and sorting
 tvShowRoutes.get('/shows', TV.getShows);
