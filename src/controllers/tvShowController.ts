@@ -129,3 +129,16 @@ export async function getShowById(req: Request, res: Response, next: NextFunctio
         res.json({ success: true, data: show });
     } catch (err) { next(err); }
 }
+
+// Coco's endpoint: GET /api/health
+// Returns service and database health status
+export async function getHealth(req: Request, res: Response, next: NextFunction) {
+    try {
+        // Call database function
+        const health = await db.getHealth();
+
+        // Return health status
+        res.json(health);
+
+    } catch (err) { next(err); }
+}

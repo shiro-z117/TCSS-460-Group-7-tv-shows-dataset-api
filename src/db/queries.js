@@ -435,9 +435,40 @@ const getRandomShow = async () => {
 };
 
 // ===================================================
+// QUERY 12: GET SERVICE HEALTH STATUS
+// ===================================================
+
+// Shiannel's endpoint: GET /api/health
+const getHealth = async () => {
+    try {
+        // Test database connection
+        const result = await pool.query('SELECT NOW()');
+        
+        // Get server uptime (in seconds)
+        const uptime = process.uptime();
+        
+        // If query succeeds, DB is ok
+        return {
+            status: 'ok',
+            db: 'ok',
+            uptime: Math.round(uptime * 100) / 100  // Round to 2 decimals
+        };
+        
+    } catch (error) {
+        // If query fails, DB is down
+        console.error('Database error in getHealth:', error);
+        return {
+            status: 'error',
+            db: 'down',
+            uptime: Math.round(process.uptime() * 100) / 100
+        };
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
-module.exports = {
+export {
     getAllShows,
     getShowsByName,
     getShowsByGenre,
@@ -449,4 +480,5 @@ module.exports = {
     getStatuses,
     getShows,
     getRandomShow,
+    getHealth,
 };
