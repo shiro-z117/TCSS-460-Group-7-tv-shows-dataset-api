@@ -59,3 +59,37 @@ export async function getYearsFirst(req: Request, res: Response, next: NextFunct
     // If anything fails, pass error to next middleware
 }
 
+// Linda's endpoint: GET /api/years/last
+// Returns distinct last air years with min/max filter
+export async function getYearsLast(req: Request, res: Response, next: NextFunction) {
+    // req = incoming request, res = response to send, next = error handler
+    
+    try {
+        // TRY BLOCK = if something fails, catch it below
+        
+        const min = req.query.min ? parseInt(req.query.min as string) : undefined;
+        // Get min parameter from URL, convert to number, or undefined if not provided
+        
+        const max = req.query.max ? parseInt(req.query.max as string) : undefined;
+        // Get max parameter from URL, convert to number, or undefined if not provided
+        
+        const page = parseInt(req.query.page as string) || 1;
+        // Get page parameter, convert to number, default 1
+        
+        const limit = parseInt(req.query.limit as string) || 50;
+        // Get limit parameter, convert to number, default 50
+        
+        const data = await db.getYearsLast(min, max, page, limit);
+        // Call database function, wait for results
+        
+        // Convert year strings to numbers
+        const years = data.map((row: any) => parseInt(row.year));
+        // Loop through each row, convert year string to number
+        
+        res.json({ success: true, data: years, page, limit, total: years.length });
+        // Send response: success flag, converted years array, pagination info, total count
+        
+    } catch (err) { next(err); }
+    // CATCH BLOCK = if any error above, pass to error handler
+}
+

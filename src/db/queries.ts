@@ -146,7 +146,9 @@ const getRandomShows = async (limit = 10) => {
     }
 };
 
-// Linda's endpoint: GET /api/years/first
+// ===================================================
+// QUERY 7: GET /api/years/first (Linda)
+// ===================================================
 // Returns distinct first air years with min/max filter
 const getYearsFirst = async (min?: number, max?: number, page = 1, limit = 50) => {
     try {
@@ -174,11 +176,41 @@ const getYearsFirst = async (min?: number, max?: number, page = 1, limit = 50) =
         throw error;
     }
 };
+
+// ===================================================
+// QUERY 8: GET /api/years/last (Linda)
+// ===================================================
+// Returns distinct last air years with min/max filter
+const getYearsLast = async (min?: number, max?: number, page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL';
+        const params = [];
+        
+        if (min) {
+            query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
+            params.push(min);
+        }
+        
+        if (max) {
+            query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
+            params.push(max);
+        }
+        
+        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+        
+        const result = await pool.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getYearsLast:', error);
+        throw error;
+    }
+};
 // ===================================================
 // EXPORTS
 // ===================================================
 // module.exports = { 
-
 export {
     getAllShows,
     getShowsByName,
@@ -188,4 +220,5 @@ export {
     getRandomShows,
     getStudios,
     getYearsFirst,
+    getYearsLast,
 };
