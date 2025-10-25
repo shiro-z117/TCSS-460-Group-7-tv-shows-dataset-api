@@ -42,5 +42,7 @@ exports.tvShowRoutes = (0, express_1.Router)();
 exports.tvShowRoutes.get('/shows', TV.list);
 // GET /api/shows/by-genre/:genre
 exports.tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
-// Linda test it
+//Linda: GET /api/studios 
 exports.tvShowRoutes.get('/studios', TV.getStudios);
+// Linda: GET /api/years/first
+exports.tvShowRoutes.get('/years/first', TV.getYearsFirst);

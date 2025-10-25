@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.list = list;
 exports.getByGenre = getByGenre;
 exports.getStudios = getStudios;
+exports.getYearsFirst = getYearsFirst;
 const db = __importStar(require("../db/queries.js")); // <-- .js required
 async function list(_req, res, next) {
     try {
@@ -67,4 +68,31 @@ async function getStudios(req, res, next) {
     catch (err) {
         next(err);
     }
+}
+// Linda's endpoint: GET /api/years/first
+async function getYearsFirst(req, res, next) {
+    try {
+        // Extract query parameters from URL
+        // Example: /api/years/first?min=2000&max=2020&page=1&limit=50
+        const min = req.query.min ? parseInt(req.query.min) : undefined;
+        // If min provided, convert string to number, else undefined
+        const max = req.query.max ? parseInt(req.query.max) : undefined;
+        // If max provided, convert string to number, else undefined
+        const page = parseInt(req.query.page) || 1;
+        // Convert page to number, default to 1 if not provided
+        const limit = parseInt(req.query.limit) || 50;
+        // Convert limit to number, default to 50 if not provided
+        // Call database function with parameters
+        const data = await db.getYearsFirst(min, max, page, limit);
+        // Convert year strings to numbers
+        const years = data.map((row) => parseInt(row.year));
+        // Send response back to client
+        //res.json({ success: true, data, page, limit, total: data.length });
+        res.json({ success: true, data: years, page, limit, total: years.length });
+        // Returns: { success: true, data: [2025, 2024, ...], page: 1, limit: 50, total: 50 }
+    }
+    catch (err) {
+        next(err);
+    }
+    // If anything fails, pass error to next middleware
 }

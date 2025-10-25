@@ -11,5 +11,8 @@ tvShowRoutes.get('/shows', TV.list);
 // GET /api/shows/by-genre/:genre
 tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
 
-// Linda test it
+//Linda: GET /api/studios 
 tvShowRoutes.get('/studios', TV.getStudios);
+
+// Linda: GET /api/years/first
+tvShowRoutes.get('/years/first', TV.getYearsFirst);

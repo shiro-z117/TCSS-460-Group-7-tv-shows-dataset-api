@@ -4,7 +4,7 @@
 // DATABASE QUERY FUNCTIONS
 // ===================================================
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStudios = exports.getRandomShows = exports.getShowById = exports.getShowsByStatus = exports.getShowsByGenre = exports.getShowsByName = exports.getAllShows = void 0;
+exports.getYearsFirst = exports.getStudios = exports.getRandomShows = exports.getShowById = exports.getShowsByStatus = exports.getShowsByGenre = exports.getShowsByName = exports.getAllShows = void 0;
 const pool = require('./connection');
 // ===================================================
 // QUERY 1: GET ALL TV SHOWS
@@ -138,5 +138,29 @@ const getRandomShows = async (limit = 10) => {
     }
 };
 exports.getRandomShows = getRandomShows;
-// Linda test
-// export { getAllShows, getShowsByGenre, getShowsByName, getShowsByStatus, getShowById, getRandomShows, getStudios };
+// Linda's endpoint: GET /api/years/first
+// Returns distinct first air years with min/max filter
+const getYearsFirst = async (min, max, page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL';
+        const params = [];
+        if (min) {
+            query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${params.length + 1}`;
+            params.push(min);
+        }
+        if (max) {
+            query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${params.length + 1}`;
+            params.push(max);
+        }
+        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+        const result = await pool.query(query, params);
+        return result.rows;
+    }
+    catch (error) {
+        console.error('Database error in getYearsFirst:', error);
+        throw error;
+    }
+};
+exports.getYearsFirst = getYearsFirst;
