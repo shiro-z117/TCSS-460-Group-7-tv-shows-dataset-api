@@ -207,6 +207,32 @@ const getYearsLast = async (min?: number, max?: number, page = 1, limit = 50) =>
         throw error;
     }
 };
+
+// ===================================================
+// QUERY 9: GET /api/seasons (Linda)
+// ===================================================
+// Returns distinct season counts
+const getSeasons = async (page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        // Calculate pagination offset
+        
+        const query = 'SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2';
+        // Get all distinct season counts, sorted ascending
+        
+        const result = await pool.query(query, [limit, offset]);
+        // Execute query with pagination
+        
+        return result.rows;
+        // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+        
+    } catch (error) {
+        console.error('Database error in getSeasons:', error);
+        throw error;
+    }
+};
+
+
 // ===================================================
 // EXPORTS
 // ===================================================
@@ -221,4 +247,5 @@ export {
     getStudios,
     getYearsFirst,
     getYearsLast,
+    getSeasons,
 };

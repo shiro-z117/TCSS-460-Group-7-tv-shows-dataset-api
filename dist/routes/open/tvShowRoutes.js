@@ -48,3 +48,5 @@ exports.tvShowRoutes.get('/studios', TV.getStudios);
 exports.tvShowRoutes.get('/years/first', TV.getYearsFirst);
 // Linda: GET /api/years/last
 exports.tvShowRoutes.get('/years/last', TV.getYearsLast);
+// Linda: GET /api/seasons
+exports.tvShowRoutes.get('/seasons', TV.getSeasons);

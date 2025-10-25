@@ -93,3 +93,41 @@ export async function getYearsLast(req: Request, res: Response, next: NextFuncti
     // CATCH BLOCK = if any error above, pass to error handler
 }
 
+// Linda's endpoint: GET /api/seasons
+// Returns distinct season counts with optional bucketing
+export async function getSeasons(req: Request, res: Response, next: NextFunction) {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        // Get page parameter, default 1
+        
+        const limit = parseInt(req.query.limit as string) || 50;
+        // Get limit parameter, default 50
+        
+        const buckets = req.query.buckets === 'true';
+        // Check if user wants bucketed format (true/false)
+        
+        const data = await db.getSeasons(page, limit);
+        // Call database to get season counts
+        
+        // Convert season objects to numbers
+        let seasons = data.map((row: any) => parseInt(row.seasons));
+        // seasons = [1, 2, 3, 4, ..., 69]
+        
+        // If buckets=true, group seasons into ranges
+        if (buckets) {
+            seasons = [
+                // Group logic: 1 stays 1, 2-3 grouped, 4-6 grouped, 7+ all rest
+                "1",
+                "2–3",
+                "4–6",
+                "7+"
+            ];
+        }
+        
+        res.json({ success: true, data: seasons, page, limit, total: seasons.length });
+        // Send response with seasons (bucketed or not)
+        
+    } catch (err) { next(err); }
+    // If error, pass to error handler
+}
+

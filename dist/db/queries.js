@@ -4,7 +4,7 @@
 // DATABASE QUERY FUNCTIONS
 // ===================================================
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getYearsLast = exports.getYearsFirst = exports.getStudios = exports.getRandomShows = exports.getShowById = exports.getShowsByStatus = exports.getShowsByGenre = exports.getShowsByName = exports.getAllShows = void 0;
+exports.getSeasons = exports.getYearsLast = exports.getYearsFirst = exports.getStudios = exports.getRandomShows = exports.getShowById = exports.getShowsByStatus = exports.getShowsByGenre = exports.getShowsByName = exports.getAllShows = void 0;
 const pool = require('./connection');
 // ===================================================
 // QUERY 1: GET ALL TV SHOWS
@@ -194,3 +194,24 @@ const getYearsLast = async (min, max, page = 1, limit = 50) => {
     }
 };
 exports.getYearsLast = getYearsLast;
+// ===================================================
+// QUERY 9: GET /api/seasons (Linda)
+// ===================================================
+// Returns distinct season counts
+const getSeasons = async (page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        // Calculate pagination offset
+        const query = 'SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2';
+        // Get all distinct season counts, sorted ascending
+        const result = await pool.query(query, [limit, offset]);
+        // Execute query with pagination
+        return result.rows;
+        // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+    }
+    catch (error) {
+        console.error('Database error in getSeasons:', error);
+        throw error;
+    }
+};
+exports.getSeasons = getSeasons;
