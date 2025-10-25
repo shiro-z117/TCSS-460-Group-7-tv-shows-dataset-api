@@ -10,3 +10,6 @@ tvShowRoutes.get('/shows', TV.list);
 
 // GET /api/shows/by-genre/:genre
 tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
+
+// Linda test it
+tvShowRoutes.get('/studios', TV.getStudios);
