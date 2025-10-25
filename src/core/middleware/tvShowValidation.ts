@@ -1,5 +1,5 @@
 // core/middleware/tvShowValidation.ts
-import { query, validationResult } from 'express-validator';
+import { query, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import {sendValidationError} from "../utilities/responseUtils";
 
@@ -31,5 +31,87 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
 export const randomTenValidator = [
     // optional: allow user to pass ?limit=N if you like
     query('limit').optional().isInt({ min: 1, max: 50 }).toInt(),
+];
+
+export const validateCreateShow = [
+    body('id')
+        .notEmpty()
+        .withMessage('ID is required')
+        .isInt({ min: 1 })
+        .withMessage('ID must be a positive integer'),
+
+    body('name')
+        .notEmpty()
+        .withMessage('Name is required')
+        .isString()
+        .withMessage('Name must be a string')
+        .trim(),
+
+    body('original_name')
+        .optional()
+        .isString()
+        .withMessage('Original name must be a string')
+        .trim(),
+
+    body('first_air_date')
+        .optional()
+        .isISO8601()
+        .withMessage('First air date must be a valid date (ISO 8601)'),
+
+    body('last_air_date')
+        .optional()
+        .isISO8601()
+        .withMessage('Last air date must be a valid date (ISO 8601)'),
+
+    body('seasons')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Seasons must be a non-negative integer'),
+
+    body('episodes')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Episodes must be a non-negative integer'),
+
+    body('status')
+        .optional()
+        .isString()
+        .withMessage('Status must be a string')
+        .trim(),
+
+    body('overview')
+        .optional()
+        .isString()
+        .withMessage('Overview must be a string')
+        .trim(),
+
+    body('popularity')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('Popularity must be a non-negative number'),
+
+    body('tmdb_rating')
+        .optional()
+        .isFloat({ min: 0, max: 10 })
+        .withMessage('TMDB rating must be between 0 and 10'),
+
+    body('vote_count')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Vote count must be a non-negative integer'),
+
+    body('poster_url')
+        .optional()
+        .isString()
+        .withMessage('Poster URL must be a string')
+        .trim(),
+
+    body('backdrop_url')
+        .optional()
+        .isString()
+        .withMessage('Backdrop URL must be a string')
+        .trim(),
+
+    validate
 ];
 

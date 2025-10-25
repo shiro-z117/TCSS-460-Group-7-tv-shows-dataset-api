@@ -420,16 +420,76 @@ const getShows = async (filters = {}) => {
 };
 
 // ===================================================
-// QUERY 11: GET ONE RANDOM SHOW
+// CREATE NEW TV SHOW
 // ===================================================
-const getRandomShow = async () => {
+const createShow = async (showData) => {
     try {
+        const {
+            id,
+            name,
+            original_name,
+            first_air_date,
+            last_air_date,
+            seasons,
+            episodes,
+            status,
+            overview,
+            popularity,
+            tmdb_rating,
+            vote_count,
+            poster_url,
+            backdrop_url
+        } = showData;
+
+        // Check if show with this ID already exists
+        const existingShow = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [id]);
+        if (existingShow.rows.length > 0) {
+            throw new Error('SHOW_EXISTS');
+        }
+
+        // Insert new show
         const result = await pool.query(
-            'SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1'
+            `INSERT INTO tv_shows (
+                id, name, original_name, first_air_date, last_air_date,
+                seasons, episodes, status, overview, popularity,
+                tmdb_rating, vote_count, poster_url, backdrop_url
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            RETURNING *`,
+            [
+                id, name, original_name, first_air_date, last_air_date,
+                seasons, episodes, status, overview, popularity,
+                tmdb_rating, vote_count, poster_url, backdrop_url
+            ]
         );
-        return result.rows[0] || null;
+
+        return result.rows[0];
     } catch (error) {
-        console.error('Database error in getRandomShow:', error);
+        console.error('Database error in createShow:', error);
+        throw error;
+    }
+};
+
+// ===================================================
+// DELETE TV SHOW BY ID
+// ===================================================
+const deleteShow = async (showId) => {
+    try {
+        // First, check if the show exists
+        const existingShow = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+
+        if (existingShow.rows.length === 0) {
+            throw new Error('SHOW_NOT_FOUND');
+        }
+
+        // Delete the show (CASCADE should handle related records)
+        const result = await pool.query(
+            'DELETE FROM tv_shows WHERE id = $1 RETURNING id',
+            [showId]
+        );
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in deleteShow:', error);
         throw error;
     }
 };
@@ -448,5 +508,6 @@ module.exports = {
     getNetworks,
     getStatuses,
     getShows,
-    getRandomShow,
+    createShow,
+    deleteShow,
 };
