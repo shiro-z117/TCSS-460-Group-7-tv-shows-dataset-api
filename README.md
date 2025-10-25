@@ -12,21 +12,16 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ## Beta Ⅱ Sprint Contributions
 ### Patrick
 
-### Linda Miao - Database & API Integration
+### Linda Miao - Database Setup & API Endpoint Development
 ### What Was Completed
-- Imported 7,382 TV shows from professor's CSV file (100% of data)
-- Created normalized database schema matching ER diagram
-- Extracted and populated reference tables:
-  - Genres: 18 unique
-  - Creators: 5,628 unique
-  - Networks: 466 unique
-  - Studios: 5,930 unique
-  - Actors: 35,915 unique
-- All data cleaned, validated, and type-converted
+- Re-imported 7,382 TV shows from professor's CSV file into Supabase(relationshiop and other debug solve by team member)
+- Built and tested 4 GET endpoints with Postman:
+  - GET /studios (search studios by name with pagination)
+  - GET /years/first (filter first air years by year range)
+  - GET /years/last (filter last air years by year range)
+  - GET /seasons (get season counts with bucketing option)
 - Database is production-ready for API development
 
-### Testing Instructions
-See SQL queries above in this document for how to verify the data.
 
 ### Shiannel
 
@@ -41,16 +36,19 @@ See SQL queries above in this document for how to verify the data.
 
 ### Patrick
 
-### Linda Miao - Database & API Integration
-### Known Issues
-- Relationship table population (show_genres, show_cast, etc.) needs final sync
-- This is non-blocking - all data remains accessible via direct queries
+### Linda Miao - Database Setup & API Endpoint Development
+**Challenges & Solutions**
+- Data Population (95% complete): Attempted Python scripts initially, but SQL UPDATE queries in Supabase worked better (faster, avoided API caching issues). Team collaboration solved this.
+- Database Relationships: First time recreating junction tables after Supabase reload. Learned how many-to-many relationships work.Team collaboration solved this.
+- API Endpoint Development: First endpoint took longest to understand layer architecture (queries.ts → controller → routes). After pattern established, remaining 3 endpoints built faster.
+- Data Type Issues: Year values returned as strings. Fixed by adding `.map()` conversion in controller layer.
 
-### How to Verify
-Run these SQL queries in Supabase to test:
-- `SELECT COUNT(*) FROM tv_shows;` → Should return 7,382
-- `SELECT COUNT(*) FROM genres;` → Should return 18
-- `SELECT * FROM tv_shows LIMIT 10;` → View sample data
+**Key Learnings**
+1. SQL more efficient than Python for bulk operations
+2. Layered API architecture: Database → Controller → Routes
+3. TypeScript compiles before testing (npx tsc)
+4. Always test SQL queries in database first
+5. Git branching keeps main branch safe
 ### Shiannel
 
 ### Shiraz
