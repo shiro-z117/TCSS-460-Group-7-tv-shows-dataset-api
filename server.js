@@ -13,8 +13,8 @@ const {
   validateUpdateStatus,
   validateUpdateDates,
   validateUpdateMetrics,
-} = require("./core/middleware/tvShowValidation");
-const { apiKeyAuth } = require("./core/middleware/apiKeyAuth");
+} = require("./src/core/middleware/tvShowValidation");
+const { apiKeyAuth } = require("./src/core/middleware/apiKeyAuth");
 const app = express();
 
 // Middleware
