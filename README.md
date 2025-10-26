@@ -22,8 +22,16 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
   - GET /seasons (get season counts with bucketing option)
 - Database is production-ready for API development
 
-
-### Shiannel
+### Shiannel - API Designer & Swagger Documentation
+### What Was Completed
+- Documented API endpoints for the TV Shows API
+- Created a complete Swagger/OpenAPI request/response format, data schemas, and error handling
+- Built and tested 3 GET endpoints with Postman:
+  - GET /health (check API health and database status)
+  - GET /shows/:id/images (get posters, backdrops, and logos with type filtering)
+  - GET /shows/:id/cast (get actor and character info with sorting options)
+- Coordinated with the team to document their endpoints (filters, search, admin operations)
+- **Files:** `project_files/swagger.yaml`
 
 ### Shiraz
 - Imported all remaining data to tables on Supabase
@@ -49,7 +57,13 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 3. TypeScript compiles before testing (npx tsc)
 4. Always test SQL queries in database first
 5. Git branching keeps main branch safe
+
 ### Shiannel
+- Swagger/OpenAPI specification completed, validated, and pushed to GitHub
+- All endpoints documented, including CRUD operations, filter vocab, search features, and admin operations
+- Data schemas defined for shows, cast, images, pagination, and error responses
+- Health, images, and cast endpoints built and tested with Postman
+- Documentation at `project_files/swagger.yaml`
 
 ### Shiraz
 
