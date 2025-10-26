@@ -12,3 +12,4 @@ AI/
 /dataSources.local.xml
 testing/
 node_modules/
+dist/
