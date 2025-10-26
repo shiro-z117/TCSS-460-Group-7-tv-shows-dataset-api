@@ -26,6 +26,11 @@ tvShowRoutes.get('/networks', TV.getNetworks);
 // GET /api/statuses
 tvShowRoutes.get('/statuses', TV.getStatuses);
 
-// Shiannel: GET /api/health
+// GET /api/health
 tvShowRoutes.get('/health', TV.getHealth);
 
+// GET /api/shows/:id/images
+tvShowRoutes.get('/shows/:id/images', TV.getShowImages);
+
+// GET /api/shows/:id/cast
+tvShowRoutes.get('/shows/:id/cast', TV.getShowCast);

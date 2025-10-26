@@ -52,5 +52,9 @@ exports.tvShowRoutes.get('/genres', TV.getGenres);
 exports.tvShowRoutes.get('/networks', TV.getNetworks);
 // GET /api/statuses
 exports.tvShowRoutes.get('/statuses', TV.getStatuses);
-// Shiannel: GET /api/health
+// GET /api/health
 exports.tvShowRoutes.get('/health', TV.getHealth);
+// GET /api/shows/:id/images
+exports.tvShowRoutes.get('/shows/:id/images', TV.getShowImages);
+// GET /api/shows/:id/cast
+exports.tvShowRoutes.get('/shows/:id/cast', TV.getShowCast);

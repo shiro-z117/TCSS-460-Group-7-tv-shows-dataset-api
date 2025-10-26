@@ -42,6 +42,8 @@ exports.getStatuses = getStatuses;
 exports.getRandomShow = getRandomShow;
 exports.getShowById = getShowById;
 exports.getHealth = getHealth;
+exports.getShowImages = getShowImages;
+exports.getShowCast = getShowCast;
 const db = __importStar(require("../db/queries.js")); // <-- .js required
 async function list(_req, res, next) {
     try {
@@ -175,14 +177,99 @@ async function getShowById(req, res, next) {
         next(err);
     }
 }
-// Coco's endpoint: GET /api/health
-// Returns service and database health status
+// GET /api/health
+// returns service and database health status
 async function getHealth(req, res, next) {
     try {
         // Call database function
         const health = await db.getHealth();
         // Return health status
         res.json(health);
+    }
+    catch (err) {
+        next(err);
+    }
+}
+// GET /api/shows/:id/images
+// returns images for a specific show w optional type filter & pagination
+async function getShowImages(req, res, next) {
+    try {
+        // gets show ID from URL path
+        const showId = parseInt(req.params.id);
+        // gets optional type filter from query params
+        const type = req.query.type;
+        // gets pagination params (default: page 1, limit 20)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        // validate show ID
+        if (!showId || showId <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid show ID'
+            });
+        }
+        // validate type if provided
+        if (type && !['poster', 'backdrop'].includes(type)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid type. Use: poster or backdrop'
+            });
+        }
+        // validate pagination params
+        if (page < 1 || limit < 1 || limit > 100) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid pagination parameters. Page must be >= 1, limit must be 1-100'
+            });
+        }
+        // calls db func
+        const data = await db.getShowImages(showId, type, page, limit);
+        // rturn response
+        res.json({
+            success: true,
+            data,
+            page,
+            limit,
+            total: data.length
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+// GET /api/shows/:id/cast
+// returns cast members for a specific show with pagination
+async function getShowCast(req, res, next) {
+    try {
+        // gets show ID from URL path
+        const showId = parseInt(req.params.id);
+        // gets pagination params (default: page 1, limit 10, max 50)
+        const page = parseInt(req.query.page) || 1;
+        const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+        // validate show ID
+        if (!showId || showId <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid show ID'
+            });
+        }
+        // validate pagination params
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid pagination parameters. Page and limit must be >= 1'
+            });
+        }
+        // calls db function
+        const data = await db.getShowCast(showId, page, limit);
+        // return response
+        res.json({
+            success: true,
+            data,
+            page,
+            limit,
+            total: data.length
+        });
     }
     catch (err) {
         next(err);
