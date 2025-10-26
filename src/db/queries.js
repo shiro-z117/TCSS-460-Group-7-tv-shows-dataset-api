@@ -95,6 +95,7 @@ const getShowById = async (showId) => {
     }
 };
 
+
 // ===================================================
 // QUERY 6: GET N RANDOM SHOWS (default 10)
 // ===================================================
@@ -495,6 +496,234 @@ const deleteShow = async (showId) => {
 };
 
 // ===================================================
+// UPDATE TV SHOW
+// ===================================================
+const updateShow = async (showId, updateData) => {
+    try {
+        // Check if show exists
+        const existingShow = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+        if (existingShow.rows.length === 0) {
+            throw new Error('SHOW_NOT_FOUND');
+        }
+
+        // Build dynamic UPDATE query
+        const updates = [];
+        const values = [];
+        let paramIndex = 1;
+
+        // Only update fields that are provided
+        if (updateData.name !== undefined) {
+            updates.push(`name = $${paramIndex}`);
+            values.push(updateData.name);
+            paramIndex++;
+        }
+        if (updateData.original_name !== undefined) {
+            updates.push(`original_name = $${paramIndex}`);
+            values.push(updateData.original_name);
+            paramIndex++;
+        }
+        if (updateData.first_air_date !== undefined) {
+            updates.push(`first_air_date = $${paramIndex}`);
+            values.push(updateData.first_air_date);
+            paramIndex++;
+        }
+        if (updateData.last_air_date !== undefined) {
+            updates.push(`last_air_date = $${paramIndex}`);
+            values.push(updateData.last_air_date);
+            paramIndex++;
+        }
+        if (updateData.seasons !== undefined) {
+            updates.push(`seasons = $${paramIndex}`);
+            values.push(updateData.seasons);
+            paramIndex++;
+        }
+        if (updateData.episodes !== undefined) {
+            updates.push(`episodes = $${paramIndex}`);
+            values.push(updateData.episodes);
+            paramIndex++;
+        }
+        if (updateData.status !== undefined) {
+            updates.push(`status = $${paramIndex}`);
+            values.push(updateData.status);
+            paramIndex++;
+        }
+        if (updateData.overview !== undefined) {
+            updates.push(`overview = $${paramIndex}`);
+            values.push(updateData.overview);
+            paramIndex++;
+        }
+        if (updateData.popularity !== undefined) {
+            updates.push(`popularity = $${paramIndex}`);
+            values.push(updateData.popularity);
+            paramIndex++;
+        }
+        if (updateData.tmdb_rating !== undefined) {
+            updates.push(`tmdb_rating = $${paramIndex}`);
+            values.push(updateData.tmdb_rating);
+            paramIndex++;
+        }
+        if (updateData.vote_count !== undefined) {
+            updates.push(`vote_count = $${paramIndex}`);
+            values.push(updateData.vote_count);
+            paramIndex++;
+        }
+        if (updateData.poster_url !== undefined) {
+            updates.push(`poster_url = $${paramIndex}`);
+            values.push(updateData.poster_url);
+            paramIndex++;
+        }
+        if (updateData.backdrop_url !== undefined) {
+            updates.push(`backdrop_url = $${paramIndex}`);
+            values.push(updateData.backdrop_url);
+            paramIndex++;
+        }
+
+        if (updates.length === 0) {
+            throw new Error('NO_FIELDS_TO_UPDATE');
+        }
+
+        // Add WHERE clause parameter
+        values.push(showId);
+
+        const query = `
+            UPDATE tv_shows
+            SET ${updates.join(', ')}
+            WHERE id = $${paramIndex}
+            RETURNING *
+        `;
+
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in updateShow:', error);
+        throw error;
+    }
+};
+
+// ===================================================
+// CAST MANAGEMENT
+// ===================================================
+
+// ADD CAST MEMBER to a TV show
+const addCastMember = async (showId, castData) => {
+    try {
+        const { actor_id, character_name } = castData;
+
+        // Check if show exists
+        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+        if (showExists.rows.length === 0) {
+            throw new Error('SHOW_NOT_FOUND');
+        }
+
+        // Check if actor exists
+        const actorExists = await pool.query('SELECT id FROM actors WHERE id = $1', [actor_id]);
+        if (actorExists.rows.length === 0) {
+            throw new Error('ACTOR_NOT_FOUND');
+        }
+
+        // Check if cast member already exists for this show
+        const existingCast = await pool.query(
+            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
+            [showId, actor_id]
+        );
+        if (existingCast.rows.length > 0) {
+            throw new Error('CAST_MEMBER_EXISTS');
+        }
+
+        // Insert new cast member
+        const result = await pool.query(
+            'INSERT INTO show_actors (tv_show_id, actor_id, character_name) VALUES ($1, $2, $3) RETURNING *',
+            [showId, actor_id, character_name]
+        );
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in addCastMember:', error);
+        throw error;
+    }
+};
+
+// UPDATE CAST MEMBER character name
+const updateCastMember = async (showId, actorId, characterName) => {
+    try {
+        // Check if show exists
+        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+        if (showExists.rows.length === 0) {
+            throw new Error('SHOW_NOT_FOUND');
+        }
+
+        // Check if cast member exists
+        const existingCast = await pool.query(
+            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
+            [showId, actorId]
+        );
+        if (existingCast.rows.length === 0) {
+            throw new Error('CAST_MEMBER_NOT_FOUND');
+        }
+
+        // Update character name
+        const result = await pool.query(
+            'UPDATE show_actors SET character_name = $1 WHERE tv_show_id = $2 AND actor_id = $3 RETURNING *',
+            [characterName, showId, actorId]
+        );
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in updateCastMember:', error);
+        throw error;
+    }
+};
+
+// GET CAST for a TV show
+const getCastByShowId = async (showId) => {
+    try {
+        const result = await pool.query(
+            `SELECT sa.tv_show_id, sa.actor_id, sa.character_name, a.name as actor_name, a.profile_url
+             FROM show_actors sa
+             JOIN actors a ON sa.actor_id = a.id
+             WHERE sa.tv_show_id = $1
+             ORDER BY sa.actor_id`,
+            [showId]
+        );
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getCastByShowId:', error);
+        throw error;
+    }
+};
+
+// DELETE CAST MEMBER from a TV show
+const deleteCastMember = async (showId, actorId) => {
+    try {
+        // Check if show exists
+        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+        if (showExists.rows.length === 0) {
+            throw new Error('SHOW_NOT_FOUND');
+        }
+
+        // Check if cast member exists
+        const existingCast = await pool.query(
+            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
+            [showId, actorId]
+        );
+        if (existingCast.rows.length === 0) {
+            throw new Error('CAST_MEMBER_NOT_FOUND');
+        }
+
+        // Delete cast member
+        const result = await pool.query(
+            'DELETE FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2 RETURNING *',
+            [showId, actorId]
+        );
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in deleteCastMember:', error);
+        throw error;
+    }
+};
+
+// ===================================================
 // EXPORTS
 // ===================================================
 module.exports = {
@@ -509,5 +738,10 @@ module.exports = {
     getStatuses,
     getShows,
     createShow,
+    updateShow,
     deleteShow,
+    addCastMember,
+    updateCastMember,
+    getCastByShowId,
+    deleteCastMember,
 };
