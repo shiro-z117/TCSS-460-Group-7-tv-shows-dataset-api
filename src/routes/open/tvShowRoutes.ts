@@ -17,13 +17,13 @@ export const tvShowRoutes = Router();
 tvShowRoutes.post('/shows', apiKeyAuth, validateCreateShow, TV.createShow);
 
 // PATCH /api/shows/:id/status - Update show status (Admin only)
-tvShowRoutes.patch('/shows/:id/status', checkShowExists, apiKeyAuth, validateUpdateStatus, TV.updateShowStatus);
+tvShowRoutes.patch('/shows/:id/status', checkShowExists, apiKeyAuth, TV.updateShowStatus);
 
 // PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', checkShowExists, apiKeyAuth, validateUpdateDates, TV.updateShowDates);
+tvShowRoutes.patch('/shows/:id/dates', checkShowExists, apiKeyAuth, TV.updateShowDates);
 
 // PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', checkShowExists, apiKeyAuth, validateUpdateMetrics, TV.updateShowMetrics);
+tvShowRoutes.patch('/shows/:id/metrics', checkShowExists, apiKeyAuth, TV.updateShowMetrics);
 
 // DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
 // Check existence first (404) before auth (401)
