@@ -36,9 +36,16 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ### Shiraz
 - Imported all remaining data to tables on Supabase
 - Implemented junction tables to handle relationships between rows on different tables
+- Implemented admin endpoints (PATCH status/dates/metrics for a selected show)
 
 ### Bao
----
+- Built and test the following endpoints on local and render:
+  - GET /shows/random (get one random show)
+  - GET /shows/:id (get full details for one show by numeric/string :id)
+  - GET /genres (get distinct list of genres)
+  - GET /networks (get distinct list of networks)
+  - GET /statuses (get distinct list of show statuses)
+  - GET /shows (get list of shows)
 
 ## Beta Sprint Comments
 
