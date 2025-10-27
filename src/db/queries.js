@@ -1032,7 +1032,7 @@ const deleteCastMember = async (showId, actorId) => {
 
 // Linda's endpoint: GET /api/studios
 // Returns distinct studio names with pagination and search
-const getStudios = async (q?: string, page = 1, limit = 50) => {
+const getStudios = async (q, page = 1, limit = 50) => {
     try {
         const offset = (page - 1) * limit;
         let query = 'SELECT DISTINCT studio_name FROM public.studios ORDER BY studio_name';
@@ -1063,7 +1063,7 @@ const getStudios = async (q?: string, page = 1, limit = 50) => {
 // QUERY 7: GET /api/years/first (Linda)
 // ===================================================
 // Returns distinct first air years with min/max filter
-const getYearsFirst = async (min?: number, max?: number, page = 1, limit = 50) => {
+const getYearsFirst = async (min, max, page = 1, limit = 50) => {
     try {
         const offset = (page - 1) * limit;
         let query = 'SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL';
@@ -1094,7 +1094,7 @@ const getYearsFirst = async (min?: number, max?: number, page = 1, limit = 50) =
 // QUERY 8: GET /api/years/last (Linda)
 // ===================================================
 // Returns distinct last air years with min/max filter
-const getYearsLast = async (min?: number, max?: number, page = 1, limit = 50) => {
+const getYearsLast = async (min, max, page = 1, limit = 50) => {
     try {
         const offset = (page - 1) * limit;
         let query = 'SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL';
@@ -1144,7 +1144,6 @@ const getSeasons = async (page = 1, limit = 50) => {
         throw error;
     }
 };
-
 
 // ===================================================
 // EXPORTS
