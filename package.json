@@ -10,7 +10,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "test": "node testing/run-postman-tests.js",
+    "test:prod": "node testing/run-postman-tests.js --base-url=https://your-production-url.com"
   },
   "dependencies": {
     "cors": "^2.8.5",
