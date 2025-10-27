@@ -2,6 +2,7 @@
 import { query, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import {sendValidationError} from "../utilities/responseUtils";
+import * as db from '../../db/queries.js';
 
 export const listValidator = [
     query('page').optional().isInt({ min: 1 }).toInt(),
@@ -110,6 +111,143 @@ export const validateCreateShow = [
         .optional()
         .isString()
         .withMessage('Backdrop URL must be a string')
+        .trim(),
+
+    validate
+];
+
+// Middleware to check if a show exists by ID (for DELETE operations)
+export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+
+        // Validate ID is a valid number
+        if (isNaN(showId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid show ID'
+            });
+            return;
+        }
+
+        // Check if show exists
+        const show = await db.getShowById(showId);
+        if (!show) {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+
+        // Show exists, continue to next middleware (auth)
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Validation for updating a show (PATCH - all fields optional)
+export const validateUpdateShow = [
+    body('name')
+        .optional()
+        .isString()
+        .withMessage('Name must be a string')
+        .trim(),
+
+    body('original_name')
+        .optional()
+        .isString()
+        .withMessage('Original name must be a string')
+        .trim(),
+
+    body('first_air_date')
+        .optional()
+        .isISO8601()
+        .withMessage('First air date must be a valid date (ISO 8601)'),
+
+    body('last_air_date')
+        .optional()
+        .isISO8601()
+        .withMessage('Last air date must be a valid date (ISO 8601)'),
+
+    body('seasons')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Seasons must be a non-negative integer'),
+
+    body('episodes')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Episodes must be a non-negative integer'),
+
+    body('status')
+        .optional()
+        .isString()
+        .withMessage('Status must be a string')
+        .trim(),
+
+    body('overview')
+        .optional()
+        .isString()
+        .withMessage('Overview must be a string')
+        .trim(),
+
+    body('popularity')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('Popularity must be a non-negative number'),
+
+    body('tmdb_rating')
+        .optional()
+        .isFloat({ min: 0, max: 10 })
+        .withMessage('TMDB rating must be between 0 and 10'),
+
+    body('vote_count')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Vote count must be a non-negative integer'),
+
+    body('poster_url')
+        .optional()
+        .isString()
+        .withMessage('Poster URL must be a string')
+        .trim(),
+
+    body('backdrop_url')
+        .optional()
+        .isString()
+        .withMessage('Backdrop URL must be a string')
+        .trim(),
+
+    validate
+];
+
+// Validation for adding a cast member
+export const validateAddCastMember = [
+    body('actor_id')
+        .notEmpty()
+        .withMessage('Actor ID is required')
+        .isInt({ min: 1 })
+        .withMessage('Actor ID must be a positive integer'),
+
+    body('character_name')
+        .notEmpty()
+        .withMessage('Character name is required')
+        .isString()
+        .withMessage('Character name must be a string')
+        .trim(),
+
+    validate
+];
+
+// Validation for updating a cast member
+export const validateUpdateCastMember = [
+    body('character_name')
+        .notEmpty()
+        .withMessage('Character name is required')
+        .isString()
+        .withMessage('Character name must be a string')
         .trim(),
 
     validate
