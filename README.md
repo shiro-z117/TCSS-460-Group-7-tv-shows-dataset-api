@@ -11,7 +11,13 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ## Beta Ⅱ Sprint Contributions
 ### Patrick
-
+### What Was Completed
+- Built and tested 5 GET endpoints with Postman:
+  - GET /api/shows/:id, 
+  - PATCH /api/shows/:id, 
+  - POST/PATCH/DELETE /api/shows/:id/cast, 
+  - Updated database queries with cast and show update functions.
+  - created tests for all above endpoints
 ### Linda Miao - Database Setup & API Endpoint Development
 ### What Was Completed
 - Re-imported 7,382 TV shows from professor's CSV file into Supabase(relationshiop and other debug solve by team member)
