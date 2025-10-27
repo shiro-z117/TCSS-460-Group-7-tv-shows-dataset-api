@@ -800,11 +800,6 @@ const updateShowMetrics = async (showId, metrics) => {
     console.error("Database error in updateShowMetrics:", error);
     throw error;
   }
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in deleteShow:', error);
-        throw error;
-    }
 };
 
 // ===================================================
