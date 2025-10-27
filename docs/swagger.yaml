@@ -32,7 +32,7 @@ tags:
   - name: Images & Cast
     description: Show images and cast information
   - name: Admin - Shows
-    description: Create and delete shows (API key required)
+    description: Create, update, and delete shows (API key required)
   - name: Admin - Seasons & Cast
     description: Manage seasons and cast members (API key required)
 
@@ -648,6 +648,193 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /shows/{id}/status:
+    patch:
+      tags:
+        - Admin - Shows
+      summary: Update show status
+      description: Update the status of a TV show (requires API key)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [Ended, Returning Series, Canceled, In Production, Planned, Pilot]
+                  example: "Ended"
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                  status:
+                    type: string
+                    example: "Ended"
+                  name:
+                    type: string
+                    example: "Breaking Bad"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /shows/{id}/dates:
+    patch:
+      tags:
+        - Admin - Shows
+      summary: Update show air dates
+      description: Update first and/or last air dates for a TV show (requires API key)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_air_date:
+                  type: string
+                  format: date
+                  description: First air date in ISO-8601 format
+                  example: "2015-01-10"
+                last_air_date:
+                  type: string
+                  format: date
+                  description: Last air date in ISO-8601 format
+                  example: "2019-06-30"
+      responses:
+        '200':
+          description: Dates updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                  first_air_date:
+                    type: string
+                    format: date
+                    example: "2015-01-10"
+                  last_air_date:
+                    type: string
+                    format: date
+                    example: "2019-06-30"
+                  name:
+                    type: string
+                    example: "Better Call Saul"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /shows/{id}/metrics:
+    patch:
+      tags:
+        - Admin - Shows
+      summary: Update show metrics
+      description: Update numeric fields like rating, popularity, and vote count (requires API key)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  format: float
+                  description: TMDb rating score
+                  example: 8.4
+                vote_count:
+                  type: integer
+                  description: Number of votes
+                  example: 3210
+                popularity:
+                  type: number
+                  format: float
+                  description: Popularity score
+                  example: 456.78
+      responses:
+        '200':
+          description: Metrics updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                  rating:
+                    type: number
+                    format: float
+                    example: 8.4
+                  vote_count:
+                    type: integer
+                    example: 3210
+                  popularity:
+                    type: number
+                    format: float
+                    example: 456.78
+                  name:
+                    type: string
+                    example: "Breaking Bad"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
