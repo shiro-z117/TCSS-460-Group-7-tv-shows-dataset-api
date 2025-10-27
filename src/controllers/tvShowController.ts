@@ -261,6 +261,112 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
     }
 }
 
+// ===================================================
+// UPDATE SHOW STATUS
+// ===================================================
+export async function updateShowStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+        const { status } = req.body;
+
+        const updatedShow = await db.updateShowStatus(showId, status);
+
+        res.status(200).json({
+            success: true,
+            message: '1 field(s) updated',
+            data: updatedShow
+        });
+    } catch (err: any) {
+        if (err.message === 'SHOW_NOT_FOUND') {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+        next(err);
+    }
+}
+
+// ===================================================
+// UPDATE SHOW DATES
+// ===================================================
+export async function updateShowDates(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+        const { first_air_date, last_air_date } = req.body;
+
+        const dates: any = {};
+        if (first_air_date !== undefined) dates.first_air_date = first_air_date;
+        if (last_air_date !== undefined) dates.last_air_date = last_air_date;
+
+        const fieldsUpdated = Object.keys(dates).length;
+        const updatedShow = await db.updateShowDates(showId, dates);
+
+        res.status(200).json({
+            success: true,
+            message: `${fieldsUpdated} field(s) updated`,
+            data: updatedShow
+        });
+    } catch (err: any) {
+        if (err.message === 'SHOW_NOT_FOUND') {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+        if (err.message === 'NO_UPDATES_PROVIDED') {
+            res.status(400).json({
+                success: false,
+                message: 'At least one date field must be provided'
+            });
+            return;
+        }
+        next(err);
+    }
+}
+
+// ===================================================
+// UPDATE SHOW METRICS
+// ===================================================
+export async function updateShowMetrics(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+        const { tmdb_rating, popularity, vote_count } = req.body;
+
+        const metrics: any = {};
+        if (tmdb_rating !== undefined) metrics.tmdb_rating = tmdb_rating;
+        if (popularity !== undefined) metrics.popularity = popularity;
+        if (vote_count !== undefined) metrics.vote_count = vote_count;
+
+        const fieldsUpdated = Object.keys(metrics).length;
+        const updatedShow = await db.updateShowMetrics(showId, metrics);
+
+        res.status(200).json({
+            success: true,
+            message: `${fieldsUpdated} field(s) updated`,
+            data: updatedShow
+        });
+    } catch (err: any) {
+        if (err.message === 'SHOW_NOT_FOUND') {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+        if (err.message === 'NO_UPDATES_PROVIDED') {
+            res.status(400).json({
+                success: false,
+                message: 'At least one metric field must be provided'
+            });
+            return;
+        }
+        next(err);
+    }
+}
+
 // Linda's controller function for GET /api/studios
 export async function getStudios(req: Request, res: Response, next: NextFunction) {
     try {
