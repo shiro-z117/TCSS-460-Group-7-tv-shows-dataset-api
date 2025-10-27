@@ -461,7 +461,7 @@ export async function getSeasons(req: Request, res: Response, next: NextFunction
         // Call database to get season counts
         
         // Convert season objects to numbers
-        let seasons = data.map((row: any) => parseInt(row.seasons));
+        let seasons: (number | string)[] = data.map((row: any) => parseInt(row.seasons));
         // seasons = [1, 2, 3, 4, ..., 69]
         
         // If buckets=true, group seasons into ranges
