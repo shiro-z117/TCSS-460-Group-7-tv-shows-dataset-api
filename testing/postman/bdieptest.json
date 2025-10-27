@@ -1,0 +1,905 @@
+{
+	"info": {
+		"_postman_id": "bdiep-2025-test-collection",
+		"name": "TCSS-460 TV Shows API - bdiep Endpoints",
+		"description": "Test collection for new endpoints implemented by bdiep:\n- GET /api/networks (vocabulary)\n- GET /api/statuses (vocabulary)\n- GET /api/shows (advanced search with filters)\n- GET /api/shows/random (random show)\n- GET /api/shows/:id (show by ID)\n\nThese tests cover all new functionality including:\n- Search and filtering\n- Pagination and sorting\n- Match logic (all/any)\n- Error handling (404, 400)\n- Data validation\n\nBase URL: http://localhost:8000 or https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "bdiep-2025"
+	},
+	"item": [
+		{
+			"name": "Networks - List",
+			"item": [
+				{
+					"name": "GET All Networks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing network list endpoint",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('data');",
+									"    pm.expect(responseJson).to.have.property('page');",
+									"    pm.expect(responseJson).to.have.property('limit');",
+									"    pm.expect(responseJson).to.have.property('total');",
+									"});",
+									"",
+									"pm.test('Data is an array of strings', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 0) {",
+									"        pm.expect(data[0]).to.be.a('string');",
+									"    }",
+									"});",
+									"",
+									"pm.test('Contains expected networks', function () {",
+									"    const data = pm.response.json().data;",
+									"    const expectedNetworks = ['HBO', 'Netflix', 'NBC', 'CBS', 'ABC'];",
+									"    const foundCount = expectedNetworks.filter(network => data.includes(network)).length;",
+									"    pm.expect(foundCount).to.be.at.least(2, 'Should contain at least 2 expected networks');",
+									"});",
+									"",
+									"pm.test('Pagination metadata is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.page).to.equal(1);",
+									"    pm.expect(responseJson.limit).to.equal(50);",
+									"    pm.expect(responseJson.total).to.be.a('number');",
+									"    pm.expect(responseJson.total).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/networks",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"networks"
+							]
+						},
+						"description": "Retrieves all available networks with default pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Networks with Search Query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing network search functionality",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response structure is valid', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.success).to.be.true;",
+									"    pm.expect(responseJson.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Search results match query', function () {",
+									"    const data = pm.response.json().data;",
+									"    // Searching for 'bbc' should return BBC networks",
+									"    pm.expect(data.length).to.be.at.least(1);",
+									"    const hasMatch = data.some(network => network.toLowerCase().includes('bbc'));",
+									"    pm.expect(hasMatch).to.be.true;",
+									"});",
+									"",
+									"pm.test('Total count reflects filtered results', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.total).to.equal(responseJson.data.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/networks?q=bbc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"networks"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "bbc"
+								}
+							]
+						},
+						"description": "Tests network search with query parameter 'bbc'."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Networks with Pagination",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing network pagination",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Pagination parameters are respected', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.page).to.equal(1);",
+									"    pm.expect(responseJson.limit).to.equal(10);",
+									"    pm.expect(responseJson.data.length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test('Data array respects limit', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data.length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test('Total count is accurate', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.total).to.be.a('number');",
+									"    pm.expect(responseJson.total).to.be.at.least(responseJson.data.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/networks?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"networks"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Tests network pagination with custom page and limit parameters."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for the networks list endpoint with search and pagination."
+		},
+		{
+			"name": "Statuses - List",
+			"item": [
+				{
+					"name": "GET All Statuses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing status list endpoint",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Data is an array of strings', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 0) {",
+									"        pm.expect(data[0]).to.be.a('string');",
+									"    }",
+									"});",
+									"",
+									"pm.test('Contains expected statuses', function () {",
+									"    const data = pm.response.json().data;",
+									"    const expectedStatuses = ['Ended', 'Canceled', 'Returning Series', 'Pilot'];",
+									"    const foundCount = expectedStatuses.filter(status => data.includes(status)).length;",
+									"    pm.expect(foundCount).to.be.at.least(3, 'Should contain at least 3 expected statuses');",
+									"});",
+									"",
+									"pm.test('Contains exactly 4 statuses', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data.length).to.equal(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/statuses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"statuses"
+							]
+						},
+						"description": "Retrieves all available show statuses (no pagination needed)."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for the statuses list endpoint."
+		},
+		{
+			"name": "TV Shows - Advanced Search",
+			"item": [
+				{
+					"name": "GET Shows - Search by Name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing show search by name",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has paginated structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('data');",
+									"    pm.expect(responseJson).to.have.property('page');",
+									"    pm.expect(responseJson).to.have.property('limit');",
+									"    pm.expect(responseJson).to.have.property('total');",
+									"});",
+									"",
+									"pm.test('Search results match query', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 0) {",
+									"        const hasMatch = data.some(show => ",
+									"            show.name.toLowerCase().includes('breaking') || ",
+									"            show.original_name.toLowerCase().includes('breaking')",
+									"        );",
+									"        pm.expect(hasMatch).to.be.true;",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?q=breaking&page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "breaking"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search shows by name with pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Shows - Filter by Genre and Network (match=all)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing multi-filter with match=all",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns results for HBO + Drama combination', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.success).to.be.true;",
+									"    pm.expect(responseJson.data).to.be.an('array');",
+									"    pm.expect(responseJson.total).to.be.at.least(1);",
+									"});",
+									"",
+									"pm.test('Pagination metadata is present', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.page).to.equal(1);",
+									"    pm.expect(responseJson.limit).to.equal(20);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?network=HBO&genre=Drama&match=all&page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "network",
+									"value": "HBO"
+								},
+								{
+									"key": "genre",
+									"value": "Drama"
+								},
+								{
+									"key": "match",
+									"value": "all"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Filter shows by both network and genre with match=all logic."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Shows - Multiple Networks (comma-separated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing comma-separated network filter",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns shows from HBO or Netflix', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.success).to.be.true;",
+									"    pm.expect(responseJson.data).to.be.an('array');",
+									"    pm.expect(responseJson.total).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?network=HBO,Netflix&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "network",
+									"value": "HBO,Netflix"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Filter shows by multiple networks using comma-separated values."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Shows - Filter by Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing status filter",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('All returned shows have status Ended', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 0) {",
+									"        data.forEach(show => {",
+									"            pm.expect(show.status).to.equal('Ended');",
+									"        });",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?status=Ended&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "Ended"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Filter shows by status."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Shows - Sort by Rating Descending",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing sorting functionality",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Results are sorted by rating in descending order', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 1) {",
+									"        for (let i = 0; i < data.length - 1; i++) {",
+									"            const currentRating = parseFloat(data[i].tmdb_rating) || 0;",
+									"            const nextRating = parseFloat(data[i + 1].tmdb_rating) || 0;",
+									"            pm.expect(currentRating).to.be.at.least(nextRating);",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?sort=rating&order=desc&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "rating"
+								},
+								{
+									"key": "order",
+									"value": "desc"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Sort shows by rating in descending order."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Shows - Complex Multi-Filter (match=any)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing match=any logic",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns shows matching any filter', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.success).to.be.true;",
+									"    pm.expect(responseJson.data).to.be.an('array');",
+									"    pm.expect(responseJson.total).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows?genre=Comedy&network=HBO&match=any&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows"
+							],
+							"query": [
+								{
+									"key": "genre",
+									"value": "Comedy"
+								},
+								{
+									"key": "network",
+									"value": "HBO"
+								},
+								{
+									"key": "match",
+									"value": "any"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Filter shows with match=any logic (OR between filter categories)."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for advanced show search with filters, pagination, and sorting."
+		},
+		{
+			"name": "TV Shows - Random",
+			"item": [
+				{
+					"name": "GET Random Show",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing random show endpoint",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Returns a single show object', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.be.an('object');",
+									"    pm.expect(data).to.have.property('id');",
+									"    pm.expect(data).to.have.property('name');",
+									"    pm.expect(data).to.have.property('overview');",
+									"});",
+									"",
+									"pm.test('Show has all required fields', function () {",
+									"    const show = pm.response.json().data;",
+									"    pm.expect(show).to.have.property('id');",
+									"    pm.expect(show).to.have.property('name');",
+									"    pm.expect(show).to.have.property('original_name');",
+									"    pm.expect(show).to.have.property('first_air_date');",
+									"    pm.expect(show).to.have.property('seasons');",
+									"    pm.expect(show).to.have.property('episodes');",
+									"    pm.expect(show).to.have.property('status');",
+									"    pm.expect(show).to.have.property('overview');",
+									"    pm.expect(show).to.have.property('tmdb_rating');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows/random",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows",
+								"random"
+							]
+						},
+						"description": "Retrieves one random show from the entire dataset."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for the random show endpoint."
+		},
+		{
+			"name": "TV Shows - By ID",
+			"item": [
+				{
+					"name": "GET Show by Valid ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing show retrieval by ID",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', true);",
+									"    pm.expect(responseJson).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Returns Breaking Bad data', function () {",
+									"    const show = pm.response.json().data;",
+									"    pm.expect(show).to.be.an('object');",
+									"    pm.expect(show.id).to.equal(1396);",
+									"    pm.expect(show.name).to.equal('Breaking Bad');",
+									"    pm.expect(show.seasons).to.equal(5);",
+									"    pm.expect(show.episodes).to.equal(62);",
+									"});",
+									"",
+									"pm.test('Show has all fields', function () {",
+									"    const show = pm.response.json().data;",
+									"    pm.expect(show).to.have.property('id');",
+									"    pm.expect(show).to.have.property('name');",
+									"    pm.expect(show).to.have.property('original_name');",
+									"    pm.expect(show).to.have.property('first_air_date');",
+									"    pm.expect(show).to.have.property('last_air_date');",
+									"    pm.expect(show).to.have.property('seasons');",
+									"    pm.expect(show).to.have.property('episodes');",
+									"    pm.expect(show).to.have.property('status');",
+									"    pm.expect(show).to.have.property('overview');",
+									"    pm.expect(show).to.have.property('popularity');",
+									"    pm.expect(show).to.have.property('tmdb_rating');",
+									"    pm.expect(show).to.have.property('vote_count');",
+									"    pm.expect(show).to.have.property('poster_url');",
+									"    pm.expect(show).to.have.property('backdrop_url');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows/1396",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows",
+								"1396"
+							]
+						},
+						"description": "Retrieves Breaking Bad by its ID (1396)."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Show by ID - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing 404 handling for non-existent show",
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Response indicates failure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', false);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"});",
+									"",
+									"pm.test('Error message is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.message).to.equal('Show not found');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows/999999999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows",
+								"999999999"
+							]
+						},
+						"description": "Tests 404 response for non-existent show ID."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Show by Invalid ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Testing 400 handling for invalid ID format",
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Response indicates failure', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('success', false);",
+									"    pm.expect(responseJson).to.have.property('message');",
+									"});",
+									"",
+									"pm.test('Error message is correct', function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.message).to.equal('Invalid show ID');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/shows/invalid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"shows",
+								"invalid"
+							]
+						},
+						"description": "Tests 400 response for invalid (non-numeric) show ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Tests for retrieving shows by ID with error handling."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"exec": [
+					"// Global pre-request script",
+					"console.log('Running bdiep tests against:', pm.environment.get('base_url'));",
+					"pm.environment.set('test_timestamp', new Date().toISOString());"
+				],
+				"type": "text/javascript"
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"exec": [
+					"// Global test script for common validations",
+					"console.log('Response Status:', pm.response.status);",
+					"console.log('Response Time:', pm.response.responseTime + 'ms');",
+					"",
+					"// Ensure no server errors",
+					"pm.test('No server errors (global)', function () {",
+					"    pm.expect(pm.response.code).to.be.below(500);",
+					"});"
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string",
+			"description": "Base URL for the TV Shows API (local development)"
+		},
+		{
+			"key": "collection_version",
+			"value": "1.0.0",
+			"type": "string"
+		},
+		{
+			"key": "author",
+			"value": "bdiep",
+			"type": "string"
+		}
+	]
+}
