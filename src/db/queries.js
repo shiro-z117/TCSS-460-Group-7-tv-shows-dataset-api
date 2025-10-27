@@ -1030,32 +1030,152 @@ const deleteCastMember = async (showId, actorId) => {
     }
 };
 
+// Linda's endpoint: GET /api/studios
+// Returns distinct studio names with pagination and search
+const getStudios = async (q?: string, page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        let query = 'SELECT DISTINCT studio_name FROM public.studios ORDER BY studio_name';
+        const params = [];
+        
+        if (q) {
+            // Filter by search term (case-insensitive)
+            query += ' WHERE studio_name ILIKE $1';
+            params.push(`%${q}%`);
+            query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+            params.push(limit, offset);
+        } else {
+            // No filter, just pagination
+            query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+            params.push(limit, offset);
+        }
+        
+        const result = await pool.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getStudios:', error);
+        throw error;
+    }
+};
+
+
+// ===================================================
+// QUERY 7: GET /api/years/first (Linda)
+// ===================================================
+// Returns distinct first air years with min/max filter
+const getYearsFirst = async (min?: number, max?: number, page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL';
+        const params = [];
+        
+        if (min) {
+            query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${params.length + 1}`;
+            params.push(min);
+        }
+        
+        if (max) {
+            query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${params.length + 1}`;
+            params.push(max);
+        }
+        
+        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+        
+        const result = await pool.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getYearsFirst:', error);
+        throw error;
+    }
+};
+
+// ===================================================
+// QUERY 8: GET /api/years/last (Linda)
+// ===================================================
+// Returns distinct last air years with min/max filter
+const getYearsLast = async (min?: number, max?: number, page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL';
+        const params = [];
+        
+        if (min) {
+            query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
+            params.push(min);
+        }
+        
+        if (max) {
+            query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
+            params.push(max);
+        }
+        
+        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+        
+        const result = await pool.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Database error in getYearsLast:', error);
+        throw error;
+    }
+};
+
+// ===================================================
+// QUERY 9: GET /api/seasons (Linda)
+// ===================================================
+// Returns distinct season counts
+const getSeasons = async (page = 1, limit = 50) => {
+    try {
+        const offset = (page - 1) * limit;
+        // Calculate pagination offset
+        
+        const query = 'SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2';
+        // Get all distinct season counts, sorted ascending
+        
+        const result = await pool.query(query, [limit, offset]);
+        // Execute query with pagination
+        
+        return result.rows;
+        // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+        
+    } catch (error) {
+        console.error('Database error in getSeasons:', error);
+        throw error;
+    }
+};
+
+
 // ===================================================
 // EXPORTS
 // ===================================================
 export {
-    getAllShows,
-    getShowsByName,
-    getShowsByGenre,
-    getShowsByStatus,
-    getShowById,
-    getRandomShows,
-    getGenres,
-    getNetworks,
-    getStatuses,
-    getShows,
-    getRandomShow,
-    createShow,
-    updateShow,
-    deleteShow,
-    addCastMember,
-    updateCastMember,
-    getCastByShowId,
-    deleteCastMember,
-    updateShowStatus,
-    updateShowDates,
-    updateShowMetrics,
-    getHealth,
-    getShowImages,
-    getShowCast,
+  getAllShows,
+  getShowsByName,
+  getShowsByGenre,
+  getShowsByStatus,
+  getShowById,
+  getRandomShows,
+  getGenres,
+  getNetworks,
+  getStatuses,
+  getShows,
+  getRandomShow,
+  createShow,
+  updateShow,
+  deleteShow,
+  addCastMember,
+  updateCastMember,
+  getCastByShowId,
+  deleteCastMember,
+  updateShowStatus,
+  updateShowDates,
+  updateShowMetrics,
+  getHealth,
+  getShowImages,
+  getShowCast,
+  getStudios,
+  getYearsFirst,
+  getYearsLast,
+  getSeasons,
 };
