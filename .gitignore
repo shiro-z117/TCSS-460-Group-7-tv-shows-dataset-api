@@ -11,5 +11,5 @@ AI/
 /dataSources/
 /dataSources.local.xml
 node_modules/
-dist/package-lock.json
+dist/
 /bdiep_local
