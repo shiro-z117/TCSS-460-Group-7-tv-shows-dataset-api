@@ -10,6 +10,6 @@ AI/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-testing/
 node_modules/
-dist/
+dist/package-lock.json
+/bdiep_local
