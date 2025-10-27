@@ -195,8 +195,6 @@ export const validateUpdateMetrics = [
   }),
   validate,
 ];
-    validate
-];
 
 // Middleware to check if a show exists by ID (for DELETE operations)
 export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
