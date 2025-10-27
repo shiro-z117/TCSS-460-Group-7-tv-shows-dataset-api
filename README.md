@@ -37,6 +37,8 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Imported all remaining data to tables on Supabase
 - Implemented junction tables to handle relationships between rows on different tables
 - Implemented admin endpoints (PATCH status/dates/metrics for a selected show)
+- Merged all branches into main
+- Cleaned up project files
 
 ### Bao
 - Built and test the following endpoints on local and render:
@@ -73,7 +75,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Documentation at `project_files/swagger.yaml`
 
 ### Shiraz
-
+- Merging numerous branches can be painful, git is kind of finnicky with what it considers a conflict (sometimes even formatting counts)
 
 ### Bao
 
