@@ -442,6 +442,149 @@ const getRandomShow = async () => {
 };
 
 // ===================================================
+// QUERY 12: GET SERVICE HEALTH STATUS
+// ===================================================
+
+// GET /api/health
+const getHealth = async () => {
+    try {
+        // test db connection
+        const result = await pool.query('SELECT NOW()');
+        
+        // Get server uptime (in seconds)
+        const uptime = process.uptime();
+        
+        // if query succeeds, DB is oke
+        return {
+            status: 'ok',
+            db: 'ok',
+            uptime: Math.round(uptime * 100) / 100  // Round to 2 decimals
+        };
+        
+    } catch (error) {
+        // If query fails, DB is down
+        console.error('Database error in getHealth:', error);
+        return {
+            status: 'error',
+            db: 'down',
+            uptime: Math.round(process.uptime() * 100) / 100
+        };
+    }
+};
+
+// ===================================================
+// QUERY 13: GET SHOW IMAGES
+// ===================================================
+
+// GET /api/shows/:id/images
+// returns images/poster of shows from tv_shows table w pagination
+const getShowImages = async (showId, type, page = 1, limit = 20) => {
+    try {
+        console.log('getShowImages called with showId:', showId, 'type:', type, 'page:', page, 'limit:', limit);
+        
+        // query tv_shows table for poster_url & backdrop_url
+        const query = 'SELECT id, poster_url, backdrop_url FROM public.tv_shows WHERE id = $1';
+        const result = await pool.query(query, [showId]);
+        
+        console.log('Query result rows:', result.rows.length);
+        
+        if (result.rows.length === 0) {
+            console.log('No show found with id:', showId);
+            return [];
+        }
+        
+        const show = result.rows[0];
+        console.log('Show data:', show);
+        
+        const images = [];
+        
+        // adds poster if exists
+        if (show.poster_url && show.poster_url.trim() !== '') {
+            images.push({
+                id: show.id + '_poster',
+                type: 'poster',
+                url: show.poster_url,
+                width: 1000,
+                height: 1500
+            });
+        }
+        
+        // adds backdrop if exists
+        if (show.backdrop_url && show.backdrop_url.trim() !== '') {
+            images.push({
+                id: show.id + '_backdrop',
+                type: 'backdrop',
+                url: show.backdrop_url,
+                width: 1920,
+                height: 1080
+            });
+        }
+        
+        console.log('Images found before filter:', images.length);
+        
+        // filter by type if specified
+        let filteredImages = images;
+        if (type) {
+            filteredImages = images.filter(img => img.type === type);
+        }
+        
+        // add in pagination
+        const offset = (page - 1) * limit;
+        const paginatedImages = filteredImages.slice(offset, offset + limit);
+        
+        console.log('Images after pagination:', paginatedImages.length);
+        
+        return paginatedImages;
+        
+    } catch (error) {
+        console.error('Database error in getShowImages:', error);
+        throw error;
+    }
+
+};
+
+// ===================================================
+// QUERY 14: GET SHOW CAST MEMBERS
+// ===================================================
+
+// GET /api/shows/:id/cast
+// Returns cast members for a show with pagination
+const getShowCast = async (showId, page = 1, limit = 10) => {
+    try {
+        console.log('getShowCast called with showId:', showId, 'page:', page, 'limit:', limit);
+        
+        // calc tge pagination offset
+        const offset = (page - 1) * limit;
+        
+        // join show_actors w actors table to get full info
+        const query = `
+            SELECT 
+                sa.id,
+                sa.character_name AS character,
+                sa.actor_order AS "order",
+                a.actor_name AS person_name,
+                a.profile_url
+            FROM public.show_actors sa
+            JOIN public.actors a ON sa.actor_id = a.id
+            WHERE sa.tv_show_id = $1
+            ORDER BY sa.actor_order
+            LIMIT $2 OFFSET $3
+        `;
+        
+        const result = await pool.query(query, [showId, limit, offset]);
+        
+        console.log('Cast members found:', result.rows.length);
+        
+        return result.rows;
+        
+    } catch (error) {
+        console.error('Database error in getShowCast:', error);
+        throw error;
+    }
+
+};
+
+// ===================================================
 // CREATE NEW TV SHOW
 // ===================================================
 const createShow = async (showData) => {
@@ -895,7 +1038,7 @@ const deleteCastMember = async (showId, actorId) => {
 // ===================================================
 // EXPORTS
 // ===================================================
-module.exports = {
+export {
     getAllShows,
     getShowsByName,
     getShowsByGenre,
@@ -917,4 +1060,7 @@ module.exports = {
     updateShowStatus,
     updateShowDates,
     updateShowMetrics,
+    getHealth,
+    getShowImages,
+    getShowCast,
 };

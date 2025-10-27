@@ -69,3 +69,12 @@ tvShowRoutes.get('/years/last', TV.getYearsLast);
 
 // Linda: GET /api/seasons
 tvShowRoutes.get('/seasons', TV.getSeasons);
+
+// GET /api/health
+tvShowRoutes.get('/health', TV.getHealth);
+
+// GET /api/shows/:id/images
+tvShowRoutes.get('/shows/:id/images', TV.getShowImages);
+
+// GET /api/shows/:id/cast
+tvShowRoutes.get('/shows/:id/cast', TV.getShowCast);
