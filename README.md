@@ -9,7 +9,34 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ---
 
-## Beta Ⅱ Sprint Contributions
+## Beta II Sprint Meetings
+### Discussion 1
+- **Date:** Monday, October 20, 2025
+- **Time:** 3:30 PM - 4:00 PM (30 minutes)
+- **Location:** In-Person
+#### Actions:
+- Planned out the week
+- Prepared to organize database tables 
+
+### Discussion 2
+- **Date:** Thursday, October 23, 2025
+- **Time:** 6:00 PM - 7:00 PM (60 minutes)
+- **Location:** Discord
+#### Actions:
+- Checked in on progress
+- Planned out remaining endpoints to implement
+
+### Discussion 3
+- **Date:** Sunday, October 26, 2025
+- **Time:** 8:00 PM - 10:00 PM (120 minutes)
+- **Location:** Discord
+#### Actions:
+- Merged everyone's branches into main and resolved merge conflicts
+- Finalized other aspects, such as documentation and postman tests
+
+---
+
+## Beta II Sprint Contributions
 ### Patrick
 ### What Was Completed
 - Built and tested 5 GET endpoints with Postman:
@@ -55,7 +82,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
   - GET /statuses (get distinct list of show statuses)
   - GET /shows (get list of shows)
 
-## Beta Sprint Comments
+## Beta II Sprint Comments
 
 ### Patrick
 
