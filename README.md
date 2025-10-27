@@ -36,6 +36,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ### Shiraz
 - Imported all remaining data to tables on Supabase
 - Implemented junction tables to handle relationships between rows on different tables
+- Implemented admin endpoints (PATCH status/dates/metrics for a selected show)
 
 ### Bao
 ---
