@@ -16,46 +16,46 @@ export const tvShowRoutes = Router();
 // ============================== GET ENDPOINTS ==============================
 
 // GET /api/shows - Advanced search with filters, pagination, and sorting
-tvShowRoutes.get('/shows', TV.getShows);
+tvShowRoutes.get("/shows", apiKeyAuth, TV.getShows);
 
 // GET /api/shows/:id - Get show by ID
-tvShowRoutes.get('/shows/:id', TV.getShowById);
+tvShowRoutes.get("/shows/:id", apiKeyAuth, TV.getShowById);
 
 // GET /api/shows/by-genre/:genre - Must be before /shows/:id to avoid conflict
-tvShowRoutes.get('/shows/by-genre/:genre', TV.getByGenre);
+tvShowRoutes.get("/shows/by-genre/:genre", apiKeyAuth, TV.getByGenre);
 
 // GET /api/genres
-tvShowRoutes.get('/genres', TV.getGenres);
+tvShowRoutes.get("/genres", apiKeyAuth, TV.getGenres);
 
 // GET /api/networks
-tvShowRoutes.get('/networks', TV.getNetworks);
+tvShowRoutes.get("/networks", apiKeyAuth, TV.getNetworks);
 
 // GET /api/statuses
-tvShowRoutes.get('/statuses', TV.getStatuses);
+tvShowRoutes.get("/statuses", apiKeyAuth, TV.getStatuses);
 
 // GET /api/studios
-tvShowRoutes.get('/studios', TV.getStudios);
+tvShowRoutes.get("/studios", apiKeyAuth, TV.getStudios);
 
 // GET /api/years/first
-tvShowRoutes.get('/years/first', TV.getYearsFirst);
+tvShowRoutes.get("/years/first", apiKeyAuth, TV.getYearsFirst);
 
 // GET /api/years/last
-tvShowRoutes.get('/years/last', TV.getYearsLast);
+tvShowRoutes.get("/years/last", apiKeyAuth, TV.getYearsLast);
 
 // GET /api/seasons
-tvShowRoutes.get('/seasons', TV.getSeasons);
+tvShowRoutes.get("/seasons", apiKeyAuth, TV.getSeasons);
 
 // GET /api/health
-tvShowRoutes.get('/health', TV.getHealth);
+tvShowRoutes.get("/health", apiKeyAuth, TV.getHealth);
 
 // GET /api/shows/:id/images
-tvShowRoutes.get('/shows/:id/images', TV.getShowImages);
+tvShowRoutes.get("/shows/:id/images", apiKeyAuth, TV.getShowImages);
 
 // GET /api/shows/:id/cast
-tvShowRoutes.get('/shows/:id/cast', TV.getShowCast);
+tvShowRoutes.get("/shows/:id/cast", apiKeyAuth, TV.getShowCast);
 
 // GET /api/shows/:id - Get a single show by ID (must be after more specific routes like /shows/:id/cast)
-tvShowRoutes.get('/shows/:id', TV.getShow);
+tvShowRoutes.get("/shows/:id", apiKeyAuth, TV.getShow);
 
 // ============================== POST ENDPOINTS ==============================
 
@@ -68,24 +68,24 @@ tvShowRoutes.post('/shows/:id/cast', apiKeyAuth, validateAddCastMember, Cast.add
 // ============================== PATCH ENDPOINTS ==============================
 
 // PATCH /api/shows/:id/status - Update show status (Admin only)
-tvShowRoutes.patch('/shows/:id/status', checkShowExists, apiKeyAuth, TV.updateShowStatus);
+tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, checkShowExists, TV.updateShowStatus);
 
 // PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', checkShowExists, apiKeyAuth, TV.updateShowDates);
+tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth checkShowExists, TV.updateShowDates);
 
 // PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', checkShowExists, apiKeyAuth, TV.updateShowMetrics);
+tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth checkShowExists, TV.updateShowMetrics);
 
 // PATCH /api/shows/:id/cast/:actorId - Update a cast member's character name (Admin only - requires API key)
 tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, validateUpdateCastMember, Cast.updateCastMember);
 
 // PATCH /api/shows/:id - Update a show (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id', checkShowExists, apiKeyAuth, validateUpdateShow, TV.updateShow);
+tvShowRoutes.patch('/shows/:id', apiKeyAuth, checkShowExists, validateUpdateShow, TV.updateShow);
 
 // ============================== DELETE ENDPOINTS ==============================
 
 // DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
-tvShowRoutes.delete('/shows/:id', checkShowExists, apiKeyAuth, TV.deleteShow);
+tvShowRoutes.delete('/shows/:id', apiKeyAuth, checkShowExists, TV.deleteShow);
 
 // DELETE /api/shows/:id/cast/:actorId - Remove a cast member from a show (Admin only - requires API key)
 tvShowRoutes.delete('/shows/:id/cast/:actorId', apiKeyAuth, Cast.deleteCastMember);
