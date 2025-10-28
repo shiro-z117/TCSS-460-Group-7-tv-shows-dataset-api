@@ -6,20 +6,7 @@
 const pool = require("./connection");
 
 // ===================================================
-// QUERY 1: GET ALL TV SHOWS
-// ===================================================
-const getAllShows = async () => {
-  try {
-    const result = await pool.query("SELECT * FROM tv_shows ORDER BY id");
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getAllShows:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 2: GET SHOWS BY NAME (SEARCH)
+// GET SHOWS BY NAME (SEARCH)
 // ===================================================
 const getShowsByName = async (showName) => {
   try {
@@ -1149,7 +1136,6 @@ const getSeasons = async (page = 1, limit = 50) => {
 // EXPORTS
 // ===================================================
 export {
-  getAllShows,
   getShowsByName,
   getShowsByGenre,
   getShowsByStatus,
