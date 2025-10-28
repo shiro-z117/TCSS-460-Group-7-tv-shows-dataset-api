@@ -13,7 +13,7 @@ import { apiKeyAuth } from '../../core/middleware/apiKeyAuth';
 
 export const tvShowRoutes = Router();
 
-
+// ============================== GET ENDPOINTS ==============================
 
 // GET /api/shows - Advanced search with filters, pagination, and sorting
 tvShowRoutes.get('/shows', TV.getShows);
@@ -36,7 +36,7 @@ tvShowRoutes.get('/networks', TV.getNetworks);
 // GET /api/statuses
 tvShowRoutes.get('/statuses', TV.getStatuses);
 
-// GET /api/studios 
+// GET /api/studios
 tvShowRoutes.get('/studios', TV.getStudios);
 
 // GET /api/years/first
@@ -60,7 +60,7 @@ tvShowRoutes.get('/shows/:id/cast', TV.getShowCast);
 // GET /api/shows/:id - Get a single show by ID (must be after more specific routes like /shows/:id/cast)
 tvShowRoutes.get('/shows/:id', TV.getShow);
 
-
+// ============================== POST ENDPOINTS ==============================
 
 // POST /api/shows - Create a new show (Admin only - requires API key)
 tvShowRoutes.post('/shows', apiKeyAuth, validateCreateShow, TV.createShow);
@@ -68,7 +68,7 @@ tvShowRoutes.post('/shows', apiKeyAuth, validateCreateShow, TV.createShow);
 // POST /api/shows/:id/cast - Add a cast member to a show (Admin only - requires API key)
 tvShowRoutes.post('/shows/:id/cast', apiKeyAuth, validateAddCastMember, Cast.addCastMember);
 
-
+// ============================== PATCH ENDPOINTS ==============================
 
 // PATCH /api/shows/:id/status - Update show status (Admin only)
 tvShowRoutes.patch('/shows/:id/status', checkShowExists, apiKeyAuth, TV.updateShowStatus);
@@ -85,7 +85,7 @@ tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, validateUpdateCastMem
 // PATCH /api/shows/:id - Update a show (Admin only - requires API key)
 tvShowRoutes.patch('/shows/:id', checkShowExists, apiKeyAuth, validateUpdateShow, TV.updateShow);
 
-
+// ============================== DELETE ENDPOINTS ==============================
 
 // DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
 tvShowRoutes.delete('/shows/:id', checkShowExists, apiKeyAuth, TV.deleteShow);
