@@ -5,192 +5,10 @@
 
 const pool = require("./connection");
 
-// ===================================================
-// GET SHOWS BY NAME (SEARCH)
-// ===================================================
-const getShowsByName = async (showName) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
-       FROM tv_shows
-       WHERE name ILIKE $1 OR original_name ILIKE $1`,
-      [`%${showName}%`]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getShowsByName:", error);
-    throw error;
-  }
-};
+
 
 // ===================================================
-// QUERY 3: GET SHOWS BY GENRE
-// ===================================================
-// For exact match: pass [genreName] and use "g.genre_name ILIKE $1"
-// For partial match: pass [`%${genreName}%`] and keep the wildcards
-const getShowsByGenre = async (genreName) => {
-  try {
-    const result = await pool.query(
-      `SELECT DISTINCT tv.id, tv.name, tv.original_name, tv.first_air_date,
-              tv.seasons, tv.episodes, tv.status, tv.tmdb_rating
-       FROM tv_shows tv
-       JOIN show_genres sg ON tv.id = sg.tv_show_id
-       JOIN genres g ON sg.genre_id = g.id
-       WHERE g.genre_name ILIKE $1
-       ORDER BY tv.id`,
-      [genreName] // use [`%${genreName}%`] if you want partials
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getShowsByGenre:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 4: GET SHOWS BY STATUS (Ongoing/Ended/etc.)
-// ===================================================
-const getShowsByStatus = async (status) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
-       FROM tv_shows
-       WHERE status = $1
-       ORDER BY id`,
-      [status]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getShowsByStatus:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 5: GET SHOW BY ID
-// ===================================================
-const getShowById = async (showId) => {
-  try {
-    const result = await pool.query("SELECT * FROM tv_shows WHERE id = $1", [
-      showId,
-    ]);
-    return result.rows[0] || null;
-  } catch (error) {
-    console.error("Database error in getShowById:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 6: GET N RANDOM SHOWS (default 10)
-// ===================================================
-const getRandomShows = async (limit = 10) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, last_air_date,
-              seasons, episodes, status, overview, popularity,
-              tmdb_rating, vote_count, poster_url, backdrop_url
-       FROM tv_shows
-       ORDER BY RANDOM()
-       LIMIT $1`,
-      [limit]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getRandomShows:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 7: GET GENRES WITH OPTIONAL SEARCH AND PAGINATION
-// ===================================================
-const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-
-    // Build the WHERE clause for optional search
-    const whereClause = searchQuery ? "WHERE genre_name ILIKE $1" : "";
-    const searchParam = searchQuery ? `%${searchQuery}%` : null;
-
-    // Get total count
-    const countQuery = `SELECT COUNT(*) as total FROM genres ${whereClause}`;
-    const countParams = searchQuery ? [searchParam] : [];
-    const countResult = await pool.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].total);
-
-    // Get paginated genres
-    const dataQuery = `
-            SELECT genre_name
-            FROM genres
-            ${whereClause}
-            ORDER BY genre_name ASC
-            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
-        `;
-    const dataParams = searchQuery
-      ? [searchParam, limit, offset]
-      : [limit, offset];
-    const dataResult = await pool.query(dataQuery, dataParams);
-
-    // Extract just the genre names into an array
-    const genres = dataResult.rows.map((row) => row.genre_name);
-
-    return { genres, total };
-  } catch (error) {
-    console.error("Database error in getGenres:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 8: GET NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
-// ===================================================
-const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-
-    // Build the WHERE clause for optional search
-    const whereClause = searchQuery ? "WHERE network_name ILIKE $1" : "";
-    const searchParam = searchQuery ? `%${searchQuery}%` : null;
-
-    // Get total count
-    const countQuery = `SELECT COUNT(*) as total FROM networks ${whereClause}`;
-    const countParams = searchQuery ? [searchParam] : [];
-    const countResult = await pool.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].total);
-
-    // Get paginated networks
-    const dataQuery = `
-            SELECT network_name
-            FROM networks
-            ${whereClause}
-            ORDER BY network_name ASC
-            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
-        `;
-    const dataParams = searchQuery
-      ? [searchParam, limit, offset]
-      : [limit, offset];
-    const dataResult = await pool.query(dataQuery, dataParams);
-
-    // Extract just the network names into an array
-    const networks = dataResult.rows.map((row) => row.network_name);
-
-    return { networks, total };
-  } catch (error) {
-    console.error("Database error in getNetworks:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 9: GET DISTINCT STATUSES
-// ===================================================
-const getStatuses = async () => {
-  return ["Canceled", "Ended", "Pilot", "Returning Series"];
-};
-
-// ===================================================
-// QUERY 10: ADVANCED SHOW SEARCH WITH FILTERS, PAGINATION, AND SORTING
+// ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
 const getShows = async (filters = {}) => {
   try {
@@ -392,17 +210,17 @@ const getShows = async (filters = {}) => {
     // Get paginated data
     params.push(limit, offset);
     const dataQuery = `
-    SELECT DISTINCT 
+      SELECT DISTINCT 
         tv.*,
         (SELECT ARRAY_AGG(g.genre_name)
          FROM show_genres sg
          JOIN genres g ON sg.genre_id = g.id
          WHERE sg.tv_show_id = tv.id) as genres
-    FROM tv_shows tv
-    ${whereClause}
-    ${orderByClause}
-    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-`;
+      FROM tv_shows tv
+      ${whereClause}
+      ${orderByClause}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
     const dataResult = await pool.query(dataQuery, params);
 
     return {
@@ -415,6 +233,192 @@ const getShows = async (filters = {}) => {
     console.error("Database error in getShows:", error);
     throw error;
   }
+};
+
+/*
+// ===================================================
+// GET SHOWS BY NAME (SEARCH)
+// ===================================================
+const getShowsByName = async (showName) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
+       FROM tv_shows
+       WHERE name ILIKE $1 OR original_name ILIKE $1`,
+      [`%${showName}%`]
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getShowsByName:", error);
+    throw error;
+  }
+};
+*/
+
+// ===================================================
+// QUERY 3: GET SHOWS BY GENRE
+// ===================================================
+// For exact match: pass [genreName] and use "g.genre_name ILIKE $1"
+// For partial match: pass [`%${genreName}%`] and keep the wildcards
+const getShowsByGenre = async (genreName) => {
+  try {
+    const result = await pool.query(
+      `SELECT DISTINCT tv.id, tv.name, tv.original_name, tv.first_air_date,
+              tv.seasons, tv.episodes, tv.status, tv.tmdb_rating
+       FROM tv_shows tv
+       JOIN show_genres sg ON tv.id = sg.tv_show_id
+       JOIN genres g ON sg.genre_id = g.id
+       WHERE g.genre_name ILIKE $1
+       ORDER BY tv.id`,
+      [genreName] // use [`%${genreName}%`] if you want partials
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getShowsByGenre:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 4: GET SHOWS BY STATUS (Ongoing/Ended/etc.)
+// ===================================================
+const getShowsByStatus = async (status) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
+       FROM tv_shows
+       WHERE status = $1
+       ORDER BY id`,
+      [status]
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getShowsByStatus:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 5: GET SHOW BY ID
+// ===================================================
+const getShowById = async (showId) => {
+  try {
+    const result = await pool.query("SELECT * FROM tv_shows WHERE id = $1", [
+      showId,
+    ]);
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error("Database error in getShowById:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 6: GET N RANDOM SHOWS (default 10)
+// ===================================================
+const getRandomShows = async (limit = 10) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, original_name, first_air_date, last_air_date,
+              seasons, episodes, status, overview, popularity,
+              tmdb_rating, vote_count, poster_url, backdrop_url
+       FROM tv_shows
+       ORDER BY RANDOM()
+       LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getRandomShows:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 7: GET GENRES WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+
+    // Build the WHERE clause for optional search
+    const whereClause = searchQuery ? "WHERE genre_name ILIKE $1" : "";
+    const searchParam = searchQuery ? `%${searchQuery}%` : null;
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM genres ${whereClause}`;
+    const countParams = searchQuery ? [searchParam] : [];
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Get paginated genres
+    const dataQuery = `
+            SELECT genre_name
+            FROM genres
+            ${whereClause}
+            ORDER BY genre_name ASC
+            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
+        `;
+    const dataParams = searchQuery
+      ? [searchParam, limit, offset]
+      : [limit, offset];
+    const dataResult = await pool.query(dataQuery, dataParams);
+
+    // Extract just the genre names into an array
+    const genres = dataResult.rows.map((row) => row.genre_name);
+
+    return { genres, total };
+  } catch (error) {
+    console.error("Database error in getGenres:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 8: GET NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+
+    // Build the WHERE clause for optional search
+    const whereClause = searchQuery ? "WHERE network_name ILIKE $1" : "";
+    const searchParam = searchQuery ? `%${searchQuery}%` : null;
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM networks ${whereClause}`;
+    const countParams = searchQuery ? [searchParam] : [];
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Get paginated networks
+    const dataQuery = `
+            SELECT network_name
+            FROM networks
+            ${whereClause}
+            ORDER BY network_name ASC
+            LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
+        `;
+    const dataParams = searchQuery
+      ? [searchParam, limit, offset]
+      : [limit, offset];
+    const dataResult = await pool.query(dataQuery, dataParams);
+
+    // Extract just the network names into an array
+    const networks = dataResult.rows.map((row) => row.network_name);
+
+    return { networks, total };
+  } catch (error) {
+    console.error("Database error in getNetworks:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// QUERY 9: GET DISTINCT STATUSES
+// ===================================================
+const getStatuses = async () => {
+  return ["Canceled", "Ended", "Pilot", "Returning Series"];
 };
 
 // ===================================================
