@@ -1175,7 +1175,6 @@ const getSeasons = async (page = 1, limit = 50) => {
 // EXPORTS
 // ===================================================
 export {
-  getShowsByName,
   getShowsByGenre,
   getShowsByStatus,
   getShowById,
@@ -1184,7 +1183,6 @@ export {
   getNetworks,
   getStatuses,
   getShows,
-  getRandomShow,
   createShow,
   updateShow,
   deleteShow,

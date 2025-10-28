@@ -34,6 +34,36 @@ export async function getShows(req: Request, res: Response, next: NextFunction) 
     } catch (err) { next(err); }
 }
 
+export async function getShowById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid show ID",
+      });
+    }
+
+    const show = await db.getShowById(id);
+
+    if (!show) {
+      return res.status(404).json({
+        success: false,
+        message: "Show not found",
+      });
+    }
+
+    res.json({ success: true, data: show });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getByGenre(req: Request, res: Response, next: NextFunction) {
     try {
         const data = await db.getShowsByGenre(req.params.genre);
@@ -81,30 +111,6 @@ export async function getStatuses(_req: Request, res: Response, next: NextFuncti
     try {
         const data = await db.getStatuses();
         res.json({ success: true, data });
-    } catch (err) { next(err); }
-}
-
-export async function getShowById(req: Request, res: Response, next: NextFunction) {
-    try {
-        const id = parseInt(req.params.id);
-
-        if (isNaN(id)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid show ID'
-            });
-        }
-
-        const show = await db.getShowById(id);
-
-        if (!show) {
-            return res.status(404).json({
-                success: false,
-                message: 'Show not found'
-            });
-        }
-
-        res.json({ success: true, data: show });
     } catch (err) { next(err); }
 }
 
@@ -161,39 +167,6 @@ export async function deleteShow(req: Request, res: Response, next: NextFunction
             message: 'Show deleted successfully'
         });
     } catch (err: any) {
-        next(err);
-    }
-}
-
-export async function getShow(req: Request, res: Response, next: NextFunction) {
-    try {
-        const showId = parseInt(req.params.id);
-
-        // Validate ID
-        if (isNaN(showId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid show ID'
-            });
-            return;
-        }
-
-        // Get show
-        const show = await db.getShowById(showId);
-
-        if (!show) {
-            res.status(404).json({
-                success: false,
-                message: 'Show not found'
-            });
-            return;
-        }
-
-        res.status(200).json({
-            success: true,
-            data: show
-        });
-    } catch (err) {
         next(err);
     }
 }
