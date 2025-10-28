@@ -235,36 +235,121 @@ const getShows = async (filters = {}) => {
   }
 };
 
-/*
 // ===================================================
-// GET SHOWS BY NAME (SEARCH)
+// GET SHOW BY ID (RETURNS FULL DETAILS)
 // ===================================================
-const getShowsByName = async (showName) => {
+const getShowById = async (showId) => {
   try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
-       FROM tv_shows
-       WHERE name ILIKE $1 OR original_name ILIKE $1`,
-      [`%${showName}%`]
-    );
-    return result.rows;
+    const query = `
+      SELECT 
+        ts.id,
+        ts.name,
+        ts.original_name,
+        ts.first_air_date,
+        ts.last_air_date,
+        ts.seasons,
+        ts.episodes,
+        ts.status,
+        ts.overview,
+        ts.popularity,
+        ts.tmdb_rating,
+        ts.vote_count,
+        ts.poster_url,
+        ts.backdrop_url,
+        -- Genres
+        (SELECT ARRAY_AGG(DISTINCT g.genre_name)
+         FROM show_genres sg
+         JOIN genres g ON sg.genre_id = g.id
+         WHERE sg.tv_show_id = ts.id) as genres,
+        -- Actors with character names
+        (SELECT JSON_AGG(jsonb_build_object(
+           'actor_name', a.actor_name,
+           'character_name', sa.character_name,
+           'profile_url', a.profile_url
+         ))
+         FROM show_actors sa
+         JOIN actors a ON sa.actor_id = a.id
+         WHERE sa.tv_show_id = ts.id) as actors,
+        -- Creators
+        (SELECT ARRAY_AGG(DISTINCT c.creator_name)
+         FROM show_creators sc
+         JOIN creators c ON sc.creator_id = c.id
+         WHERE sc.tv_show_id = ts.id) as creators,
+        -- Networks
+        (SELECT JSON_AGG(DISTINCT jsonb_build_object(
+           'network_name', n.network_name,
+           'logo_url', n.logo_url,
+           'country', n.country
+         ))
+         FROM show_networks sn
+         JOIN networks n ON sn.network_id = n.id
+         WHERE sn.tv_show_id = ts.id) as networks,
+        -- Studios
+        (SELECT JSON_AGG(DISTINCT jsonb_build_object(
+           'studio_name', st.studio_name,
+           'logo_url', st.logo_url,
+           'country', st.country
+         ))
+         FROM show_studios ss
+         JOIN studios st ON ss.studio_id = st.id
+         WHERE ss.tv_show_id = ts.id) as studios
+      FROM tv_shows ts
+      WHERE ts.id = $1
+    `;
+
+    const result = await pool.query(query, [showId]);
+    return result.rows[0] || null;
   } catch (error) {
-    console.error("Database error in getShowsByName:", error);
+    console.error("Database error in getShowById:", error);
     throw error;
   }
 };
-*/
 
 // ===================================================
-// QUERY 3: GET SHOWS BY GENRE
+// GET ONE RANDOM SHOW
+// ===================================================
+const getRandomShow = async () => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1"
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error("Database error in getRandomShow:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// GET N RANDOM SHOWS (default 10)
+// ===================================================
+const getRandomShows = async (limit = 10) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, original_name, first_air_date, last_air_date,
+              seasons, episodes, status, overview, popularity,
+              tmdb_rating, vote_count, poster_url, backdrop_url
+       FROM tv_shows
+       ORDER BY RANDOM()
+       LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getRandomShows:", error);
+    throw error;
+  }
+};
+
+// ===================================================
+// GET SHOWS BY GENRE
 // ===================================================
 // For exact match: pass [genreName] and use "g.genre_name ILIKE $1"
 // For partial match: pass [`%${genreName}%`] and keep the wildcards
 const getShowsByGenre = async (genreName) => {
   try {
     const result = await pool.query(
-      `SELECT DISTINCT tv.id, tv.name, tv.original_name, tv.first_air_date,
-              tv.seasons, tv.episodes, tv.status, tv.tmdb_rating
+      `SELECT DISTINCT tv.*
        FROM tv_shows tv
        JOIN show_genres sg ON tv.id = sg.tv_show_id
        JOIN genres g ON sg.genre_id = g.id
@@ -294,42 +379,6 @@ const getShowsByStatus = async (status) => {
     return result.rows;
   } catch (error) {
     console.error("Database error in getShowsByStatus:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 5: GET SHOW BY ID
-// ===================================================
-const getShowById = async (showId) => {
-  try {
-    const result = await pool.query("SELECT * FROM tv_shows WHERE id = $1", [
-      showId,
-    ]);
-    return result.rows[0] || null;
-  } catch (error) {
-    console.error("Database error in getShowById:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 6: GET N RANDOM SHOWS (default 10)
-// ===================================================
-const getRandomShows = async (limit = 10) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, last_air_date,
-              seasons, episodes, status, overview, popularity,
-              tmdb_rating, vote_count, poster_url, backdrop_url
-       FROM tv_shows
-       ORDER BY RANDOM()
-       LIMIT $1`,
-      [limit]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getRandomShows:", error);
     throw error;
   }
 };
@@ -419,21 +468,6 @@ const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
 // ===================================================
 const getStatuses = async () => {
   return ["Canceled", "Ended", "Pilot", "Returning Series"];
-};
-
-// ===================================================
-// QUERY 11: GET ONE RANDOM SHOW
-// ===================================================
-const getRandomShow = async () => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1"
-    );
-    return result.rows[0] || null;
-  } catch (error) {
-    console.error("Database error in getRandomShow:", error);
-    throw error;
-  }
 };
 
 // ===================================================
@@ -570,13 +604,11 @@ const getShowCast = async (showId, page = 1, limit = 10) => {
             SELECT 
                 sa.id,
                 sa.character_name AS character,
-                sa.actor_order AS "order",
                 a.actor_name AS person_name,
                 a.profile_url
             FROM public.show_actors sa
             JOIN public.actors a ON sa.actor_id = a.id
             WHERE sa.tv_show_id = $1
-            ORDER BY sa.actor_order
             LIMIT $2 OFFSET $3
         `;
 
