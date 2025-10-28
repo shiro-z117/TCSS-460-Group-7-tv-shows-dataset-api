@@ -81,7 +81,6 @@ const getShowById = async (showId) => {
   }
 };
 
-
 // ===================================================
 // QUERY 6: GET N RANDOM SHOWS (default 10)
 // ===================================================
@@ -393,12 +392,17 @@ const getShows = async (filters = {}) => {
     // Get paginated data
     params.push(limit, offset);
     const dataQuery = `
-            SELECT DISTINCT tv.*
-            FROM tv_shows tv
-            ${whereClause}
-            ${orderByClause}
-            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-        `;
+    SELECT DISTINCT 
+        tv.*,
+        (SELECT ARRAY_AGG(g.genre_name)
+         FROM show_genres sg
+         JOIN genres g ON sg.genre_id = g.id
+         WHERE sg.tv_show_id = tv.id) as genres
+    FROM tv_shows tv
+    ${whereClause}
+    ${orderByClause}
+    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+`;
     const dataResult = await pool.query(dataQuery, params);
 
     return {
@@ -417,15 +421,15 @@ const getShows = async (filters = {}) => {
 // QUERY 11: GET ONE RANDOM SHOW
 // ===================================================
 const getRandomShow = async () => {
-    try {
-        const result = await pool.query(
-            'SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1'
-        );
-        return result.rows[0] || null;
-    } catch (error) {
-        console.error('Database error in getRandomShow:', error);
-        throw error;
-    }
+  try {
+    const result = await pool.query(
+      "SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1"
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error("Database error in getRandomShow:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -434,29 +438,28 @@ const getRandomShow = async () => {
 
 // GET /api/health
 const getHealth = async () => {
-    try {
-        // test db connection
-        const result = await pool.query('SELECT NOW()');
-        
-        // Get server uptime (in seconds)
-        const uptime = process.uptime();
-        
-        // if query succeeds, DB is oke
-        return {
-            status: 'ok',
-            db: 'ok',
-            uptime: Math.round(uptime * 100) / 100  // Round to 2 decimals
-        };
-        
-    } catch (error) {
-        // If query fails, DB is down
-        console.error('Database error in getHealth:', error);
-        return {
-            status: 'error',
-            db: 'down',
-            uptime: Math.round(process.uptime() * 100) / 100
-        };
-    }
+  try {
+    // test db connection
+    const result = await pool.query("SELECT NOW()");
+
+    // Get server uptime (in seconds)
+    const uptime = process.uptime();
+
+    // if query succeeds, DB is oke
+    return {
+      status: "ok",
+      db: "ok",
+      uptime: Math.round(uptime * 100) / 100, // Round to 2 decimals
+    };
+  } catch (error) {
+    // If query fails, DB is down
+    console.error("Database error in getHealth:", error);
+    return {
+      status: "error",
+      db: "down",
+      uptime: Math.round(process.uptime() * 100) / 100,
+    };
+  }
 };
 
 // ===================================================
@@ -466,68 +469,76 @@ const getHealth = async () => {
 // GET /api/shows/:id/images
 // returns images/poster of shows from tv_shows table w pagination
 const getShowImages = async (showId, type, page = 1, limit = 20) => {
-    try {
-        console.log('getShowImages called with showId:', showId, 'type:', type, 'page:', page, 'limit:', limit);
-        
-        // query tv_shows table for poster_url & backdrop_url
-        const query = 'SELECT id, poster_url, backdrop_url FROM public.tv_shows WHERE id = $1';
-        const result = await pool.query(query, [showId]);
-        
-        console.log('Query result rows:', result.rows.length);
-        
-        if (result.rows.length === 0) {
-            console.log('No show found with id:', showId);
-            return [];
-        }
-        
-        const show = result.rows[0];
-        console.log('Show data:', show);
-        
-        const images = [];
-        
-        // adds poster if exists
-        if (show.poster_url && show.poster_url.trim() !== '') {
-            images.push({
-                id: show.id + '_poster',
-                type: 'poster',
-                url: show.poster_url,
-                width: 1000,
-                height: 1500
-            });
-        }
-        
-        // adds backdrop if exists
-        if (show.backdrop_url && show.backdrop_url.trim() !== '') {
-            images.push({
-                id: show.id + '_backdrop',
-                type: 'backdrop',
-                url: show.backdrop_url,
-                width: 1920,
-                height: 1080
-            });
-        }
-        
-        console.log('Images found before filter:', images.length);
-        
-        // filter by type if specified
-        let filteredImages = images;
-        if (type) {
-            filteredImages = images.filter(img => img.type === type);
-        }
-        
-        // add in pagination
-        const offset = (page - 1) * limit;
-        const paginatedImages = filteredImages.slice(offset, offset + limit);
-        
-        console.log('Images after pagination:', paginatedImages.length);
-        
-        return paginatedImages;
-        
-    } catch (error) {
-        console.error('Database error in getShowImages:', error);
-        throw error;
+  try {
+    console.log(
+      "getShowImages called with showId:",
+      showId,
+      "type:",
+      type,
+      "page:",
+      page,
+      "limit:",
+      limit
+    );
+
+    // query tv_shows table for poster_url & backdrop_url
+    const query =
+      "SELECT id, poster_url, backdrop_url FROM public.tv_shows WHERE id = $1";
+    const result = await pool.query(query, [showId]);
+
+    console.log("Query result rows:", result.rows.length);
+
+    if (result.rows.length === 0) {
+      console.log("No show found with id:", showId);
+      return [];
     }
 
+    const show = result.rows[0];
+    console.log("Show data:", show);
+
+    const images = [];
+
+    // adds poster if exists
+    if (show.poster_url && show.poster_url.trim() !== "") {
+      images.push({
+        id: show.id + "_poster",
+        type: "poster",
+        url: show.poster_url,
+        width: 1000,
+        height: 1500,
+      });
+    }
+
+    // adds backdrop if exists
+    if (show.backdrop_url && show.backdrop_url.trim() !== "") {
+      images.push({
+        id: show.id + "_backdrop",
+        type: "backdrop",
+        url: show.backdrop_url,
+        width: 1920,
+        height: 1080,
+      });
+    }
+
+    console.log("Images found before filter:", images.length);
+
+    // filter by type if specified
+    let filteredImages = images;
+    if (type) {
+      filteredImages = images.filter((img) => img.type === type);
+    }
+
+    // add in pagination
+    const offset = (page - 1) * limit;
+    const paginatedImages = filteredImages.slice(offset, offset + limit);
+
+    console.log("Images after pagination:", paginatedImages.length);
+
+    return paginatedImages;
+  } catch (error) {
+    console.error("Database error in getShowImages:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -537,14 +548,21 @@ const getShowImages = async (showId, type, page = 1, limit = 20) => {
 // GET /api/shows/:id/cast
 // Returns cast members for a show with pagination
 const getShowCast = async (showId, page = 1, limit = 10) => {
-    try {
-        console.log('getShowCast called with showId:', showId, 'page:', page, 'limit:', limit);
-        
-        // calc tge pagination offset
-        const offset = (page - 1) * limit;
-        
-        // join show_actors w actors table to get full info
-        const query = `
+  try {
+    console.log(
+      "getShowCast called with showId:",
+      showId,
+      "page:",
+      page,
+      "limit:",
+      limit
+    );
+
+    // calc tge pagination offset
+    const offset = (page - 1) * limit;
+
+    // join show_actors w actors table to get full info
+    const query = `
             SELECT 
                 sa.id,
                 sa.character_name AS character,
@@ -557,18 +575,16 @@ const getShowCast = async (showId, page = 1, limit = 10) => {
             ORDER BY sa.actor_order
             LIMIT $2 OFFSET $3
         `;
-        
-        const result = await pool.query(query, [showId, limit, offset]);
-        
-        console.log('Cast members found:', result.rows.length);
-        
-        return result.rows;
-        
-    } catch (error) {
-        console.error('Database error in getShowCast:', error);
-        throw error;
-    }
 
+    const result = await pool.query(query, [showId, limit, offset]);
+
+    console.log("Cast members found:", result.rows.length);
+
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getShowCast:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -793,105 +809,108 @@ const updateShowMetrics = async (showId, metrics) => {
 // UPDATE TV SHOW
 // ===================================================
 const updateShow = async (showId, updateData) => {
-    try {
-        // Check if show exists
-        const existingShow = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
-        if (existingShow.rows.length === 0) {
-            throw new Error('SHOW_NOT_FOUND');
-        }
+  try {
+    // Check if show exists
+    const existingShow = await pool.query(
+      "SELECT id FROM tv_shows WHERE id = $1",
+      [showId]
+    );
+    if (existingShow.rows.length === 0) {
+      throw new Error("SHOW_NOT_FOUND");
+    }
 
-        // Build dynamic UPDATE query
-        const updates = [];
-        const values = [];
-        let paramIndex = 1;
+    // Build dynamic UPDATE query
+    const updates = [];
+    const values = [];
+    let paramIndex = 1;
 
-        // Only update fields that are provided
-        if (updateData.name !== undefined) {
-            updates.push(`name = $${paramIndex}`);
-            values.push(updateData.name);
-            paramIndex++;
-        }
-        if (updateData.original_name !== undefined) {
-            updates.push(`original_name = $${paramIndex}`);
-            values.push(updateData.original_name);
-            paramIndex++;
-        }
-        if (updateData.first_air_date !== undefined) {
-            updates.push(`first_air_date = $${paramIndex}`);
-            values.push(updateData.first_air_date);
-            paramIndex++;
-        }
-        if (updateData.last_air_date !== undefined) {
-            updates.push(`last_air_date = $${paramIndex}`);
-            values.push(updateData.last_air_date);
-            paramIndex++;
-        }
-        if (updateData.seasons !== undefined) {
-            updates.push(`seasons = $${paramIndex}`);
-            values.push(updateData.seasons);
-            paramIndex++;
-        }
-        if (updateData.episodes !== undefined) {
-            updates.push(`episodes = $${paramIndex}`);
-            values.push(updateData.episodes);
-            paramIndex++;
-        }
-        if (updateData.status !== undefined) {
-            updates.push(`status = $${paramIndex}`);
-            values.push(updateData.status);
-            paramIndex++;
-        }
-        if (updateData.overview !== undefined) {
-            updates.push(`overview = $${paramIndex}`);
-            values.push(updateData.overview);
-            paramIndex++;
-        }
-        if (updateData.popularity !== undefined) {
-            updates.push(`popularity = $${paramIndex}`);
-            values.push(updateData.popularity);
-            paramIndex++;
-        }
-        if (updateData.tmdb_rating !== undefined) {
-            updates.push(`tmdb_rating = $${paramIndex}`);
-            values.push(updateData.tmdb_rating);
-            paramIndex++;
-        }
-        if (updateData.vote_count !== undefined) {
-            updates.push(`vote_count = $${paramIndex}`);
-            values.push(updateData.vote_count);
-            paramIndex++;
-        }
-        if (updateData.poster_url !== undefined) {
-            updates.push(`poster_url = $${paramIndex}`);
-            values.push(updateData.poster_url);
-            paramIndex++;
-        }
-        if (updateData.backdrop_url !== undefined) {
-            updates.push(`backdrop_url = $${paramIndex}`);
-            values.push(updateData.backdrop_url);
-            paramIndex++;
-        }
+    // Only update fields that are provided
+    if (updateData.name !== undefined) {
+      updates.push(`name = $${paramIndex}`);
+      values.push(updateData.name);
+      paramIndex++;
+    }
+    if (updateData.original_name !== undefined) {
+      updates.push(`original_name = $${paramIndex}`);
+      values.push(updateData.original_name);
+      paramIndex++;
+    }
+    if (updateData.first_air_date !== undefined) {
+      updates.push(`first_air_date = $${paramIndex}`);
+      values.push(updateData.first_air_date);
+      paramIndex++;
+    }
+    if (updateData.last_air_date !== undefined) {
+      updates.push(`last_air_date = $${paramIndex}`);
+      values.push(updateData.last_air_date);
+      paramIndex++;
+    }
+    if (updateData.seasons !== undefined) {
+      updates.push(`seasons = $${paramIndex}`);
+      values.push(updateData.seasons);
+      paramIndex++;
+    }
+    if (updateData.episodes !== undefined) {
+      updates.push(`episodes = $${paramIndex}`);
+      values.push(updateData.episodes);
+      paramIndex++;
+    }
+    if (updateData.status !== undefined) {
+      updates.push(`status = $${paramIndex}`);
+      values.push(updateData.status);
+      paramIndex++;
+    }
+    if (updateData.overview !== undefined) {
+      updates.push(`overview = $${paramIndex}`);
+      values.push(updateData.overview);
+      paramIndex++;
+    }
+    if (updateData.popularity !== undefined) {
+      updates.push(`popularity = $${paramIndex}`);
+      values.push(updateData.popularity);
+      paramIndex++;
+    }
+    if (updateData.tmdb_rating !== undefined) {
+      updates.push(`tmdb_rating = $${paramIndex}`);
+      values.push(updateData.tmdb_rating);
+      paramIndex++;
+    }
+    if (updateData.vote_count !== undefined) {
+      updates.push(`vote_count = $${paramIndex}`);
+      values.push(updateData.vote_count);
+      paramIndex++;
+    }
+    if (updateData.poster_url !== undefined) {
+      updates.push(`poster_url = $${paramIndex}`);
+      values.push(updateData.poster_url);
+      paramIndex++;
+    }
+    if (updateData.backdrop_url !== undefined) {
+      updates.push(`backdrop_url = $${paramIndex}`);
+      values.push(updateData.backdrop_url);
+      paramIndex++;
+    }
 
-        if (updates.length === 0) {
-            throw new Error('NO_FIELDS_TO_UPDATE');
-        }
+    if (updates.length === 0) {
+      throw new Error("NO_FIELDS_TO_UPDATE");
+    }
 
-        // Add WHERE clause parameter
-        values.push(showId);
+    // Add WHERE clause parameter
+    values.push(showId);
 
-        const query = `
+    const query = `
             UPDATE tv_shows
-            SET ${updates.join(', ')}
+            SET ${updates.join(", ")}
             WHERE id = $${paramIndex}
             RETURNING *
         `;
 
-        const result = await pool.query(query, values);
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in updateShow:', error);
-        throw error;
-    }
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in updateShow:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -900,181 +919,200 @@ const updateShow = async (showId, updateData) => {
 
 // ADD CAST MEMBER to a TV show
 const addCastMember = async (showId, castData) => {
-    try {
-        const { actor_id, character_name } = castData;
+  try {
+    const { actor_id, character_name } = castData;
 
-        // Check if show exists
-        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
-        if (showExists.rows.length === 0) {
-            throw new Error('SHOW_NOT_FOUND');
-        }
-
-        // Check if actor exists
-        const actorExists = await pool.query('SELECT id FROM actors WHERE id = $1', [actor_id]);
-        if (actorExists.rows.length === 0) {
-            throw new Error('ACTOR_NOT_FOUND');
-        }
-
-        // Check if cast member already exists for this show
-        const existingCast = await pool.query(
-            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
-            [showId, actor_id]
-        );
-        if (existingCast.rows.length > 0) {
-            throw new Error('CAST_MEMBER_EXISTS');
-        }
-
-        // Insert new cast member
-        const result = await pool.query(
-            'INSERT INTO show_actors (tv_show_id, actor_id, character_name) VALUES ($1, $2, $3) RETURNING *',
-            [showId, actor_id, character_name]
-        );
-
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in addCastMember:', error);
-        throw error;
+    // Check if show exists
+    const showExists = await pool.query(
+      "SELECT id FROM tv_shows WHERE id = $1",
+      [showId]
+    );
+    if (showExists.rows.length === 0) {
+      throw new Error("SHOW_NOT_FOUND");
     }
+
+    // Check if actor exists
+    const actorExists = await pool.query(
+      "SELECT id FROM actors WHERE id = $1",
+      [actor_id]
+    );
+    if (actorExists.rows.length === 0) {
+      throw new Error("ACTOR_NOT_FOUND");
+    }
+
+    // Check if cast member already exists for this show
+    const existingCast = await pool.query(
+      "SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2",
+      [showId, actor_id]
+    );
+    if (existingCast.rows.length > 0) {
+      throw new Error("CAST_MEMBER_EXISTS");
+    }
+
+    // Insert new cast member
+    const result = await pool.query(
+      "INSERT INTO show_actors (tv_show_id, actor_id, character_name) VALUES ($1, $2, $3) RETURNING *",
+      [showId, actor_id, character_name]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in addCastMember:", error);
+    throw error;
+  }
 };
 
 // UPDATE CAST MEMBER character name
 const updateCastMember = async (showId, actorId, characterName) => {
-    try {
-        // Check if show exists
-        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
-        if (showExists.rows.length === 0) {
-            throw new Error('SHOW_NOT_FOUND');
-        }
-
-        // Check if cast member exists
-        const existingCast = await pool.query(
-            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
-            [showId, actorId]
-        );
-        if (existingCast.rows.length === 0) {
-            throw new Error('CAST_MEMBER_NOT_FOUND');
-        }
-
-        // Update character name
-        const result = await pool.query(
-            'UPDATE show_actors SET character_name = $1 WHERE tv_show_id = $2 AND actor_id = $3 RETURNING *',
-            [characterName, showId, actorId]
-        );
-
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in updateCastMember:', error);
-        throw error;
+  try {
+    // Check if show exists
+    const showExists = await pool.query(
+      "SELECT id FROM tv_shows WHERE id = $1",
+      [showId]
+    );
+    if (showExists.rows.length === 0) {
+      throw new Error("SHOW_NOT_FOUND");
     }
+
+    // Check if cast member exists
+    const existingCast = await pool.query(
+      "SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2",
+      [showId, actorId]
+    );
+    if (existingCast.rows.length === 0) {
+      throw new Error("CAST_MEMBER_NOT_FOUND");
+    }
+
+    // Update character name
+    const result = await pool.query(
+      "UPDATE show_actors SET character_name = $1 WHERE tv_show_id = $2 AND actor_id = $3 RETURNING *",
+      [characterName, showId, actorId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in updateCastMember:", error);
+    throw error;
+  }
 };
 
 // GET CAST for a TV show
 const getCastByShowId = async (showId) => {
-    try {
-        const result = await pool.query(
-            `SELECT sa.tv_show_id, sa.actor_id, sa.character_name, a.name as actor_name, a.profile_url
+  try {
+    const result = await pool.query(
+      `SELECT sa.tv_show_id, sa.actor_id, sa.character_name, a.name as actor_name, a.profile_url
              FROM show_actors sa
              JOIN actors a ON sa.actor_id = a.id
              WHERE sa.tv_show_id = $1
              ORDER BY sa.actor_id`,
-            [showId]
-        );
-        return result.rows;
-    } catch (error) {
-        console.error('Database error in getCastByShowId:', error);
-        throw error;
-    }
+      [showId]
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getCastByShowId:", error);
+    throw error;
+  }
 };
 
 // DELETE CAST MEMBER from a TV show
 const deleteCastMember = async (showId, actorId) => {
-    try {
-        // Check if show exists
-        const showExists = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
-        if (showExists.rows.length === 0) {
-            throw new Error('SHOW_NOT_FOUND');
-        }
-
-        // Check if cast member exists
-        const existingCast = await pool.query(
-            'SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2',
-            [showId, actorId]
-        );
-        if (existingCast.rows.length === 0) {
-            throw new Error('CAST_MEMBER_NOT_FOUND');
-        }
-
-        // Delete cast member
-        const result = await pool.query(
-            'DELETE FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2 RETURNING *',
-            [showId, actorId]
-        );
-
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in deleteCastMember:', error);
-        throw error;
+  try {
+    // Check if show exists
+    const showExists = await pool.query(
+      "SELECT id FROM tv_shows WHERE id = $1",
+      [showId]
+    );
+    if (showExists.rows.length === 0) {
+      throw new Error("SHOW_NOT_FOUND");
     }
+
+    // Check if cast member exists
+    const existingCast = await pool.query(
+      "SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2",
+      [showId, actorId]
+    );
+    if (existingCast.rows.length === 0) {
+      throw new Error("CAST_MEMBER_NOT_FOUND");
+    }
+
+    // Delete cast member
+    const result = await pool.query(
+      "DELETE FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2 RETURNING *",
+      [showId, actorId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteCastMember:", error);
+    throw error;
+  }
 };
 
 // Linda's endpoint: GET /api/studios
 // Returns distinct studio names with pagination and search
 const getStudios = async (q, page = 1, limit = 50) => {
-    try {
-        const offset = (page - 1) * limit;
-        let query = 'SELECT DISTINCT studio_name FROM public.studios ORDER BY studio_name';
-        const params = [];
-        
-        if (q) {
-            // Filter by search term (case-insensitive)
-            query += ' WHERE studio_name ILIKE $1';
-            params.push(`%${q}%`);
-            query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-            params.push(limit, offset);
-        } else {
-            // No filter, just pagination
-            query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-            params.push(limit, offset);
-        }
-        
-        const result = await pool.query(query, params);
-        return result.rows;
-    } catch (error) {
-        console.error('Database error in getStudios:', error);
-        throw error;
-    }
-};
+  try {
+    const offset = (page - 1) * limit;
+    let query =
+      "SELECT DISTINCT studio_name FROM public.studios ORDER BY studio_name";
+    const params = [];
 
+    if (q) {
+      // Filter by search term (case-insensitive)
+      query += " WHERE studio_name ILIKE $1";
+      params.push(`%${q}%`);
+      query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+      params.push(limit, offset);
+    } else {
+      // No filter, just pagination
+      query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+      params.push(limit, offset);
+    }
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getStudios:", error);
+    throw error;
+  }
+};
 
 // ===================================================
 // QUERY 7: GET /api/years/first (Linda)
 // ===================================================
 // Returns distinct first air years with min/max filter
 const getYearsFirst = async (min, max, page = 1, limit = 50) => {
-    try {
-        const offset = (page - 1) * limit;
-        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL';
-        const params = [];
-        
-        if (min) {
-            query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${params.length + 1}`;
-            params.push(min);
-        }
-        
-        if (max) {
-            query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${params.length + 1}`;
-            params.push(max);
-        }
-        
-        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-        params.push(limit, offset);
-        
-        const result = await pool.query(query, params);
-        return result.rows;
-    } catch (error) {
-        console.error('Database error in getYearsFirst:', error);
-        throw error;
+  try {
+    const offset = (page - 1) * limit;
+    let query =
+      "SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL";
+    const params = [];
+
+    if (min) {
+      query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${
+        params.length + 1
+      }`;
+      params.push(min);
     }
+
+    if (max) {
+      query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${
+        params.length + 1
+      }`;
+      params.push(max);
+    }
+
+    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
+      params.length + 2
+    }`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getYearsFirst:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -1082,30 +1120,33 @@ const getYearsFirst = async (min, max, page = 1, limit = 50) => {
 // ===================================================
 // Returns distinct last air years with min/max filter
 const getYearsLast = async (min, max, page = 1, limit = 50) => {
-    try {
-        const offset = (page - 1) * limit;
-        let query = 'SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL';
-        const params = [];
-        
-        if (min) {
-            query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
-            params.push(min);
-        }
-        
-        if (max) {
-            query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
-            params.push(max);
-        }
-        
-        query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-        params.push(limit, offset);
-        
-        const result = await pool.query(query, params);
-        return result.rows;
-    } catch (error) {
-        console.error('Database error in getYearsLast:', error);
-        throw error;
+  try {
+    const offset = (page - 1) * limit;
+    let query =
+      "SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL";
+    const params = [];
+
+    if (min) {
+      query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
+      params.push(min);
     }
+
+    if (max) {
+      query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
+      params.push(max);
+    }
+
+    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
+      params.length + 2
+    }`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getYearsLast:", error);
+    throw error;
+  }
 };
 
 // ===================================================
@@ -1113,23 +1154,23 @@ const getYearsLast = async (min, max, page = 1, limit = 50) => {
 // ===================================================
 // Returns distinct season counts
 const getSeasons = async (page = 1, limit = 50) => {
-    try {
-        const offset = (page - 1) * limit;
-        // Calculate pagination offset
-        
-        const query = 'SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2';
-        // Get all distinct season counts, sorted ascending
-        
-        const result = await pool.query(query, [limit, offset]);
-        // Execute query with pagination
-        
-        return result.rows;
-        // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
-        
-    } catch (error) {
-        console.error('Database error in getSeasons:', error);
-        throw error;
-    }
+  try {
+    const offset = (page - 1) * limit;
+    // Calculate pagination offset
+
+    const query =
+      "SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2";
+    // Get all distinct season counts, sorted ascending
+
+    const result = await pool.query(query, [limit, offset]);
+    // Execute query with pagination
+
+    return result.rows;
+    // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+  } catch (error) {
+    console.error("Database error in getSeasons:", error);
+    throw error;
+  }
 };
 
 // ===================================================
