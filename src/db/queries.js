@@ -5,8 +5,6 @@
 
 const pool = require("./connection");
 
-
-
 // ===================================================
 // ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
@@ -301,42 +299,6 @@ const getShowById = async (showId) => {
     return result.rows[0] || null;
   } catch (error) {
     console.error("Database error in getShowById:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// GET ONE RANDOM SHOW
-// ===================================================
-const getRandomShow = async () => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM tv_shows ORDER BY RANDOM() LIMIT 1"
-    );
-    return result.rows[0] || null;
-  } catch (error) {
-    console.error("Database error in getRandomShow:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// GET N RANDOM SHOWS (default 10)
-// ===================================================
-const getRandomShows = async (limit = 10) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, last_air_date,
-              seasons, episodes, status, overview, popularity,
-              tmdb_rating, vote_count, poster_url, backdrop_url
-       FROM tv_shows
-       ORDER BY RANDOM()
-       LIMIT $1`,
-      [limit]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getRandomShows:", error);
     throw error;
   }
 };
