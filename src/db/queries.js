@@ -510,37 +510,44 @@ const getStudios = async (q = "", page = 1, limit = 50) => {
 
 
 // ===================================================
-// QUERY 7: GET /api/years/first (Linda)
+// GET LIST OF FIRST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-// Returns distinct first air years with min/max filter
 const getYearsFirst = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
-    let query =
-      "SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL";
-    const params = [];
 
-    if (min) {
-      query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${
-        params.length + 1
-      }`;
-      params.push(min);
+    // Get the absolute min and max years in the table
+    const rangeQuery = `
+      SELECT 
+        MIN(EXTRACT(YEAR FROM first_air_date)) AS min_year,
+        MAX(EXTRACT(YEAR FROM first_air_date)) AS max_year
+      FROM public.tv_shows
+      WHERE first_air_date IS NOT NULL
+    `;
+    const rangeResult = await pool.query(rangeQuery);
+    const tableMin = parseInt(rangeResult.rows[0].min_year);
+    const tableMax = parseInt(rangeResult.rows[0].max_year);
+
+    // Apply optional min/max filters
+    const finalMin = min ? Math.max(min, tableMin) : tableMin;
+    const finalMax = max ? Math.min(max, tableMax) : tableMax;
+
+    // Build full array of years
+    const allYears = [];
+    for (let y = finalMax; y >= finalMin; y--) {
+      allYears.push(y);
     }
 
-    if (max) {
-      query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${
-        params.length + 1
-      }`;
-      params.push(max);
-    }
+    // Paginate
+    const paginatedYears = allYears.slice(offset, offset + limit);
+    const total = allYears.length;
 
-    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
-      params.length + 2
-    }`;
-    params.push(limit, offset);
-
-    const result = await pool.query(query, params);
-    return result.rows;
+    return {
+      data: paginatedYears,
+      page,
+      limit,
+      total,
+    };
   } catch (error) {
     console.error("Database error in getYearsFirst:", error);
     throw error;
@@ -549,35 +556,46 @@ const getYearsFirst = async (min, max, page = 1, limit = 50) => {
 
 
 // ===================================================
-// QUERY 8: GET /api/years/last (Linda)
+// GET LIST OF LAST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-// Returns distinct last air years with min/max filter
 const getYearsLast = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
-    let query =
-      "SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL";
-    const params = [];
 
-    if (min) {
-      query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
-      params.push(min);
+    // Get the absolute min and max years in the table
+    const rangeQuery = `
+      SELECT 
+        MIN(EXTRACT(YEAR FROM last_air_date)) AS min_year,
+        MAX(EXTRACT(YEAR FROM last_air_date)) AS max_year
+      FROM public.tv_shows
+      WHERE last_air_date IS NOT NULL
+    `;
+    const rangeResult = await pool.query(rangeQuery);
+    const tableMin = parseInt(rangeResult.rows[0].min_year);
+    const tableMax = parseInt(rangeResult.rows[0].max_year);
+
+    // Apply optional min/max filters
+    const finalMin = min ? Math.max(min, tableMin) : tableMin;
+    const finalMax = max ? Math.min(max, tableMax) : tableMax;
+
+    // Build full array of years
+    const allYears = [];
+    for (let y = finalMax; y >= finalMin; y--) {
+      allYears.push(y);
     }
 
-    if (max) {
-      query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
-      params.push(max);
-    }
+    // Paginate
+    const paginatedYears = allYears.slice(offset, offset + limit);
+    const total = allYears.length;
 
-    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
-      params.length + 2
-    }`;
-    params.push(limit, offset);
-
-    const result = await pool.query(query, params);
-    return result.rows;
+    return {
+      data: paginatedYears,
+      page,
+      limit,
+      total,
+    };
   } catch (error) {
-    console.error("Database error in getYearsLast:", error);
+    console.error("Database error in getYearsFirst:", error);
     throw error;
   }
 };
