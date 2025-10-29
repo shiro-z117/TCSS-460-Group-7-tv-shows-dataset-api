@@ -65,13 +65,25 @@ export async function getShowById(
   }
 }
 
-export async function getStatuses(_req: Request, res: Response, next: NextFunction) {
+export async function getStatuses(req: Request, res: Response, next: NextFunction) {
     try {
-        const data = await db.getStatuses();
-        res.json({ success: true, data });
-    } catch (err) { next(err); }
-}
+        const searchQuery = (req.query.q as string) || '';
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
 
+        const { statuses, total } = await db.getStatuses(searchQuery, page, limit);
+
+        res.json({
+            success: true,
+            data: statuses,
+            page,
+            limit,
+            total
+        });
+    } catch (err) {
+        next(err);
+    }
+}
 
 export async function getGenres(req: Request, res: Response, next: NextFunction) {
     try {

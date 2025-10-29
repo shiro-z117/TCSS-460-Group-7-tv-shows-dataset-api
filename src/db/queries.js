@@ -7,6 +7,35 @@ const pool = require("./connection");
 
 
 // ===================================================
+// GET SERVICE HEALTH STATUS
+// ===================================================
+const getHealth = async () => {
+  try {
+    // test db connection
+    const result = await pool.query("SELECT NOW()");
+
+    // Get server uptime (in seconds)
+    const uptime = process.uptime();
+
+    // if query succeeds, DB is oke
+    return {
+      status: "ok",
+      db: "ok",
+      uptime: Math.round(uptime * 100) / 100, // Round to 2 decimals
+    };
+  } catch (error) {
+    // If query fails, DB is down
+    console.error("Database error in getHealth:", error);
+    return {
+      status: "error",
+      db: "down",
+      uptime: Math.round(process.uptime() * 100) / 100,
+    };
+  }
+};
+
+
+// ===================================================
 // ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
 const getShows = async (filters = {}) => {
@@ -307,7 +336,7 @@ const getShowById = async (showId) => {
 
 
 // ===================================================
-// GET LIST OF STATUS TYPES WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF STATUS TYPES
 // ===================================================
 const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
   try {
@@ -354,7 +383,7 @@ const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
 
 
 // ===================================================
-// GET LIST OF GENRES WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF GENRES
 // ===================================================
 const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
   try {
@@ -395,7 +424,7 @@ const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
 
 
 // ===================================================
-// GET LIST OF NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF NETWORKS
 // ===================================================
 const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
   try {
@@ -436,7 +465,7 @@ const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
 
 
 // ===================================================
-// GET LIST OF STUDIOS WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF STUDIOS
 // ===================================================
 const getStudios = async (q = "", page = 1, limit = 50) => {
   try {
@@ -481,37 +510,107 @@ const getStudios = async (q = "", page = 1, limit = 50) => {
 
 
 // ===================================================
-// GET SERVICE HEALTH STATUS
+// QUERY 7: GET /api/years/first (Linda)
 // ===================================================
-const getHealth = async () => {
+// Returns distinct first air years with min/max filter
+const getYearsFirst = async (min, max, page = 1, limit = 50) => {
   try {
-    // test db connection
-    const result = await pool.query("SELECT NOW()");
+    const offset = (page - 1) * limit;
+    let query =
+      "SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL";
+    const params = [];
 
-    // Get server uptime (in seconds)
-    const uptime = process.uptime();
+    if (min) {
+      query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${
+        params.length + 1
+      }`;
+      params.push(min);
+    }
 
-    // if query succeeds, DB is oke
-    return {
-      status: "ok",
-      db: "ok",
-      uptime: Math.round(uptime * 100) / 100, // Round to 2 decimals
-    };
+    if (max) {
+      query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${
+        params.length + 1
+      }`;
+      params.push(max);
+    }
+
+    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
+      params.length + 2
+    }`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+    return result.rows;
   } catch (error) {
-    // If query fails, DB is down
-    console.error("Database error in getHealth:", error);
-    return {
-      status: "error",
-      db: "down",
-      uptime: Math.round(process.uptime() * 100) / 100,
-    };
+    console.error("Database error in getYearsFirst:", error);
+    throw error;
   }
 };
+
+
+// ===================================================
+// QUERY 8: GET /api/years/last (Linda)
+// ===================================================
+// Returns distinct last air years with min/max filter
+const getYearsLast = async (min, max, page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+    let query =
+      "SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL";
+    const params = [];
+
+    if (min) {
+      query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
+      params.push(min);
+    }
+
+    if (max) {
+      query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
+      params.push(max);
+    }
+
+    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
+      params.length + 2
+    }`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  } catch (error) {
+    console.error("Database error in getYearsLast:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// QUERY 9: GET /api/seasons (Linda)
+// ===================================================
+// Returns distinct season counts
+const getSeasons = async (page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+    // Calculate pagination offset
+
+    const query =
+      "SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2";
+    // Get all distinct season counts, sorted ascending
+
+    const result = await pool.query(query, [limit, offset]);
+    // Execute query with pagination
+
+    return result.rows;
+    // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+  } catch (error) {
+    console.error("Database error in getSeasons:", error);
+    throw error;
+  }
+};
+
 
 // ===================================================
 // QUERY 13: GET SHOW IMAGES
 // ===================================================
-
 // GET /api/shows/:id/images
 // returns images/poster of shows from tv_shows table w pagination
 const getShowImages = async (showId, type, page = 1, limit = 20) => {
@@ -1093,110 +1192,19 @@ const deleteCastMember = async (showId, actorId) => {
 };
 
 // ===================================================
-// QUERY 7: GET /api/years/first (Linda)
-// ===================================================
-// Returns distinct first air years with min/max filter
-const getYearsFirst = async (min, max, page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-    let query =
-      "SELECT DISTINCT EXTRACT(YEAR FROM first_air_date) as year FROM public.tv_shows WHERE first_air_date IS NOT NULL";
-    const params = [];
-
-    if (min) {
-      query += ` AND EXTRACT(YEAR FROM first_air_date) >= $${
-        params.length + 1
-      }`;
-      params.push(min);
-    }
-
-    if (max) {
-      query += ` AND EXTRACT(YEAR FROM first_air_date) <= $${
-        params.length + 1
-      }`;
-      params.push(max);
-    }
-
-    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
-      params.length + 2
-    }`;
-    params.push(limit, offset);
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getYearsFirst:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 8: GET /api/years/last (Linda)
-// ===================================================
-// Returns distinct last air years with min/max filter
-const getYearsLast = async (min, max, page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-    let query =
-      "SELECT DISTINCT EXTRACT(YEAR FROM last_air_date) as year FROM public.tv_shows WHERE last_air_date IS NOT NULL";
-    const params = [];
-
-    if (min) {
-      query += ` AND EXTRACT(YEAR FROM last_air_date) >= $${params.length + 1}`;
-      params.push(min);
-    }
-
-    if (max) {
-      query += ` AND EXTRACT(YEAR FROM last_air_date) <= $${params.length + 1}`;
-      params.push(max);
-    }
-
-    query += ` ORDER BY year DESC LIMIT $${params.length + 1} OFFSET $${
-      params.length + 2
-    }`;
-    params.push(limit, offset);
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getYearsLast:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// QUERY 9: GET /api/seasons (Linda)
-// ===================================================
-// Returns distinct season counts
-const getSeasons = async (page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-    // Calculate pagination offset
-
-    const query =
-      "SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2";
-    // Get all distinct season counts, sorted ascending
-
-    const result = await pool.query(query, [limit, offset]);
-    // Execute query with pagination
-
-    return result.rows;
-    // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
-  } catch (error) {
-    console.error("Database error in getSeasons:", error);
-    throw error;
-  }
-};
-
-// ===================================================
 // EXPORTS
 // ===================================================
 export {
+  getHealth,
   getShows,
   getShowById,
+  getStatuses,
   getGenres,
   getNetworks,
-  getStatuses,
+  getStudios,
+  getYearsFirst,
+  getYearsLast,
+  getSeasons,
   createShow,
   updateShow,
   deleteShow,
@@ -1207,11 +1215,6 @@ export {
   updateShowStatus,
   updateShowDates,
   updateShowMetrics,
-  getHealth,
   getShowImages,
   getShowCast,
-  getStudios,
-  getYearsFirst,
-  getYearsLast,
-  getSeasons,
 };
