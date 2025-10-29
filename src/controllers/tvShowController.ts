@@ -34,6 +34,7 @@ export async function getShows(req: Request, res: Response, next: NextFunction) 
     } catch (err) { next(err); }
 }
 
+
 export async function getShowById(
   req: Request,
   res: Response,
@@ -71,6 +72,7 @@ export async function getStatuses(_req: Request, res: Response, next: NextFuncti
     } catch (err) { next(err); }
 }
 
+
 export async function getGenres(req: Request, res: Response, next: NextFunction) {
     try {
         const searchQuery = req.query.q as string || '';
@@ -88,6 +90,7 @@ export async function getGenres(req: Request, res: Response, next: NextFunction)
         });
     } catch (err) { next(err); }
 }
+
 
 export async function getNetworks(req: Request, res: Response, next: NextFunction) {
     try {
@@ -107,17 +110,34 @@ export async function getNetworks(req: Request, res: Response, next: NextFunctio
     } catch (err) { next(err); }
 }
 
-// Linda's controller function for GET /api/studios
-export async function getStudios(req: Request, res: Response, next: NextFunction) {
-    try {
-        const q = req.query.q as string;
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 50;
-        
-        const data = await db.getStudios(q, page, limit);
-        res.json({ success: true, data, page, limit, total: data.length });
-    } catch (err) { next(err); }
+
+export async function getStudios(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const q = req.query.q as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+
+    // Destructure returned values
+    const { studios, total } = await db.getStudios(q, page, limit);
+
+    // Match the output style of other endpoints
+    res.json({
+      success: true,
+      data: studios,
+      page,
+      limit,
+      total,
+    });
+  } catch (err) {
+    next(err);
+  }
 }
+
+
 
 // Linda's endpoint: GET /api/years/first
 export async function getYearsFirst(req: Request, res: Response, next: NextFunction) {
@@ -149,6 +169,7 @@ export async function getYearsFirst(req: Request, res: Response, next: NextFunct
     } catch (err) { next(err); }
     // If anything fails, pass error to next middleware
 }
+
 
 // Linda's endpoint: GET /api/years/last
 // Returns distinct last air years with min/max filter
@@ -183,6 +204,7 @@ export async function getYearsLast(req: Request, res: Response, next: NextFuncti
     } catch (err) { next(err); }
     // CATCH BLOCK = if any error above, pass to error handler
 }
+
 
 // Linda's endpoint: GET /api/seasons
 // Returns distinct season counts with optional bucketing

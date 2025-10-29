@@ -5,6 +5,7 @@
 
 const pool = require("./connection");
 
+
 // ===================================================
 // ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
@@ -233,6 +234,7 @@ const getShows = async (filters = {}) => {
   }
 };
 
+
 // ===================================================
 // GET SHOW BY ID (RETURNS FULL DETAILS)
 // ===================================================
@@ -303,6 +305,7 @@ const getShowById = async (showId) => {
   }
 };
 
+
 // ===================================================
 // GET LIST OF STATUS TYPES WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
@@ -349,6 +352,7 @@ const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
   }
 };
 
+
 // ===================================================
 // GET LIST OF GENRES WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
@@ -389,6 +393,7 @@ const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
   }
 };
 
+
 // ===================================================
 // GET LIST OF NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
@@ -428,6 +433,52 @@ const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
     throw error;
   }
 };
+
+
+// ===================================================
+// GET LIST OF STUDIOS WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getStudios = async (q = "", page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+
+    // Build WHERE clause
+    const whereClause = q ? "WHERE studio_name ILIKE $1" : "";
+    const searchParam = q ? `%${q}%` : null;
+
+    // Count total results
+    const countQuery = `SELECT COUNT(DISTINCT studio_name) AS total FROM public.studios ${whereClause}`;
+    const countParams = q ? [searchParam] : [];
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Fetch paginated studio names
+    const dataQuery = `
+      SELECT DISTINCT studio_name
+      FROM public.studios
+      ${whereClause}
+      ORDER BY studio_name ASC
+      LIMIT $${q ? 2 : 1} OFFSET $${q ? 3 : 2}
+    `;
+    const dataParams = q ? [searchParam, limit, offset] : [limit, offset];
+    const dataResult = await pool.query(dataQuery, dataParams);
+
+    // Map to array of names
+    const studios = dataResult.rows.map((row) => row.studio_name);
+
+    // Return consistent structure
+    return {
+      studios,
+      page,
+      limit,
+      total,
+    };
+  } catch (error) {
+    console.error("Database error in getStudios:", error);
+    throw error;
+  }
+};
+
 
 // ===================================================
 // GET SERVICE HEALTH STATUS
@@ -1037,35 +1088,6 @@ const deleteCastMember = async (showId, actorId) => {
     return result.rows[0];
   } catch (error) {
     console.error("Database error in deleteCastMember:", error);
-    throw error;
-  }
-};
-
-// Linda's endpoint: GET /api/studios
-// Returns distinct studio names with pagination and search
-const getStudios = async (q, page = 1, limit = 50) => {
-  try {
-    const offset = (page - 1) * limit;
-    let query =
-      "SELECT DISTINCT studio_name FROM public.studios ORDER BY studio_name";
-    const params = [];
-
-    if (q) {
-      // Filter by search term (case-insensitive)
-      query += " WHERE studio_name ILIKE $1";
-      params.push(`%${q}%`);
-      query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-      params.push(limit, offset);
-    } else {
-      // No filter, just pagination
-      query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-      params.push(limit, offset);
-    }
-
-    const result = await pool.query(query, params);
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getStudios:", error);
     throw error;
   }
 };
