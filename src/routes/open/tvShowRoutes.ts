@@ -50,8 +50,8 @@ tvShowRoutes.get("/years/first", apiKeyAuth, TV.getYearsFirst);
 // GET /api/years/last
 tvShowRoutes.get("/years/last", apiKeyAuth, TV.getYearsLast);
 
-// GET /api/seasons
-tvShowRoutes.get("/seasons", apiKeyAuth, TV.getSeasons);
+// GET /api/episodes
+tvShowRoutes.get("/episodes", apiKeyAuth, TV.getEpisodes);
 
 // ============================== POST ENDPOINTS ==============================
 

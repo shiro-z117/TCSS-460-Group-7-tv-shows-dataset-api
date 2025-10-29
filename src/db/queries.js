@@ -516,7 +516,7 @@ const getYearsFirst = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
-    // Get the absolute min and max years in the table
+    // Get the min and max years in the table
     const rangeQuery = `
       SELECT 
         MIN(EXTRACT(YEAR FROM first_air_date)) AS min_year,
@@ -562,7 +562,7 @@ const getYearsLast = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
-    // Get the absolute min and max years in the table
+    // Get the min and max years in the table
     const rangeQuery = `
       SELECT 
         MIN(EXTRACT(YEAR FROM last_air_date)) AS min_year,
@@ -595,32 +595,53 @@ const getYearsLast = async (min, max, page = 1, limit = 50) => {
       total,
     };
   } catch (error) {
-    console.error("Database error in getYearsFirst:", error);
+    console.error("Database error in getYearsLast:", error);
     throw error;
   }
 };
 
 
 // ===================================================
-// QUERY 9: GET /api/seasons (Linda)
+// GET LIST OF EPISODE COUNTS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-// Returns distinct season counts
-const getSeasons = async (page = 1, limit = 50) => {
+const getEpisodes = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
-    // Calculate pagination offset
 
-    const query =
-      "SELECT DISTINCT seasons FROM public.tv_shows WHERE seasons IS NOT NULL ORDER BY seasons ASC LIMIT $1 OFFSET $2";
-    // Get all distinct season counts, sorted ascending
+    // Get the min and max episodes in the table
+    const rangeQuery = `
+      SELECT 
+        MIN(episodes) AS min_episodes,
+        MAX(episodes) AS max_episodes
+      FROM public.tv_shows
+      WHERE episodes IS NOT NULL
+    `;
+    const rangeResult = await pool.query(rangeQuery);
+    const tableMin = parseInt(rangeResult.rows[0].min_episodes);
+    const tableMax = parseInt(rangeResult.rows[0].max_episodes);
 
-    const result = await pool.query(query, [limit, offset]);
-    // Execute query with pagination
+    // Apply optional min/max filters
+    const finalMin = min ? Math.max(min, tableMin) : tableMin;
+    const finalMax = max ? Math.min(max, tableMax) : tableMax;
 
-    return result.rows;
-    // Return: [{ seasons: 1 }, { seasons: 2 }, ...]
+    // Build full array of episodes
+    const allCounts = [];
+    for (let y = finalMax; y >= finalMin; y--) {
+      allCounts.push(y);
+    }
+
+    // Paginate
+    const paginatedEpisodes = allCounts.slice(offset, offset + limit);
+    const total = allCounts.length;
+
+    return {
+      data: paginatedEpisodes,
+      page,
+      limit,
+      total,
+    };
   } catch (error) {
-    console.error("Database error in getSeasons:", error);
+    console.error("Database error in getEpisodes:", error);
     throw error;
   }
 };
@@ -1222,7 +1243,7 @@ export {
   getStudios,
   getYearsFirst,
   getYearsLast,
-  getSeasons,
+  getEpisodes,
   createShow,
   updateShow,
   deleteShow,
