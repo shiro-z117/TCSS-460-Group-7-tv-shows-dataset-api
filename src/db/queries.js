@@ -304,25 +304,6 @@ const getShowById = async (showId) => {
 };
 
 // ===================================================
-// QUERY 4: GET SHOWS BY STATUS (Ongoing/Ended/etc.)
-// ===================================================
-const getShowsByStatus = async (status) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, original_name, first_air_date, seasons, episodes, status, tmdb_rating
-       FROM tv_shows
-       WHERE status = $1
-       ORDER BY id`,
-      [status]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getShowsByStatus:", error);
-    throw error;
-  }
-};
-
-// ===================================================
 // QUERY 7: GET GENRES WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
 const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
@@ -1152,13 +1133,11 @@ const getSeasons = async (page = 1, limit = 50) => {
 // EXPORTS
 // ===================================================
 export {
-  getShowsByGenre,
-  getShowsByStatus,
+  getShows,
   getShowById,
   getGenres,
   getNetworks,
   getStatuses,
-  getShows,
   createShow,
   updateShow,
   deleteShow,
