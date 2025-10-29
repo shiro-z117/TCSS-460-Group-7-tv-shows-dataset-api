@@ -304,29 +304,6 @@ const getShowById = async (showId) => {
 };
 
 // ===================================================
-// GET SHOWS BY GENRE
-// ===================================================
-// For exact match: pass [genreName] and use "g.genre_name ILIKE $1"
-// For partial match: pass [`%${genreName}%`] and keep the wildcards
-const getShowsByGenre = async (genreName) => {
-  try {
-    const result = await pool.query(
-      `SELECT DISTINCT tv.*
-       FROM tv_shows tv
-       JOIN show_genres sg ON tv.id = sg.tv_show_id
-       JOIN genres g ON sg.genre_id = g.id
-       WHERE g.genre_name ILIKE $1
-       ORDER BY tv.id`,
-      [genreName] // use [`%${genreName}%`] if you want partials
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getShowsByGenre:", error);
-    throw error;
-  }
-};
-
-// ===================================================
 // QUERY 4: GET SHOWS BY STATUS (Ongoing/Ended/etc.)
 // ===================================================
 const getShowsByStatus = async (status) => {
@@ -1178,7 +1155,6 @@ export {
   getShowsByGenre,
   getShowsByStatus,
   getShowById,
-  getRandomShows,
   getGenres,
   getNetworks,
   getStatuses,

@@ -27,9 +27,6 @@ tvShowRoutes.get("/shows/:id/images", apiKeyAuth, TV.getShowImages);
 // GET /api/shows/:id/cast
 tvShowRoutes.get("/shows/:id/cast", apiKeyAuth, TV.getShowCast);
 
-// GET /api/shows/by-genre/:genre
-tvShowRoutes.get("/shows/by-genre/:genre", apiKeyAuth, TV.getByGenre);
-
 // GET /api/shows/:id - Get show by ID
 tvShowRoutes.get("/shows/:id", apiKeyAuth, TV.getShowById);
 

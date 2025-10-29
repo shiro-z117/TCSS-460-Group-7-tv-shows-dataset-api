@@ -64,13 +64,6 @@ export async function getShowById(
   }
 }
 
-export async function getByGenre(req: Request, res: Response, next: NextFunction) {
-    try {
-        const data = await db.getShowsByGenre(req.params.genre);
-        res.json({ success: true, data });
-    } catch (err) { next(err); }
-}
-
 export async function getGenres(req: Request, res: Response, next: NextFunction) {
     try {
         const searchQuery = req.query.q as string || '';
@@ -498,7 +491,7 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
         
         } catch (err) { next(err); }
     }
-    
+
 // GET /api/shows/:id/cast
 // returns cast members for a specific show with pagination
 export async function getShowCast(req: Request, res: Response, next: NextFunction) {
