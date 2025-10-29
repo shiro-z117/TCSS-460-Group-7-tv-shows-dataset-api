@@ -70,10 +70,10 @@ tvShowRoutes.post('/shows/:id/cast', apiKeyAuth, validateAddCastMember, Cast.add
 tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, checkShowExists, TV.updateShowStatus);
 
 // PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth checkShowExists, TV.updateShowDates);
+tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, checkShowExists, TV.updateShowDates);
 
 // PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth checkShowExists, TV.updateShowMetrics);
+tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, checkShowExists, TV.updateShowMetrics);
 
 // PATCH /api/shows/:id/cast/:actorId - Update a cast member's character name (Admin only - requires API key)
 tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, validateUpdateCastMember, Cast.updateCastMember);
