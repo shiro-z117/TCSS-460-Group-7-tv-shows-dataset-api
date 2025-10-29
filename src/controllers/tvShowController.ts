@@ -64,6 +64,13 @@ export async function getShowById(
   }
 }
 
+export async function getStatuses(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const data = await db.getStatuses();
+        res.json({ success: true, data });
+    } catch (err) { next(err); }
+}
+
 export async function getGenres(req: Request, res: Response, next: NextFunction) {
     try {
         const searchQuery = req.query.q as string || '';
@@ -97,13 +104,6 @@ export async function getNetworks(req: Request, res: Response, next: NextFunctio
             limit,
             total
         });
-    } catch (err) { next(err); }
-}
-
-export async function getStatuses(_req: Request, res: Response, next: NextFunction) {
-    try {
-        const data = await db.getStatuses();
-        res.json({ success: true, data });
     } catch (err) { next(err); }
 }
 

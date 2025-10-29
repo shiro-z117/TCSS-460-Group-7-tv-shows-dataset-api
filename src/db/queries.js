@@ -304,7 +304,48 @@ const getShowById = async (showId) => {
 };
 
 // ===================================================
-// QUERY 7: GET GENRES WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF STATUS TYPES WITH OPTIONAL SEARCH AND PAGINATION
+// ===================================================
+const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
+  try {
+    const offset = (page - 1) * limit;
+
+    // Optional WHERE clause if a search term is provided
+    const whereClause = searchQuery ? "WHERE name ILIKE $1" : "";
+    const searchParam = searchQuery ? `%${searchQuery}%` : null;
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) AS total FROM statuses ${whereClause}`;
+    const countParams = searchQuery ? [searchParam] : [];
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Get paginated status names
+    const dataQuery = `
+      SELECT name
+      FROM statuses
+      ${whereClause}
+      ORDER BY name ASC
+      LIMIT $${searchQuery ? 2 : 1} OFFSET $${searchQuery ? 3 : 2}
+    `;
+    const dataParams = searchQuery
+      ? [searchParam, limit, offset]
+      : [limit, offset];
+    const dataResult = await pool.query(dataQuery, dataParams);
+
+    // Return just the names
+    const statuses = dataResult.rows.map((row) => row.name);
+
+    return { statuses, total };
+  } catch (error) {
+    console.error("Database error in getStatuses:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// GET LIST OF GENRES WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
 const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
   try {
@@ -344,7 +385,7 @@ const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
 };
 
 // ===================================================
-// QUERY 8: GET NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
+// GET LIST OF NETWORKS WITH OPTIONAL SEARCH AND PAGINATION
 // ===================================================
 const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
   try {
@@ -384,17 +425,8 @@ const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
 };
 
 // ===================================================
-// QUERY 9: GET DISTINCT STATUSES
+// GET SERVICE HEALTH STATUS
 // ===================================================
-const getStatuses = async () => {
-  return ["Canceled", "Ended", "Pilot", "Returning Series"];
-};
-
-// ===================================================
-// QUERY 12: GET SERVICE HEALTH STATUS
-// ===================================================
-
-// GET /api/health
 const getHealth = async () => {
   try {
     // test db connection
