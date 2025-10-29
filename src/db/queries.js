@@ -648,10 +648,8 @@ const getEpisodes = async (min, max, page = 1, limit = 50) => {
 
 
 // ===================================================
-// QUERY 13: GET SHOW IMAGES
+// GET SHOW IMAGES
 // ===================================================
-// GET /api/shows/:id/images
-// returns images/poster of shows from tv_shows table w pagination
 const getShowImages = async (showId, type, page = 1, limit = 20) => {
   try {
     console.log(
@@ -725,12 +723,10 @@ const getShowImages = async (showId, type, page = 1, limit = 20) => {
   }
 };
 
-// ===================================================
-// QUERY 14: GET SHOW CAST MEMBERS
-// ===================================================
 
-// GET /api/shows/:id/cast
-// Returns cast members for a show with pagination
+// ===================================================
+// GET SHOW CAST MEMBERS
+// ===================================================
 const getShowCast = async (showId, page = 1, limit = 10) => {
   try {
     console.log(
@@ -1244,6 +1240,8 @@ export {
   getYearsFirst,
   getYearsLast,
   getEpisodes,
+  getShowImages,
+  getShowCast,
   createShow,
   updateShow,
   deleteShow,
@@ -1254,6 +1252,4 @@ export {
   updateShowStatus,
   updateShowDates,
   updateShowMetrics,
-  getShowImages,
-  getShowCast,
 };
