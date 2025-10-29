@@ -320,7 +320,7 @@ const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
     const countResult = await pool.query(countQuery, countParams);
     const total = parseInt(countResult.rows[0].total);
 
-    // Get paginated status names
+    // Get paginated statuses
     const dataQuery = `
       SELECT name
       FROM statuses
@@ -333,16 +333,21 @@ const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
       : [limit, offset];
     const dataResult = await pool.query(dataQuery, dataParams);
 
-    // Return just the names
+    // Extract names into an array
     const statuses = dataResult.rows.map((row) => row.name);
 
-    return { statuses, total };
+    // Return formatted response
+    return {
+      statuses,
+      page,
+      limit,
+      total,
+    };
   } catch (error) {
     console.error("Database error in getStatuses:", error);
     throw error;
   }
 };
-
 
 // ===================================================
 // GET LIST OF GENRES WITH OPTIONAL SEARCH AND PAGINATION
