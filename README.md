@@ -11,6 +11,14 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ## Production Version Sprint Meetings
 
+### Discussion 1
+- **Date:** Monday, October 27, 2025
+- **Time:** 3:30 PM - 4:15 PM (45 minutes)
+- **Location:** In-Person
+#### Actions:
+- Planned credentials API
+- Planned review of dataset API
+
 ---
 
 ## Production Version Sprint Contributions
