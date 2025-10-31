@@ -4,6 +4,37 @@ import { Request, Response, NextFunction } from 'express';
 import {sendValidationError} from "../utilities/responseUtils";
 import * as db from '../../db/queries.js';
 
+// Middleware to check if a show exists by ID (for DELETE operations)
+export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+
+        // Validate ID is a valid number
+        if (isNaN(showId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid show ID'
+            });
+            return;
+        }
+
+        // Check if show exists
+        const show = await db.getShowById(showId);
+        if (!show) {
+            res.status(404).json({
+                success: false,
+                message: 'Show not found'
+            });
+            return;
+        }
+
+        // Show exists, continue to next middleware (auth)
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
 export const listValidator = [
   query("page").optional().isInt({ min: 1 }).toInt(),
   query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
@@ -195,37 +226,6 @@ export const validateUpdateMetrics = [
   }),
   validate,
 ];
-
-// Middleware to check if a show exists by ID (for DELETE operations)
-export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const showId = parseInt(req.params.id);
-
-        // Validate ID is a valid number
-        if (isNaN(showId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid show ID'
-            });
-            return;
-        }
-
-        // Check if show exists
-        const show = await db.getShowById(showId);
-        if (!show) {
-            res.status(404).json({
-                success: false,
-                message: 'Show not found'
-            });
-            return;
-        }
-
-        // Show exists, continue to next middleware (auth)
-        next();
-    } catch (err) {
-        next(err);
-    }
-}
 
 // Validation for updating a show (PATCH - all fields optional)
 export const validateUpdateShow = [
