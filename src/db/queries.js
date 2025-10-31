@@ -744,8 +744,9 @@ const getShowCast = async (showId, page = 1, limit = 10) => {
     // join show_actors w actors table to get full info
     const query = `
             SELECT 
-                sa.id,
+                sa.id AS uuid,
                 sa.character_name AS character,
+                a.id AS actor_id,
                 a.actor_name AS person_name,
                 a.profile_url
             FROM public.show_actors sa
