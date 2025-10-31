@@ -1,14 +1,7 @@
 // src/routes/open/tvShowRoutes.ts
 import { Router } from 'express';
 import * as TV from '../../controllers/tvShowController';
-import * as Cast from '../../controllers/castController';
-import {
-    validateCreateShow,
-    validateUpdateShow,
-    validateAddCastMember,
-    validateUpdateCastMember,
-    checkShowExists
-} from '../../core/middleware/tvShowValidation';
+import * as Validator from '../../core/middleware/tvShowValidation';
 import { apiKeyAuth } from '../../core/middleware/apiKeyAuth';
 
 export const tvShowRoutes = Router();
@@ -58,32 +51,32 @@ tvShowRoutes.get("/episodes", apiKeyAuth, TV.getEpisodes);
 // ============================== POST ENDPOINTS ==============================
 
 // POST /api/shows - Create a new show (Admin only - requires API key)
-tvShowRoutes.post('/shows', apiKeyAuth, validateCreateShow, TV.createShow);
+tvShowRoutes.post('/shows', apiKeyAuth, Validator.validateCreateShow, TV.createShow);
 
 // POST /api/shows/:id/cast - Add a cast member to a show (Admin only - requires API key)
-tvShowRoutes.post('/shows/:id/cast', apiKeyAuth, validateAddCastMember, Cast.addCastMember);
+tvShowRoutes.post('/shows/:id/cast', apiKeyAuth, Validator.validateAddCastMember, TV.addCastMember);
 
 // ============================== PATCH ENDPOINTS ==============================
 
 // PATCH /api/shows/:id/status - Update show status (Admin only)
-tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, checkShowExists, TV.updateShowStatus);
+tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, Validator.checkShowExists, TV.updateShowStatus);
 
 // PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, checkShowExists, TV.updateShowDates);
+tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, Validator.checkShowExists, TV.updateShowDates);
 
 // PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, checkShowExists, TV.updateShowMetrics);
+tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, Validator.checkShowExists, TV.updateShowMetrics);
 
 // PATCH /api/shows/:id/cast/:actorId - Update a cast member's character name (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, validateUpdateCastMember, Cast.updateCastMember);
+tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, Validator.validateUpdateCastMember, TV.updateCastMember);
 
 // PATCH /api/shows/:id - Update a show (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id', apiKeyAuth, checkShowExists, validateUpdateShow, TV.updateShow);
+tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.checkShowExists, Validator.validateUpdateShow, TV.updateShow);
 
 // ============================== DELETE ENDPOINTS ==============================
 
 // DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
-tvShowRoutes.delete('/shows/:id', apiKeyAuth, checkShowExists, TV.deleteShow);
+tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.checkShowExists, TV.deleteShow);
 
 // DELETE /api/shows/:id/cast/:actorId - Remove a cast member from a show (Admin only - requires API key)
-tvShowRoutes.delete('/shows/:id/cast/:actorId', apiKeyAuth, Cast.deleteCastMember);
+tvShowRoutes.delete('/shows/:id/cast/:actorId', apiKeyAuth, TV.deleteCastMember);
