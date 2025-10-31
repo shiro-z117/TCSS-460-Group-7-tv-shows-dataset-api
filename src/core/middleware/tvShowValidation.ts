@@ -19,8 +19,8 @@ export async function checkShowExists(req: Request, res: Response, next: NextFun
         }
 
         // Check if show exists
-        const show = await pool.query('SELECT id FROM shows WHERE id = $1', [showId]);
-        if (!show) {
+        const { rows } = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
+        if (rows.length === 0) {
             res.status(404).json({
                 success: false,
                 message: 'Show not found'
@@ -48,8 +48,8 @@ export async function checkActorExists(req: Request, res: Response, next: NextFu
             return;
         }
 
-        const actor = await pool.query('SELECT id FROM actors WHERE id = $1', [actorId]);
-        if (!actor) {
+        const { rows } = await pool.query('SELECT id FROM actors WHERE id = $1', [actorId]);
+        if (rows.length === 0) {
             res.status(404).json({
                 success: false,
                 message: 'Actor not found'
