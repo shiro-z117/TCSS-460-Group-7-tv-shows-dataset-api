@@ -1252,6 +1252,7 @@ export {
   getShowImages,
   getShowCast,
   deleteShow,
+  deleteActor,
   createShow,
   updateShow,
   addCastMember,
