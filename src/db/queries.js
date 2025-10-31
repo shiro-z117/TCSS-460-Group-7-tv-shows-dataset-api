@@ -1176,24 +1176,6 @@ const updateCastMember = async (showId, actorId, characterName) => {
   }
 };
 
-// GET CAST for a TV show
-const getCastByShowId = async (showId) => {
-  try {
-    const result = await pool.query(
-      `SELECT sa.tv_show_id, sa.actor_id, sa.character_name, a.name as actor_name, a.profile_url
-             FROM show_actors sa
-             JOIN actors a ON sa.actor_id = a.id
-             WHERE sa.tv_show_id = $1
-             ORDER BY sa.actor_id`,
-      [showId]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Database error in getCastByShowId:", error);
-    throw error;
-  }
-};
-
 // DELETE CAST MEMBER from a TV show
 const deleteCastMember = async (showId, actorId) => {
   try {
@@ -1244,12 +1226,11 @@ export {
   getEpisodes,
   getShowImages,
   getShowCast,
-  createShow,
   deleteShow,
+  createShow,
   updateShow,
   addCastMember,
   updateCastMember,
-  getCastByShowId,
   deleteCastMember,
   updateShowStatus,
   updateShowDates,
