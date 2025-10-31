@@ -85,7 +85,7 @@ tvShowRoutes.delete('/actors/:id', apiKeyAuth, Validator.checkActorExists, TV.de
 tvShowRoutes.delete('/networks/:id', apiKeyAuth, Validator.checkNetworkExists, TV.deleteNetwork);
 
 // DELETE /api/studios/:id - delete a studio by ID
-tvShowRoutes.delete('/studios/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteStudio);
+tvShowRoutes.delete('/studios/:id', apiKeyAuth, Validator.checkStudioExists, TV.deleteStudio);
 
 // DELETE /api/creators/:id - delete a creator by ID
-tvShowRoutes.delete('/creators/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteCreator);
+tvShowRoutes.delete('/creators/:id', apiKeyAuth, Validator.checkCreatorExists, TV.deleteCreator);
