@@ -1285,39 +1285,6 @@ const updateCastMember = async (showId, actorId, characterName) => {
   }
 };
 
-// DELETE CAST MEMBER from a TV show
-const deleteCastMember = async (showId, actorId) => {
-  try {
-    // Check if show exists
-    const showExists = await pool.query(
-      "SELECT id FROM tv_shows WHERE id = $1",
-      [showId]
-    );
-    if (showExists.rows.length === 0) {
-      throw new Error("SHOW_NOT_FOUND");
-    }
-
-    // Check if cast member exists
-    const existingCast = await pool.query(
-      "SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2",
-      [showId, actorId]
-    );
-    if (existingCast.rows.length === 0) {
-      throw new Error("CAST_MEMBER_NOT_FOUND");
-    }
-
-    // Delete cast member
-    const result = await pool.query(
-      "DELETE FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2 RETURNING *",
-      [showId, actorId]
-    );
-
-    return result.rows[0];
-  } catch (error) {
-    console.error("Database error in deleteCastMember:", error);
-    throw error;
-  }
-};
 
 // ===================================================
 // EXPORTS
@@ -1344,7 +1311,6 @@ export {
   updateShow,
   addCastMember,
   updateCastMember,
-  deleteCastMember,
   updateShowStatus,
   updateShowDates,
   updateShowMetrics,
