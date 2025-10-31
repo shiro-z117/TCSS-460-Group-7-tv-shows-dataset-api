@@ -35,6 +35,26 @@ export async function checkShowExists(req: Request, res: Response, next: NextFun
     }
 }
 
+
+export async function checkActorExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const actorId = parseInt(req.params.id);
+        if (isNaN(actorId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid actor ID'
+            });
+            return;
+        }
+
+        // Optional: You can skip this check entirely and rely on DELETE returning 0 rows
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export const listValidator = [
   query("page").optional().isInt({ min: 1 }).toInt(),
   query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),

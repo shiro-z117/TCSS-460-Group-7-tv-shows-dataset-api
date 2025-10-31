@@ -75,8 +75,16 @@ tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.checkShowExists, Validato
 
 // ============================== DELETE ENDPOINTS ==============================
 
-// DELETE /api/shows/:id - Delete a show by ID (Admin only - requires API key)
+// DELETE /api/shows/:id - Delete a show by ID
 tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.checkShowExists, TV.deleteShow);
 
-// DELETE /api/shows/:id/cast/:actorId - Remove a cast member from a show (Admin only - requires API key)
-tvShowRoutes.delete('/shows/:id/cast/:actorId', apiKeyAuth, TV.deleteCastMember);
+// DELETE /api/ - delete an actor
+tvShowRoutes.delete('/actors/:id', apiKeyAuth, TV.deleteActor);
+
+// DELETE /api/ - delete a network
+
+
+// DELETE /api/ - delete a studio
+
+
+// DELETE /api/ - delete a creator

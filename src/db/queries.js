@@ -796,6 +796,31 @@ const deleteShow = async (showId) => {
 
 
 // ===================================================
+// DELETE ACTOR BY ID
+// ===================================================
+export const deleteActor = async (actorId: number) => {
+    try {
+        const result = await pool.query(
+            'DELETE FROM actors WHERE id = $1 RETURNING id',
+            [actorId]
+        );
+
+        if (result.rows.length === 0) {
+            throw new Error('ACTOR_NOT_FOUND');
+        }
+
+        return result.rows[0];
+    } catch (error) {
+        console.error('Database error in deleteActor:', error);
+        throw error;
+    }
+};
+
+
+
+
+
+// ===================================================
 // CREATE NEW TV SHOW
 // ===================================================
 const createShow = async (showData) => {
