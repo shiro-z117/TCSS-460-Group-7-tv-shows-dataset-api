@@ -79,7 +79,7 @@ tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.checkShowExists, Validato
 tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.checkShowExists, TV.deleteShow);
 
 // DELETE /api/ - delete an actor
-tvShowRoutes.delete('/actors/:id', apiKeyAuth, TV.deleteActor);
+tvShowRoutes.delete('/actors/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteActor);
 
 // DELETE /api/ - delete a network
 

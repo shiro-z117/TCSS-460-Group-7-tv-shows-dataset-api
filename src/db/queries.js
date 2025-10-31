@@ -800,10 +800,6 @@ const deleteShow = async (showId) => {
 // ===================================================
 const deleteActor = async (actorId) => {
   try {
-    if (!Number.isInteger(actorId)) {
-      throw new Error("INVALID_ACTOR_ID");
-    }
-
     const existingActor = await pool.query(
       "SELECT id FROM actors WHERE id = $1",
       [actorId]

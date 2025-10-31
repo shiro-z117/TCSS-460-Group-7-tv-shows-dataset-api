@@ -2,7 +2,7 @@
 import { query, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import {sendValidationError} from "../utilities/responseUtils";
-import * as db from '../../db/queries.js';
+import pool from '../../db/connection.js';
 
 // Middleware to check if a show exists by ID (for DELETE operations)
 export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
@@ -19,7 +19,7 @@ export async function checkShowExists(req: Request, res: Response, next: NextFun
         }
 
         // Check if show exists
-        const show = await db.getShowById(showId);
+        const show = await pool.query('SELECT id FROM shows WHERE id = $1', [showId]);
         if (!show) {
             res.status(404).json({
                 success: false,
@@ -34,6 +34,35 @@ export async function checkShowExists(req: Request, res: Response, next: NextFun
         next(err);
     }
 }
+
+
+export async function checkActorExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const actorId = parseInt(req.params.id);
+
+        if (isNaN(actorId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid actor ID'
+            });
+            return;
+        }
+
+        const actor = await pool.query('SELECT id FROM actors WHERE id = $1', [actorId]);
+        if (!actor) {
+            res.status(404).json({
+                success: false,
+                message: 'Actor not found'
+            });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 export const listValidator = [
   query("page").optional().isInt({ min: 1 }).toInt(),
