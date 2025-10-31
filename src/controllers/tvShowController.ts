@@ -277,7 +277,7 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
         });
         
         } catch (err) { next(err); }
-    }
+}
 
 
 export async function getShowCast(req: Request, res: Response, next: NextFunction) {
@@ -331,7 +331,7 @@ export async function deleteShow(req: Request, res: Response, next: NextFunction
 
         res.status(200).json({
             success: true,
-            data: { id: deletedShow.id },
+            data: deletedShow,
             message: 'Show deleted successfully'
         });
     } catch (err: any) {
@@ -347,8 +347,56 @@ export async function deleteActor(req: Request, res: Response, next: NextFunctio
 
         res.status(200).json({
           success: true,
-          data: { id: deletedActor.id },
+          data: deletedActor,
           message: "Actor deleted successfully",
+        });
+    } catch (err: any) {
+        next(err);
+    }
+}
+
+
+export async function deleteNetwork(req: Request, res: Response, next: NextFunction) {
+    try {
+        const networkId = parseInt(req.params.id);
+        const deletedNetwork = await db.deleteNetwork(networkId);
+
+        res.status(200).json({
+          success: true,
+          data: deletedNetwork,
+          message: "Network deleted successfully",
+        });
+    } catch (err: any) {
+        next(err);
+    }
+}
+
+
+export async function deleteStudio(req: Request, res: Response, next: NextFunction) {
+    try {
+        const studioId = parseInt(req.params.id);
+        const deletedStudio = await db.deleteStudio(studioId);
+
+        res.status(200).json({
+          success: true,
+          data: deletedStudio,
+          message: "Studio deleted successfully",
+        });
+    } catch (err: any) {
+        next(err);
+    }
+}
+
+
+export async function deleteCreator(req: Request, res: Response, next: NextFunction) {
+    try {
+        const creatorId = parseInt(req.params.id);
+        const deletedCreator = await db.deleteCreator(creatorId);
+
+        res.status(200).json({
+          success: true,
+          data: deletedCreator,
+          message: "Creator deleted successfully",
         });
     } catch (err: any) {
         next(err);

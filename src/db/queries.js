@@ -783,7 +783,7 @@ const deleteShow = async (showId) => {
 
     // Delete the show (CASCADE should handle related records)
     const result = await pool.query(
-      "DELETE FROM tv_shows WHERE id = $1 RETURNING id",
+      "DELETE FROM tv_shows WHERE id = $1 RETURNING *",
       [showId]
     );
 
@@ -810,7 +810,7 @@ const deleteActor = async (actorId) => {
     }
 
     const result = await pool.query(
-      "DELETE FROM actors WHERE id = $1 RETURNING id",
+      "DELETE FROM actors WHERE id = $1 RETURNING *",
       [actorId]
     );
 
@@ -821,6 +821,86 @@ const deleteActor = async (actorId) => {
   }
 };
 
+
+// ===================================================
+// DELETE NETWORK BY ID
+// ===================================================
+const deleteNetwork = async (networkId) => {
+  try {
+    const existingNetwork = await pool.query(
+      "SELECT id FROM networks WHERE id = $1",
+      [networkId]
+    );
+
+    if (existingNetwork.rows.length === 0) {
+      throw new Error("NETWORK_NOT_FOUND");
+    }
+
+    const result = await pool.query(
+      "DELETE FROM networks WHERE id = $1 RETURNING *",
+      [networkId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteNetwork:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// DELETE STUDIO BY ID
+// ===================================================
+const deleteStudio = async (studioId) => {
+  try {
+    const existingStudio = await pool.query(
+      "SELECT id FROM studios WHERE id = $1",
+      [studioId]
+    );
+
+    if (existingStudio.rows.length === 0) {
+      throw new Error("STUDIO_NOT_FOUND");
+    }
+
+    const result = await pool.query(
+      "DELETE FROM studios WHERE id = $1 RETURNING *",
+      [studioId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteStudio:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// DELETE CREATOR BY ID
+// ===================================================
+const deleteCreator = async (creatorId) => {
+  try {
+    const existingCreator = await pool.query(
+      "SELECT id FROM creators WHERE id = $1",
+      [creatorId]
+    );
+
+    if (existingCreator.rows.length === 0) {
+      throw new Error("CREATOR_NOT_FOUND");
+    }
+
+    const result = await pool.query(
+      "DELETE FROM creators WHERE id = $1 RETURNING *",
+      [creatorId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteCreator:", error);
+    throw error;
+  }
+};
 
 
 

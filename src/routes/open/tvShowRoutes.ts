@@ -75,16 +75,17 @@ tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.checkShowExists, Validato
 
 // ============================== DELETE ENDPOINTS ==============================
 
-// DELETE /api/shows/:id - Delete a show by ID
+// DELETE /api/shows/:id - delete a show by ID
 tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.checkShowExists, TV.deleteShow);
 
-// DELETE /api/ - delete an actor
+// DELETE /api/actors/:id - delete an actor by ID
 tvShowRoutes.delete('/actors/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteActor);
 
-// DELETE /api/ - delete a network
+// DELETE /api/networks/:id - delete a network by ID
+tvShowRoutes.delete('/networks/:id', apiKeyAuth, Validator.checkNetworkExists, TV.deleteNetwork);
 
+// DELETE /api/studios/:id - delete a studio by ID
+tvShowRoutes.delete('/studios/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteStudio);
 
-// DELETE /api/ - delete a studio
-
-
-// DELETE /api/ - delete a creator
+// DELETE /api/creators/:id - delete a creator by ID
+tvShowRoutes.delete('/creators/:id', apiKeyAuth, Validator.checkActorExists, TV.deleteCreator);

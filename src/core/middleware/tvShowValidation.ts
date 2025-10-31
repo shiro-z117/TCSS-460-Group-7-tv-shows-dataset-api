@@ -64,6 +64,90 @@ export async function checkActorExists(req: Request, res: Response, next: NextFu
 }
 
 
+export async function checkNetworkExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const networkId = parseInt(req.params.id);
+
+        if (isNaN(networkId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid network ID'
+            });
+            return;
+        }
+
+        const { rows } = await pool.query('SELECT id FROM networks WHERE id = $1', [networkId]);
+        if (rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'Network not found'
+            });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function checkStudioExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const studioId = parseInt(req.params.id);
+
+        if (isNaN(studioId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid studio ID'
+            });
+            return;
+        }
+
+        const { rows } = await pool.query('SELECT id FROM studios WHERE id = $1', [studioId]);
+        if (rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'Studio not found'
+            });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function checkCreatorExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const creatorId = parseInt(req.params.id);
+
+        if (isNaN(creatorId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid creator ID'
+            });
+            return;
+        }
+
+        const { rows } = await pool.query('SELECT id FROM creators WHERE id = $1', [creatorId]);
+        if (rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'Creator not found'
+            });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export const listValidator = [
   query("page").optional().isInt({ min: 1 }).toInt(),
   query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
