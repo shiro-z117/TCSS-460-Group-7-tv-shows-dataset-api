@@ -32,26 +32,28 @@ tvShowRoutes.get("/shows/:id", apiKeyAuth, TV.getShowById);
 
 // PARAMETERS/METADATA
 
-// GET /api/genres
+// GET /api/genres - a list of genres in the database
 tvShowRoutes.get("/genres", apiKeyAuth, TV.getGenres);
 
-// GET /api/networks
+// GET /api/networks - a list of networks in the database
 tvShowRoutes.get("/networks", apiKeyAuth, TV.getNetworks);
 
-// GET /api/statuses
+// GET /api/statuses - a list of statuses in the database
 tvShowRoutes.get("/statuses", apiKeyAuth, TV.getStatuses);
 
-// GET /api/studios
+// GET /api/studios - a list of studios in the database
 tvShowRoutes.get("/studios", apiKeyAuth, TV.getStudios);
 
-// GET /api/years/first
+// GET /api/years/first - a range of years from the minimum and maximum first air dates in the database
 tvShowRoutes.get("/years/first", apiKeyAuth, TV.getYearsFirst);
 
-// GET /api/years/last
+// GET /api/years/last - a range of years from the minimum and maximum last air dates in the database
 tvShowRoutes.get("/years/last", apiKeyAuth, TV.getYearsLast);
 
-// GET /api/episodes
+// GET /api/episodes - a range of numbers from the minimum and maximum episode counts in the database
 tvShowRoutes.get("/episodes", apiKeyAuth, TV.getEpisodes);
+
+// ============================== DATA MODIFICATION (POST/PATCH/DELETE) ==============================
 
 // ============================== POST ENDPOINTS ==============================
 
