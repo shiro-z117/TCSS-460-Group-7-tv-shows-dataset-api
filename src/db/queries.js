@@ -765,6 +765,36 @@ const getShowCast = async (showId, page = 1, limit = 10) => {
   }
 };
 
+
+// ===================================================
+// DELETE TV SHOW BY ID
+// ===================================================
+const deleteShow = async (showId) => {
+  try {
+    // First, check if the show exists
+    const existingShow = await pool.query(
+      "SELECT id FROM tv_shows WHERE id = $1",
+      [showId]
+    );
+
+    if (existingShow.rows.length === 0) {
+      throw new Error("SHOW_NOT_FOUND");
+    }
+
+    // Delete the show (CASCADE should handle related records)
+    const result = await pool.query(
+      "DELETE FROM tv_shows WHERE id = $1 RETURNING id",
+      [showId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteShow:", error);
+    throw error;
+  }
+};
+
+
 // ===================================================
 // CREATE NEW TV SHOW
 // ===================================================
@@ -825,34 +855,6 @@ const createShow = async (showData) => {
     return result.rows[0];
   } catch (error) {
     console.error("Database error in createShow:", error);
-    throw error;
-  }
-};
-
-// ===================================================
-// DELETE TV SHOW BY ID
-// ===================================================
-const deleteShow = async (showId) => {
-  try {
-    // First, check if the show exists
-    const existingShow = await pool.query(
-      "SELECT id FROM tv_shows WHERE id = $1",
-      [showId]
-    );
-
-    if (existingShow.rows.length === 0) {
-      throw new Error("SHOW_NOT_FOUND");
-    }
-
-    // Delete the show (CASCADE should handle related records)
-    const result = await pool.query(
-      "DELETE FROM tv_shows WHERE id = $1 RETURNING id",
-      [showId]
-    );
-
-    return result.rows[0];
-  } catch (error) {
-    console.error("Database error in deleteShow:", error);
     throw error;
   }
 };

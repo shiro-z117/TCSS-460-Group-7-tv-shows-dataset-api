@@ -326,6 +326,24 @@ export async function getShowCast(req: Request, res: Response, next: NextFunctio
 }
 
 
+export async function deleteShow(req: Request, res: Response, next: NextFunction) {
+    try {
+        const showId = parseInt(req.params.id);
+
+        // ID validation and existence check already done by middleware
+        const deletedShow = await db.deleteShow(showId);
+
+        res.status(200).json({
+            success: true,
+            data: { id: deletedShow.id },
+            message: 'Show deleted successfully'
+        });
+    } catch (err: any) {
+        next(err);
+    }
+}
+
+
 export async function createShow(req: Request, res: Response, next: NextFunction) {
     try {
         const showData = {
@@ -366,22 +384,6 @@ export async function createShow(req: Request, res: Response, next: NextFunction
     }
 }
 
-export async function deleteShow(req: Request, res: Response, next: NextFunction) {
-    try {
-        const showId = parseInt(req.params.id);
-
-        // ID validation and existence check already done by middleware
-        const deletedShow = await db.deleteShow(showId);
-
-        res.status(200).json({
-            success: true,
-            data: { id: deletedShow.id },
-            message: 'Show deleted successfully'
-        });
-    } catch (err: any) {
-        next(err);
-    }
-}
 
 export async function updateShow(req: Request, res: Response, next: NextFunction) {
     try {
