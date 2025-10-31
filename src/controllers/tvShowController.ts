@@ -343,26 +343,17 @@ export async function deleteShow(req: Request, res: Response, next: NextFunction
 export async function deleteActor(req: Request, res: Response, next: NextFunction) {
     try {
         const actorId = parseInt(req.params.id);
-
-        const deleted = await db.deleteActor(actorId);
+        const deletedActor = await db.deleteActor(actorId);
 
         res.status(200).json({
-            success: true,
-            data: { id: deleted.id },
-            message: 'Actor deleted successfully'
+          success: true,
+          data: { id: deletedActor.id },
+          message: "Actor deleted successfully",
         });
     } catch (err: any) {
-        if (err.message === 'ACTOR_NOT_FOUND') {
-            res.status(404).json({
-                success: false,
-                message: 'Actor not found'
-            });
-            return;
-        }
         next(err);
     }
 }
-
 
 
 export async function createShow(req: Request, res: Response, next: NextFunction) {

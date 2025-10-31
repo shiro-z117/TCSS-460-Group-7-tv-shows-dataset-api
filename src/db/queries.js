@@ -798,24 +798,32 @@ const deleteShow = async (showId) => {
 // ===================================================
 // DELETE ACTOR BY ID
 // ===================================================
-export const deleteActor = async (actorId: number) => {
-    try {
-        const result = await pool.query(
-            'DELETE FROM actors WHERE id = $1 RETURNING id',
-            [actorId]
-        );
-
-        if (result.rows.length === 0) {
-            throw new Error('ACTOR_NOT_FOUND');
-        }
-
-        return result.rows[0];
-    } catch (error) {
-        console.error('Database error in deleteActor:', error);
-        throw error;
+const deleteActor = async (actorId) => {
+  try {
+    if (!Number.isInteger(actorId)) {
+      throw new Error("INVALID_ACTOR_ID");
     }
-};
 
+    const existingActor = await pool.query(
+      "SELECT id FROM actors WHERE id = $1",
+      [actorId]
+    );
+
+    if (existingActor.rows.length === 0) {
+      throw new Error("ACTOR_NOT_FOUND");
+    }
+
+    const result = await pool.query(
+      "DELETE FROM actors WHERE id = $1 RETURNING id",
+      [actorId]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in deleteActor:", error);
+    throw error;
+  }
+};
 
 
 
