@@ -5,7 +5,7 @@ import {sendValidationError} from "../utilities/responseUtils";
 import pool from '../../db/connection.js';
 
 // Middleware to check if a show exists by ID (for DELETE operations)
-export async function checkShowExists(req: Request, res: Response, next: NextFunction) {
+export async function checkShowIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const showId = parseInt(req.params.id);
 
@@ -36,7 +36,7 @@ export async function checkShowExists(req: Request, res: Response, next: NextFun
 }
 
 
-export async function checkActorExists(req: Request, res: Response, next: NextFunction) {
+export async function checkActorIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const actorId = parseInt(req.params.id);
 
@@ -64,7 +64,7 @@ export async function checkActorExists(req: Request, res: Response, next: NextFu
 }
 
 
-export async function checkNetworkExists(req: Request, res: Response, next: NextFunction) {
+export async function checkNetworkIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const networkId = parseInt(req.params.id);
 
@@ -92,7 +92,7 @@ export async function checkNetworkExists(req: Request, res: Response, next: Next
 }
 
 
-export async function checkStudioExists(req: Request, res: Response, next: NextFunction) {
+export async function checkStudioIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const studioId = parseInt(req.params.id);
 
@@ -120,7 +120,7 @@ export async function checkStudioExists(req: Request, res: Response, next: NextF
 }
 
 
-export async function checkCreatorExists(req: Request, res: Response, next: NextFunction) {
+export async function checkCreatorIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const creatorId = parseInt(req.params.id);
 
@@ -146,6 +146,91 @@ export async function checkCreatorExists(req: Request, res: Response, next: Next
         next(err);
     }
 }
+
+
+export async function checkActorDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { actor_name } = req.body;
+
+        if (!actor_name || typeof actor_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'actor_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM actors WHERE actor_name = $1',
+            [actor_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Actor with name "${actor_name}" already exists`,
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkActorDuplicate:', err);
+        next(err);
+    }
+}
+
+
+// Validate that the "country" field exists in countries.country_code
+export async function validateCountry(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { country } = req.body;
+
+        if (!country) {
+            res.status(400).json({ success: false, message: 'Missing country field' });
+            return;
+        }
+
+        const { rows } = await pool.query(
+            'SELECT 1 FROM countries WHERE country_code = $1',
+            [country]
+        );
+
+        if (rows.length === 0) {
+            res.status(400).json({ success: false, message: `Invalid country: ${country}` });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Validate that the "status" field exists in statuses.name
+export async function validateStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { status } = req.body;
+
+        if (!status) {
+            res.status(400).json({ success: false, message: 'Missing status field' });
+            return;
+        }
+
+        const { rows } = await pool.query(
+            'SELECT 1 FROM statuses WHERE name = $1',
+            [status]
+        );
+
+        if (rows.length === 0) {
+            res.status(400).json({ success: false, message: `Invalid status: ${status}` });
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 
 export const listValidator = [

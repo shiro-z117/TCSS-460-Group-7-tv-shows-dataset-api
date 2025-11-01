@@ -9,7 +9,7 @@ const pool = require("./connection");
 // ===================================================
 // GET SERVICE HEALTH STATUS
 // ===================================================
-const getHealth = async () => {
+export const getHealth = async () => {
   try {
     // test db connection
     const result = await pool.query("SELECT NOW()");
@@ -38,7 +38,7 @@ const getHealth = async () => {
 // ===================================================
 // ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
-const getShows = async (filters = {}) => {
+export const getShows = async (filters = {}) => {
   try {
     const {
       q = "",
@@ -267,7 +267,7 @@ const getShows = async (filters = {}) => {
 // ===================================================
 // GET SHOW BY ID (RETURNS FULL DETAILS)
 // ===================================================
-const getShowById = async (showId) => {
+export const getShowById = async (showId) => {
   try {
     const query = `
       SELECT 
@@ -338,7 +338,7 @@ const getShowById = async (showId) => {
 // ===================================================
 // GET LIST OF STATUS TYPES
 // ===================================================
-const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
+export const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -385,7 +385,7 @@ const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF GENRES
 // ===================================================
-const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
+export const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -426,7 +426,7 @@ const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF NETWORKS
 // ===================================================
-const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
+export const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -467,7 +467,7 @@ const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF STUDIOS
 // ===================================================
-const getStudios = async (q = "", page = 1, limit = 50) => {
+export const getStudios = async (q = "", page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -512,7 +512,7 @@ const getStudios = async (q = "", page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF FIRST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-const getYearsFirst = async (min, max, page = 1, limit = 50) => {
+export const getYearsFirst = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -558,7 +558,7 @@ const getYearsFirst = async (min, max, page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF LAST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-const getYearsLast = async (min, max, page = 1, limit = 50) => {
+export const getYearsLast = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -604,7 +604,7 @@ const getYearsLast = async (min, max, page = 1, limit = 50) => {
 // ===================================================
 // GET LIST OF EPISODE COUNTS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
-const getEpisodes = async (min, max, page = 1, limit = 50) => {
+export const getEpisodes = async (min, max, page = 1, limit = 50) => {
   try {
     const offset = (page - 1) * limit;
 
@@ -650,7 +650,7 @@ const getEpisodes = async (min, max, page = 1, limit = 50) => {
 // ===================================================
 // GET SHOW IMAGES
 // ===================================================
-const getShowImages = async (showId, type, page = 1, limit = 20) => {
+export const getShowImages = async (showId, type, page = 1, limit = 20) => {
   try {
     console.log(
       "getShowImages called with showId:",
@@ -727,7 +727,7 @@ const getShowImages = async (showId, type, page = 1, limit = 20) => {
 // ===================================================
 // GET SHOW CAST MEMBERS
 // ===================================================
-const getShowCast = async (showId, page = 1, limit = 10) => {
+export const getShowCast = async (showId, page = 1, limit = 10) => {
   try {
     console.log(
       "getShowCast called with showId:",
@@ -770,7 +770,7 @@ const getShowCast = async (showId, page = 1, limit = 10) => {
 // ===================================================
 // DELETE TV SHOW BY ID
 // ===================================================
-const deleteShow = async (showId) => {
+export const deleteShow = async (showId) => {
   try {
     // First, check if the show exists
     const existingShow = await pool.query(
@@ -799,7 +799,7 @@ const deleteShow = async (showId) => {
 // ===================================================
 // DELETE ACTOR BY ID
 // ===================================================
-const deleteActor = async (actorId) => {
+export const deleteActor = async (actorId) => {
   try {
     const existingActor = await pool.query(
       "SELECT id FROM actors WHERE id = $1",
@@ -826,7 +826,7 @@ const deleteActor = async (actorId) => {
 // ===================================================
 // DELETE NETWORK BY ID
 // ===================================================
-const deleteNetwork = async (networkId) => {
+export const deleteNetwork = async (networkId) => {
   try {
     const existingNetwork = await pool.query(
       "SELECT id FROM networks WHERE id = $1",
@@ -853,7 +853,7 @@ const deleteNetwork = async (networkId) => {
 // ===================================================
 // DELETE STUDIO BY ID
 // ===================================================
-const deleteStudio = async (studioId) => {
+export const deleteStudio = async (studioId) => {
   try {
     const existingStudio = await pool.query(
       "SELECT id FROM studios WHERE id = $1",
@@ -880,7 +880,7 @@ const deleteStudio = async (studioId) => {
 // ===================================================
 // DELETE CREATOR BY ID
 // ===================================================
-const deleteCreator = async (creatorId) => {
+export const deleteCreator = async (creatorId) => {
   try {
     const existingCreator = await pool.query(
       "SELECT id FROM creators WHERE id = $1",
@@ -904,11 +904,10 @@ const deleteCreator = async (creatorId) => {
 };
 
 
-
 // ===================================================
 // CREATE NEW TV SHOW
 // ===================================================
-const createShow = async (showData) => {
+export const createShow = async (showData) => {
   try {
     const {
       id,
@@ -969,10 +968,36 @@ const createShow = async (showData) => {
   }
 };
 
+
+// ===================================================
+// CREATE ACTOR
+// ===================================================
+export const createActor = async (actor_name, profile_url = null) => {
+  try {
+    if (!actor_name) {
+      throw new Error("MISSING_ACTOR_NAME");
+    }
+
+    const result = await pool.query(
+      `INSERT INTO actors (actor_name, profile_url)
+       VALUES ($1, $2)
+       RETURNING *`,
+      [actor_name, profile_url || null]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in createActor:", error);
+    throw error;
+  }
+};
+
+
+
 // ===================================================
 // UPDATE SHOW STATUS
 // ===================================================
-const updateShowStatus = async (showId, status) => {
+export const updateShowStatus = async (showId, status) => {
   try {
     const result = await pool.query(
       `UPDATE tv_shows 
@@ -996,7 +1021,7 @@ const updateShowStatus = async (showId, status) => {
 // ===================================================
 // UPDATE SHOW DATES
 // ===================================================
-const updateShowDates = async (showId, dates) => {
+export const updateShowDates = async (showId, dates) => {
   try {
     const { first_air_date, last_air_date } = dates;
 
@@ -1044,7 +1069,7 @@ const updateShowDates = async (showId, dates) => {
 // ===================================================
 // UPDATE SHOW METRICS
 // ===================================================
-const updateShowMetrics = async (showId, metrics) => {
+export const updateShowMetrics = async (showId, metrics) => {
   try {
     const { tmdb_rating, popularity, vote_count } = metrics;
 
@@ -1098,7 +1123,7 @@ const updateShowMetrics = async (showId, metrics) => {
 // ===================================================
 // UPDATE TV SHOW
 // ===================================================
-const updateShow = async (showId, updateData) => {
+export const updateShow = async (showId, updateData) => {
   try {
     // Check if show exists
     const existingShow = await pool.query(
@@ -1208,7 +1233,7 @@ const updateShow = async (showId, updateData) => {
 // ===================================================
 
 // ADD CAST MEMBER to a TV show
-const addCastMember = async (showId, castData) => {
+export const addCastMember = async (showId, castData) => {
   try {
     const { actor_id, character_name } = castData;
 
@@ -1253,7 +1278,7 @@ const addCastMember = async (showId, castData) => {
 };
 
 // UPDATE CAST MEMBER character name
-const updateCastMember = async (showId, actorId, characterName) => {
+export const updateCastMember = async (showId, actorId, characterName) => {
   try {
     // Check if show exists
     const showExists = await pool.query(
@@ -1284,35 +1309,4 @@ const updateCastMember = async (showId, actorId, characterName) => {
     console.error("Database error in updateCastMember:", error);
     throw error;
   }
-};
-
-
-// ===================================================
-// EXPORTS
-// ===================================================
-export {
-  getHealth,
-  getShows,
-  getShowById,
-  getStatuses,
-  getGenres,
-  getNetworks,
-  getStudios,
-  getYearsFirst,
-  getYearsLast,
-  getEpisodes,
-  getShowImages,
-  getShowCast,
-  deleteShow,
-  deleteActor,
-  deleteNetwork,
-  deleteStudio,
-  deleteCreator,
-  createShow,
-  updateShow,
-  addCastMember,
-  updateCastMember,
-  updateShowStatus,
-  updateShowDates,
-  updateShowMetrics,
 };
