@@ -179,58 +179,49 @@ export async function checkActorDuplicate(req: Request, res: Response, next: Nex
 }
 
 
-// Validate that the "country" field exists in countries.country_code
 export async function validateCountry(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { country } = req.body;
-
-        if (!country) {
-            res.status(400).json({ success: false, message: 'Missing country field' });
-            return;
-        }
-
-        const { rows } = await pool.query(
-            'SELECT 1 FROM countries WHERE country_code = $1',
-            [country]
-        );
-
-        if (rows.length === 0) {
-            res.status(400).json({ success: false, message: `Invalid country: ${country}` });
-            return;
-        }
-
-        next();
-    } catch (err) {
-        next(err);
+  try {
+    const { country } = req.body;
+    if (!country) {
+      return next();
     }
+    const { rows } = await pool.query('SELECT country_code FROM countries');
+    const validCountries = rows.map(r => r.country_code);
+
+    if (!validCountries.includes(country)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid country',
+        validValues: validCountries
+      });
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 }
 
-// Validate that the "status" field exists in statuses.name
+
 export async function validateStatus(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { status } = req.body;
+  try {
+    const { status } = req.body;
+    const { rows } = await pool.query('SELECT name FROM statuses');
+    const validStatuses = rows.map(r => r.name);
 
-        if (!status) {
-            res.status(400).json({ success: false, message: 'Missing status field' });
-            return;
-        }
-
-        const { rows } = await pool.query(
-            'SELECT 1 FROM statuses WHERE name = $1',
-            [status]
-        );
-
-        if (rows.length === 0) {
-            res.status(400).json({ success: false, message: `Invalid status: ${status}` });
-            return;
-        }
-
-        next();
-    } catch (err) {
-        next(err);
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status',
+        validValues: validStatuses
+      });
     }
-}
 
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 export const listValidator = [

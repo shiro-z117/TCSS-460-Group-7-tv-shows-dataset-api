@@ -462,6 +462,23 @@ export async function createActor(req: Request, res: Response, next: NextFunctio
 }
 
 
+export async function createNetwork(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { network_name, logo_url, country } = req.body;
+
+        const newNetwork = await db.createNetwork(network_name, logo_url, country);
+
+        res.status(201).json({
+            success: true,
+            message: 'Network created successfully',
+            data: newNetwork,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export async function updateShow(req: Request, res: Response, next: NextFunction) {
     try {
         const showId = parseInt(req.params.id);

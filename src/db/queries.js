@@ -993,6 +993,68 @@ export const createActor = async (actor_name, profile_url = null) => {
 };
 
 
+export const createNetwork = async (network_name, logo_url = null, country = null) => {
+  try {
+    if (!network_name) {
+      throw new Error("MISSING_NETWORK_NAME");
+    }
+
+    const result = await pool.query(
+      `INSERT INTO networks (network_name, logo_url, country)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [network_name, logo_url || null, country || null]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in createNetwork:", error);
+    throw error;
+  }
+};
+
+
+export const createStudio = async (studio_name, logo_url = null, country = null) => {
+  try {
+    if (!studio_name) {
+      throw new Error("MISSING_STUDIO_NAME");
+    }
+
+    const result = await pool.query(
+      `INSERT INTO studios (studio_name, logo_url, country)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [studio_name, logo_url || null, country || null]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in createStudio:", error);
+    throw error;
+  }
+};
+
+
+export const createCreator = async (creator_name) => {
+  try {
+    if (!creator_name) {
+      throw new Error("MISSING_CREATOR_NAME");
+    }
+
+    const result = await pool.query(
+      `INSERT INTO creators (creator_name)
+       VALUES ($1)
+       RETURNING *`,
+      [creator_name]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in createCreator:", error);
+    throw error;
+  }
+};
+
 
 // ===================================================
 // UPDATE SHOW STATUS
