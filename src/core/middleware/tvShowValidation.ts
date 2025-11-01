@@ -179,6 +179,99 @@ export async function checkActorDuplicate(req: Request, res: Response, next: Nex
 }
 
 
+export async function checkNetworkDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { network_name } = req.body;
+
+        if (!network_name || typeof network_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'network_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM networks WHERE network_name = $1',
+            [network_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Network with name "${network_name}" already exists`,
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkNetworkDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function checkStudioDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { studio_name } = req.body;
+
+        if (!studio_name || typeof studio_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'studio_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM studios WHERE studio_name = $1',
+            [studio_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Studio with name "${studio_name}" already exists`,
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkStudioDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function checkCreatorDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { creator_name } = req.body;
+
+        if (!creator_name || typeof creator_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'creator_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM creators WHERE creator_name = $1',
+            [creator_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Creator with name "${creator_name}" already exists`,
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkCreatorDuplicate:', err);
+        next(err);
+    }
+}
+
+
 export async function validateCountry(req: Request, res: Response, next: NextFunction) {
   try {
     const { country } = req.body;

@@ -57,13 +57,13 @@ tvShowRoutes.post('/shows', apiKeyAuth, Validator.validateCreateShow, TV.createS
 tvShowRoutes.post('/actors', apiKeyAuth, Validator.checkActorDuplicate, TV.createActor);
 
 // POST /api/networks - Add a network to the database
-tvShowRoutes.post('/networks', apiKeyAuth, Validator.checkActorDuplicate, Validator.validateCountry, TV.createNetwork);
+tvShowRoutes.post('/networks', apiKeyAuth, Validator.checkNetworkDuplicate, Validator.validateCountry, TV.createNetwork);
 
 // POST /api/studios - Add a studio to the database
-tvShowRoutes.post('/studios', apiKeyAuth, Validator.checkActorDuplicate, Validator.validateCountry, TV.createStudio);
+tvShowRoutes.post('/studios', apiKeyAuth, Validator.checkStudioDuplicate, Validator.validateCountry, TV.createStudio);
 
 // POST /api/creators - Add a creator to the database
-tvShowRoutes.post('/creators', apiKeyAuth, Validator.checkActorDuplicate, TV.createCreator);
+tvShowRoutes.post('/creators', apiKeyAuth, Validator.checkCreatorDuplicate, TV.createCreator);
 
 // ============================== PATCH ENDPOINTS ==============================
 
