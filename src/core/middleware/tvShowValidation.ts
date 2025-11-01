@@ -168,6 +168,7 @@ export async function checkActorDuplicate(req: Request, res: Response, next: Nex
             return res.status(409).json({
                 success: false,
                 message: `Actor with name "${actor_name}" already exists`,
+                data: rows[0]
             });
         }
 
@@ -197,8 +198,9 @@ export async function checkNetworkDuplicate(req: Request, res: Response, next: N
 
         if (rows.length > 0) {
             return res.status(409).json({
-                success: false,
-                message: `Network with name "${network_name}" already exists`,
+              success: false,
+              message: `Network with name "${network_name}" already exists`,
+              data: rows[0],
             });
         }
 
@@ -228,8 +230,9 @@ export async function checkStudioDuplicate(req: Request, res: Response, next: Ne
 
         if (rows.length > 0) {
             return res.status(409).json({
-                success: false,
-                message: `Studio with name "${studio_name}" already exists`,
+              success: false,
+              message: `Studio with name "${studio_name}" already exists`,
+              data: rows[0],
             });
         }
 
@@ -259,8 +262,9 @@ export async function checkCreatorDuplicate(req: Request, res: Response, next: N
 
         if (rows.length > 0) {
             return res.status(409).json({
-                success: false,
-                message: `Creator with name "${creator_name}" already exists`,
+              success: false,
+              message: `Creator with name "${creator_name}" already exists`,
+              data: rows[0],
             });
         }
 
