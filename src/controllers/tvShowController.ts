@@ -479,6 +479,40 @@ export async function createNetwork(req: Request, res: Response, next: NextFunct
 }
 
 
+export async function createStudio(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { studio_name, logo_url, country } = req.body;
+
+        const newStudio = await db.createStudio(studio_name, logo_url, country);
+
+        res.status(201).json({
+            success: true,
+            message: 'Studio created successfully',
+            data: newStudio,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function createCreator(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { creator_name } = req.body;
+
+        const newCreator = await db.createCreator(creator_name);
+
+        res.status(201).json({
+            success: true,
+            message: 'Creator created successfully',
+            data: newCreator,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export async function updateShow(req: Request, res: Response, next: NextFunction) {
     try {
         const showId = parseInt(req.params.id);
