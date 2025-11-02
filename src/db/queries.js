@@ -910,7 +910,6 @@ export const deleteCreator = async (creatorId) => {
 export const createShow = async (showData) => {
   try {
     const {
-      id,
       name,
       original_name,
       first_air_date,
@@ -924,49 +923,55 @@ export const createShow = async (showData) => {
       vote_count,
       poster_url,
       backdrop_url,
+      genres = []
     } = showData;
 
-    // Check if show with this ID already exists
-    const existingShow = await pool.query(
-      "SELECT id FROM tv_shows WHERE id = $1",
-      [id]
-    );
-    if (existingShow.rows.length > 0) {
-      throw new Error("SHOW_EXISTS");
-    }
+    // Generate unique ID for new show
+    const { rows: idRows } = await pool.query('SELECT MAX(id) AS max_id FROM tv_shows');
+    const id = (idRows[0].max_id || 0) + 1;
 
-    // Insert new show
+    // Insert into tv_shows
     const result = await pool.query(
       `INSERT INTO tv_shows (
-                id, name, original_name, first_air_date, last_air_date,
-                seasons, episodes, status, overview, popularity,
-                tmdb_rating, vote_count, poster_url, backdrop_url
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-            RETURNING *`,
+        id, name, original_name, first_air_date, last_air_date,
+        seasons, episodes, status, overview, popularity,
+        tmdb_rating, vote_count, poster_url, backdrop_url
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+      RETURNING *`,
       [
-        id,
-        name,
-        original_name,
-        first_air_date,
-        last_air_date,
-        seasons,
-        episodes,
-        status,
-        overview,
-        popularity,
-        tmdb_rating,
-        vote_count,
-        poster_url,
-        backdrop_url,
+        id, name, original_name, first_air_date, last_air_date,
+        seasons, episodes, status, overview, popularity,
+        tmdb_rating, vote_count, poster_url, backdrop_url
       ]
     );
 
-    return result.rows[0];
+    const newShow = result.rows[0];
+
+    // Insert into junction table show_genres
+    if (genres.length > 0) {
+      for (const genreName of genres) {
+        const { rows: genreRows } = await pool.query(
+          'SELECT id FROM genres WHERE genre_name = $1',
+          [genreName]
+        );
+        if (genreRows.length > 0) {
+          await pool.query(
+            'INSERT INTO show_genres (id, tv_show_id, genre_id) VALUES (gen_random_uuid(), $1, $2)',
+            [newShow.id, genreRows[0].id]
+          );
+        }
+      }
+    }
+
+    return newShow;
+
   } catch (error) {
     console.error("Database error in createShow:", error);
     throw error;
   }
 };
+
+
 
 
 // ===================================================

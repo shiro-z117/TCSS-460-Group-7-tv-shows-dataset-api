@@ -1,7 +1,7 @@
 // core/middleware/tvShowValidation.ts
 import { query, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import {sendValidationError} from "../utilities/responseUtils";
+import { sendValidationError } from "../utilities/responseUtils";
 import pool from '../../db/connection.js';
 
 // Middleware to check if a show exists by ID (for DELETE operations)
@@ -300,52 +300,7 @@ export async function validateCountry(req: Request, res: Response, next: NextFun
 }
 
 
-export async function validateStatus(req: Request, res: Response, next: NextFunction) {
-  try {
-    const { status } = req.body;
-    const { rows } = await pool.query('SELECT name FROM statuses');
-    const validStatuses = rows.map(r => r.name);
-
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid status',
-        validValues: validStatuses
-      });
-    }
-
-    next();
-  } catch (err) {
-    next(err);
-  }
-}
-
-
-export const listValidator = [
-  query("page").optional().isInt({ min: 1 }).toInt(),
-  query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-];
-
-export const filterByYearRangeValidator = [
-  query("start_year")
-    .exists()
-    .withMessage("start_year required")
-    .isInt()
-    .toInt(),
-  query("end_year").exists().withMessage("end_year required").isInt().toInt(),
-  (req: Request, res: Response, next: NextFunction) => {
-    const s = Number(req.query.start_year);
-    const e = Number(req.query.end_year);
-    if (Number.isInteger(s) && Number.isInteger(e) && s <= e) return next();
-    return res.status(400).json({
-      success: false,
-      error:
-        "start_year and end_year must be integers and start_year <= end_year",
-    });
-  },
-  ...listValidator,
-];
-
+// helper function to send error messages
 export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) return next();
@@ -353,18 +308,8 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
   return sendValidationError(res, "Invalid request parameters", errors.array());
 };
 
-export const randomTenValidator = [
-  // optional: allow user to pass ?limit=N if you like
-  query("limit").optional().isInt({ min: 1, max: 50 }).toInt(),
-];
 
 export const validateCreateShow = [
-  body("id")
-    .notEmpty()
-    .withMessage("ID is required")
-    .isInt({ min: 1 })
-    .withMessage("ID must be a positive integer"),
-
   body("name")
     .notEmpty()
     .withMessage("Name is required")
@@ -373,36 +318,49 @@ export const validateCreateShow = [
     .trim(),
 
   body("original_name")
-    .optional()
+    .notEmpty()
+    .withMessage("Original name is required")
     .isString()
     .withMessage("Original name must be a string")
     .trim(),
 
   body("first_air_date")
-    .optional()
+    .notEmpty()
+    .withMessage("First air date is required")
     .isISO8601()
     .withMessage("First air date must be a valid date (ISO 8601)"),
 
   body("last_air_date")
-    .optional()
+    .notEmpty()
+    .withMessage("Last air date is required")
     .isISO8601()
     .withMessage("Last air date must be a valid date (ISO 8601)"),
 
   body("seasons")
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage("Seasons must be a non-negative integer"),
+    .notEmpty()
+    .withMessage("Seasons is required")
+    .isInt({ min: 1 })
+    .withMessage("Seasons must be an integer >= 1"),
 
   body("episodes")
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage("Episodes must be a non-negative integer"),
+    .notEmpty()
+    .withMessage("Episodes is required")
+    .isInt({ min: 1 })
+    .withMessage("Episodes must be an integer >= 1"),
 
   body("status")
-    .optional()
-    .isString()
-    .withMessage("Status must be a string")
-    .trim(),
+    .notEmpty()
+    .withMessage("Status is required")
+    .custom(async (statusValue) => {
+      const { rows } = await pool.query("SELECT name FROM statuses");
+      const validStatuses = rows.map((r) => r.name);
+      if (!validStatuses.includes(statusValue)) {
+        throw new Error(
+          `Invalid status. Valid values: ${validStatuses.join(", ")}`
+        );
+      }
+      return true;
+    }),
 
   body("overview")
     .optional()
@@ -437,8 +395,85 @@ export const validateCreateShow = [
     .withMessage("Backdrop URL must be a string")
     .trim(),
 
-  validate,
+  body("genres")
+    .isArray({ min: 1 })
+    .withMessage("Genres must be an array with at least one value")
+    .custom(async (genresArray) => {
+      const { rows } = await pool.query("SELECT genre_name FROM genres");
+      const validGenres = rows.map((r) => r.genre_name);
+      for (const genre of genresArray) {
+        if (!validGenres.includes(genre)) {
+          throw new Error(
+            `Invalid genre: ${genre}. Valid values: ${validGenres.join(", ")}`
+          );
+        }
+      }
+      return true;
+    }),
+
+  // Duplicate check: name + original_name + status + first_air_date
+  body().custom(async (value, { req }) => {
+    const { name, original_name, status, first_air_date } = req.body;
+
+    const { rows } = await pool.query(
+      `SELECT 1
+       FROM tv_shows
+       WHERE name = $1
+         AND original_name = $2
+         AND status = $3
+         AND first_air_date = $4`,
+      [name, original_name, status, first_air_date]
+    );
+
+    if (rows.length > 0) {
+      throw new Error(
+        "Duplicate show: a show with the same name, original name, status, and first air date already exists"
+      );
+    }
+
+    return true;
+  }),
+
+  // helper to format validation errors
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) return next();
+    return sendValidationError(
+      res,
+      "Invalid request parameters",
+      errors.array()
+    );
+  },
 ];
+
+
+export const listValidator = [
+  query("page").optional().isInt({ min: 1 }).toInt(),
+  query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
+];
+
+export const filterByYearRangeValidator = [
+  query("start_year")
+    .exists()
+    .withMessage("start_year required")
+    .isInt()
+    .toInt(),
+  query("end_year").exists().withMessage("end_year required").isInt().toInt(),
+  (req: Request, res: Response, next: NextFunction) => {
+    const s = Number(req.query.start_year);
+    const e = Number(req.query.end_year);
+    if (Number.isInteger(s) && Number.isInteger(e) && s <= e) return next();
+    return res.status(400).json({
+      success: false,
+      error:
+        "start_year and end_year must be integers and start_year <= end_year",
+    });
+  },
+  ...listValidator,
+];
+
+
+
 
 // ===================================================
 // VALIDATE UPDATE STATUS
