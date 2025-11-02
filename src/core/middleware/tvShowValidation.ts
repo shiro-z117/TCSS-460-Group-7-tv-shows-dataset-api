@@ -305,7 +305,7 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) return next();
   // Don’t inspect; just forward
-  return sendValidationError(res, "Invalid request parameters", errors.array());
+  return sendValidationError(res, "An error has occurred (see details below) ", errors.array());
 };
 
 
