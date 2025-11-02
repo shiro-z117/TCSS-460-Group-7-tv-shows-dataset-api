@@ -637,62 +637,6 @@ export async function updateShowMetrics(req: Request, res: Response, next: NextF
     }
 }
 
-/**
- * POST /api/shows/:id/cast
- * Add a cast member to a TV show
- */
-export async function addCastMember(req: Request, res: Response, next: NextFunction) {
-    try {
-        const tvShowId = parseInt(req.params.id);
-
-        // Validate show ID
-        if (isNaN(tvShowId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid show ID'
-            });
-            return;
-        }
-
-        const castData = {
-            actor_id: req.body.actor_id,
-            character_name: req.body.character_name
-        };
-
-        const newCastMember = await db.addCastMember(tvShowId, castData);
-
-        res.status(201)
-            .location(`/api/shows/${tvShowId}/cast/${newCastMember.actor_id}`)
-            .json({
-                success: true,
-                data: newCastMember,
-                message: 'Cast member added successfully'
-            });
-    } catch (err: any) {
-        if (err.message === 'SHOW_NOT_FOUND') {
-            res.status(404).json({
-                success: false,
-                message: 'TV show not found'
-            });
-            return;
-        }
-        if (err.message === 'ACTOR_NOT_FOUND') {
-            res.status(404).json({
-                success: false,
-                message: 'Actor not found'
-            });
-            return;
-        }
-        if (err.message === 'CAST_MEMBER_EXISTS') {
-            res.status(409).json({
-                success: false,
-                message: 'This actor is already in the cast for this show'
-            });
-            return;
-        }
-        next(err);
-    }
-}
 
 /**
  * PATCH /api/shows/:id/cast/:actorId

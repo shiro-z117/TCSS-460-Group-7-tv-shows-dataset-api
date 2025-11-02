@@ -1304,54 +1304,6 @@ export const updateShow = async (showId, updateData) => {
   }
 };
 
-// ===================================================
-// CAST MANAGEMENT
-// ===================================================
-
-// ADD CAST MEMBER to a TV show
-export const addCastMember = async (showId, castData) => {
-  try {
-    const { actor_id, character_name } = castData;
-
-    // Check if show exists
-    const showExists = await pool.query(
-      "SELECT id FROM tv_shows WHERE id = $1",
-      [showId]
-    );
-    if (showExists.rows.length === 0) {
-      throw new Error("SHOW_NOT_FOUND");
-    }
-
-    // Check if actor exists
-    const actorExists = await pool.query(
-      "SELECT id FROM actors WHERE id = $1",
-      [actor_id]
-    );
-    if (actorExists.rows.length === 0) {
-      throw new Error("ACTOR_NOT_FOUND");
-    }
-
-    // Check if cast member already exists for this show
-    const existingCast = await pool.query(
-      "SELECT * FROM show_actors WHERE tv_show_id = $1 AND actor_id = $2",
-      [showId, actor_id]
-    );
-    if (existingCast.rows.length > 0) {
-      throw new Error("CAST_MEMBER_EXISTS");
-    }
-
-    // Insert new cast member
-    const result = await pool.query(
-      "INSERT INTO show_actors (tv_show_id, actor_id, character_name) VALUES ($1, $2, $3) RETURNING *",
-      [showId, actor_id, character_name]
-    );
-
-    return result.rows[0];
-  } catch (error) {
-    console.error("Database error in addCastMember:", error);
-    throw error;
-  }
-};
 
 // UPDATE CAST MEMBER character name
 export const updateCastMember = async (showId, actorId, characterName) => {
