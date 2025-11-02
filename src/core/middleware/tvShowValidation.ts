@@ -363,34 +363,34 @@ export const validateCreateShow = [
     }),
 
   body("overview")
-    .optional()
+    .optional({ nullable: true })
     .isString()
     .withMessage("Overview must be a string")
     .trim(),
 
   body("popularity")
-    .optional()
+    .optional({ nullable: true })
     .isFloat({ min: 0 })
     .withMessage("Popularity must be a non-negative number"),
 
   body("tmdb_rating")
-    .optional()
+    .optional({ nullable: true })
     .isFloat({ min: 0, max: 10 })
     .withMessage("TMDB rating must be between 0 and 10"),
 
   body("vote_count")
-    .optional()
+    .optional({ nullable: true })
     .isInt({ min: 0 })
     .withMessage("Vote count must be a non-negative integer"),
 
   body("poster_url")
-    .optional()
+    .optional({ nullable: true })
     .isString()
     .withMessage("Poster URL must be a string")
     .trim(),
 
   body("backdrop_url")
-    .optional()
+    .optional({ nullable: true })
     .isString()
     .withMessage("Backdrop URL must be a string")
     .trim(),
