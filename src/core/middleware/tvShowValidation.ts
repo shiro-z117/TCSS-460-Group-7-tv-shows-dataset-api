@@ -447,107 +447,6 @@ export const validateCreateShow = [
 ];
 
 
-export const listValidator = [
-  query("page").optional().isInt({ min: 1 }).toInt(),
-  query("limit").optional().isInt({ min: 1, max: 100 }).toInt(),
-];
-
-export const filterByYearRangeValidator = [
-  query("start_year")
-    .exists()
-    .withMessage("start_year required")
-    .isInt()
-    .toInt(),
-  query("end_year").exists().withMessage("end_year required").isInt().toInt(),
-  (req: Request, res: Response, next: NextFunction) => {
-    const s = Number(req.query.start_year);
-    const e = Number(req.query.end_year);
-    if (Number.isInteger(s) && Number.isInteger(e) && s <= e) return next();
-    return res.status(400).json({
-      success: false,
-      error:
-        "start_year and end_year must be integers and start_year <= end_year",
-    });
-  },
-  ...listValidator,
-];
-
-
-
-
-// ===================================================
-// VALIDATE UPDATE STATUS
-// ===================================================
-const validStatuses = ["Canceled", "Ended", "Pilot", "Returning Series"];
-
-export const validateUpdateStatus = [
-  body("status")
-    .notEmpty()
-    .withMessage("Status is required")
-    .isString()
-    .withMessage("Status must be a string")
-    .trim()
-    .isIn(validStatuses)
-    .withMessage(`Status must be one of: ${validStatuses.join(", ")}`),
-  validate,
-];
-
-// ===================================================
-// VALIDATE UPDATE DATES
-// ===================================================
-export const validateUpdateDates = [
-  body("first_air_date")
-    .optional()
-    .isISO8601()
-    .withMessage("First air date must be a valid date (ISO 8601)"),
-  body("last_air_date")
-    .optional()
-    .isISO8601()
-    .withMessage("Last air date must be a valid date (ISO 8601)"),
-  // At least one date must be provided
-  body().custom((value, { req }) => {
-    if (!req.body.first_air_date && !req.body.last_air_date) {
-      throw new Error(
-        "At least one date field (first_air_date or last_air_date) must be provided"
-      );
-    }
-    return true;
-  }),
-  validate,
-];
-
-// ===================================================
-// VALIDATE UPDATE METRICS
-// ===================================================
-export const validateUpdateMetrics = [
-  body("tmdb_rating")
-    .optional()
-    .isFloat({ min: 0, max: 10 })
-    .withMessage("TMDB rating must be between 0 and 10"),
-  body("popularity")
-    .optional()
-    .isFloat({ min: 0 })
-    .withMessage("Popularity must be a non-negative number"),
-  body("vote_count")
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage("Vote count must be a non-negative integer"),
-  // At least one metric must be provided
-  body().custom((value, { req }) => {
-    if (
-      req.body.tmdb_rating === undefined &&
-      req.body.popularity === undefined &&
-      req.body.vote_count === undefined
-    ) {
-      throw new Error(
-        "At least one metric field (tmdb_rating, popularity, or vote_count) must be provided"
-      );
-    }
-    return true;
-  }),
-  validate,
-];
-
 // Validation for updating a show (PATCH - all fields optional)
 export const validateUpdateShow = [
     body('name')
@@ -624,23 +523,6 @@ export const validateUpdateShow = [
     validate
 ];
 
-// Validation for adding a cast member
-export const validateAddCastMember = [
-    body('actor_id')
-        .notEmpty()
-        .withMessage('Actor ID is required')
-        .isInt({ min: 1 })
-        .withMessage('Actor ID must be a positive integer'),
-
-    body('character_name')
-        .notEmpty()
-        .withMessage('Character name is required')
-        .isString()
-        .withMessage('Character name must be a string')
-        .trim(),
-
-    validate
-];
 
 // Validation for updating a cast member
 export const validateUpdateCastMember = [
@@ -653,4 +535,3 @@ export const validateUpdateCastMember = [
 
     validate
 ];
-
