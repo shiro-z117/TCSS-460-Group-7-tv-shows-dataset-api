@@ -1054,7 +1054,7 @@ export const createShow = async (showData) => {
     await handleAssociations(networks, 'network');
     await handleAssociations(studios, 'studio');
 
-    return newShow;
+    return getShowById(newShow.id);
 
   } catch (error) {
     console.error("Database error in createShow:", error);
