@@ -1,12 +1,12 @@
 // core/middleware/tvShowValidation.ts
-import { query, body, validationResult } from 'express-validator';
+import { param, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { sendValidationError } from "../utilities/responseUtils";
 import pool from '../../db/connection.js';
 
 
 export const validateDeleteShow = [
-    body("id")
+    param("id")
         .notEmpty()
         .withMessage("Show ID is required")
         .isInt({ min: 1 })
@@ -32,7 +32,7 @@ export const validateDeleteShow = [
 
 
 export const validateDeleteActor = [
-    body("id")
+    param("id")
         .notEmpty()
         .withMessage("Actor ID is required")
         .isInt({ min: 1 })
@@ -58,7 +58,7 @@ export const validateDeleteActor = [
 
 
 export const validateDeleteNetwork = [
-    body("id")
+    param("id")
         .notEmpty()
         .withMessage("Network ID is required")
         .isInt({ min: 1 })
@@ -84,7 +84,7 @@ export const validateDeleteNetwork = [
 
 
 export const validateDeleteStudio = [
-    body("id")
+    param("id")
         .notEmpty()
         .withMessage("Studio ID is required")
         .isInt({ min: 1 })
@@ -109,7 +109,7 @@ export const validateDeleteStudio = [
 ];
 
 export const validateDeleteCreator = [
-    body("id")
+    param("id")
         .notEmpty()
         .withMessage("Creator ID is required")
         .isInt({ min: 1 })
