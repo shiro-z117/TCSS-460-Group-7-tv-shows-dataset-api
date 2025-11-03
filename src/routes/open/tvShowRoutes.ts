@@ -68,7 +68,7 @@ tvShowRoutes.post('/creators', apiKeyAuth, Validator.validateCreateCreator, TV.c
 // ============================== PATCH ENDPOINTS ==============================
 
 // PATCH /api/shows/:id/ - Update show data
-tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, TV.updateShowStatus);
+tvShowRoutes.patch('/shows/:id/', apiKeyAuth, Validator.validateUpdateShow, TV.updateShow);
 
 // PATCH /api/actor/:id/ - Update actor data
 tvShowRoutes.patch('/actors/:id/', apiKeyAuth, Validator.validateUpdateActor, TV.updateActor);
