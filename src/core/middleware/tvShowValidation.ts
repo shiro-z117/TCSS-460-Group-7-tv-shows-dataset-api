@@ -451,7 +451,7 @@ export const validateCreateActor = [
                 [actor_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Actor with name "${actor_name}" already exists`);
+                throw new Error(`Actor with name "${actor_name}" already exists (id: ${rows[0].id})`);
             }
             return true;
         }),
@@ -485,7 +485,7 @@ export const validateCreateNetwork = [
                 [network_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Network with name "${network_name}" already exists`);
+                throw new Error(`Network with name "${network_name}" already exists (id: ${rows[0].id})`);
             }
             return true;
         }),
@@ -532,7 +532,7 @@ export const validateCreateStudio = [
                 [studio_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Studio with name "${studio_name}" already exists`);
+                throw new Error(`Studio with name "${studio_name}" already exists (id: ${rows[0].id})`);
             }
             return true;
         }),
@@ -579,7 +579,7 @@ export const validateCreateCreator = [
                 [creator_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Creator with name "${creator_name}" already exists`);
+                throw new Error(`Creator with name "${creator_name}" already exists (id: ${rows[0].id})`);
             }
             return true;
         }),
