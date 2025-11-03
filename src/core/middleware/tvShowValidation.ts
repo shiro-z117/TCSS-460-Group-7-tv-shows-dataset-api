@@ -108,6 +108,7 @@ export const validateDeleteStudio = [
     }
 ];
 
+
 export const validateDeleteCreator = [
     param("id")
         .notEmpty()
@@ -574,6 +575,51 @@ export const validateCreateCreator = [
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ success: false, errors: errors.array() });
+        }
+        next();
+    }
+];
+
+
+export const validateUpdateActor = [
+    // Validate ID from URL param
+    param("id")
+        .notEmpty()
+        .withMessage("Actor ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Actor ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Actor not found");
+            }
+            return true;
+        }),
+
+    // Validate actor_name if present
+    body("actor_name")
+        .optional({ nullable: false })
+        .isString()
+        .withMessage("actor_name must be a string")
+        .notEmpty()
+        .withMessage("actor_name cannot be null")
+        .trim(),
+
+    // Validate profile_url if present
+    body("profile_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("profile_url must be a string")
+        .trim(),
+
+    // Final validation result handling
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Actor not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
         next();
     }
