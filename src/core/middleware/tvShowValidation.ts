@@ -462,7 +462,22 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Networks must be an array")
+        .customSanitizer((networksArray: Array<{
+            id?: number;
+            network_name?: string;
+            logo_url?: string;
+            country?: string;
+        }>) => {
+            // This MODIFIES req.body by returning the trimmed version
+            return networksArray.map(network => ({
+                ...network,
+                network_name: network.network_name?.trim(),
+                logo_url: network.logo_url?.trim(),
+                country: network.country?.trim(),
+            }));
+        })
         .custom(async (networksArray) => {
+            // Now validate the already-trimmed values
             const { rows: countryRows } = await pool.query("SELECT country_code FROM countries");
             const validCountries = countryRows.map(r => r.country_code);
 
@@ -479,8 +494,13 @@ export const validateCreateShow = [
                 if (network.logo_url && typeof network.logo_url !== "string") {
                     throw new Error("Network logo_url must be a string");
                 }
-                if (network.country && !validCountries.includes(network.country)) {
-                    throw new Error(`Invalid network country: ${network.country}. Valid values: ${validCountries.join(", ")}`);
+                if (network.country) {
+                    if (typeof network.country !== "string") {
+                        throw new Error("Network country must be a string");
+                    }
+                    if (!validCountries.includes(network.country)) {
+                        throw new Error(`Invalid network country: "${network.country}". Valid values: ${validCountries.join(", ")}`);
+                    }
                 }
             }
             return true;
