@@ -966,7 +966,7 @@ export const createShow = async (showData) => {
       }
     }
 
-    // Helper nested function for each type
+    // Helper nested function for junctioned types
     const handleAssociations = async (items, type) => {
       const tableMap = {
         actor: { table: 'actors', junction: 'show_actors', idField: 'actor_id', nameField: 'actor_name', extraFields: ['profile_url'] },
@@ -979,16 +979,26 @@ export const createShow = async (showData) => {
       // IDs-only mode
       const invalidIds = [];
       const idsOnly = items.every(i => 'id' in i && Object.keys(i).length === 1);
-
       if (idsOnly) {
         for (const item of items) {
           const { rows } = await pool.query(`SELECT id FROM ${table} WHERE id = $1`, [item.id]);
-          if (rows.length === 0) invalidIds.push(item.id);
-          else {
-            await pool.query(
-              `INSERT INTO ${junction} (id, tv_show_id, ${idField}) VALUES (gen_random_uuid(), $1, $2)`,
-              [newShow.id, item.id]
-            );
+          if (rows.length === 0) {
+            invalidIds.push(item.id);
+          } else {
+            // === HANDLE CHARACTER_NAME FOR ACTORS (ID-ONLY MODE) ===
+            if (type === 'actor') {
+              await pool.query(
+                `INSERT INTO ${junction} (id, tv_show_id, ${idField}, character_name)
+                 VALUES (gen_random_uuid(), $1, $2, $3)`,
+                [newShow.id, item.id, item.character_name || null]
+              );
+            } else {
+              await pool.query(
+                `INSERT INTO ${junction} (id, tv_show_id, ${idField})
+                 VALUES (gen_random_uuid(), $1, $2)`,
+                [newShow.id, item.id]
+              );
+            }
           }
         }
         if (invalidIds.length) throw new Error(`Invalid IDs for ${type}: ${invalidIds.join(', ')}`);
@@ -1021,14 +1031,22 @@ export const createShow = async (showData) => {
           const { rows: insertedRows } = await pool.query(insertQuery, valueList);
           rowId = insertedRows[0].id;
         }
-        // Insert into junction
-        await pool.query(
-          `INSERT INTO ${junction} (id, tv_show_id, ${idField}) VALUES (gen_random_uuid(), $1, $2)`,
-          [newShow.id, rowId]
-        );
+        if (type === 'actor') {
+          await pool.query(
+            `INSERT INTO ${junction} (id, tv_show_id, ${idField}, character_name)
+             VALUES (gen_random_uuid(), $1, $2, $3)`,
+            [newShow.id, rowId, item.character_name || null]
+          );
+        } else {
+          await pool.query(
+            `INSERT INTO ${junction} (id, tv_show_id, ${idField})
+             VALUES (gen_random_uuid(), $1, $2)`,
+            [newShow.id, rowId]
+          );
+        }
       }
     };
-    
+
     // Process optional arrays
     if (actors.length > 10) throw new Error("Maximum of 10 actors allowed");
     await handleAssociations(actors, 'actor');

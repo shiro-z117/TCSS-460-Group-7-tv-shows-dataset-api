@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from 'express';
 import { sendValidationError } from "../utilities/responseUtils";
 import pool from '../../db/connection.js';
 
-// Middleware to check if a show exists by ID (for DELETE operations)
 export async function checkShowIdExists(req: Request, res: Response, next: NextFunction) {
     try {
         const showId = parseInt(req.params.id);
@@ -419,7 +418,7 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray({ max: 10 })
         .withMessage("Actors must be an array with maximum 10 items")
-        .custom((actorsArray) => {
+        .custom(async (actorsArray) => {
             for (const actor of actorsArray) {
                 if (!actor.id && !actor.actor_name) {
                     throw new Error("Each actor must have either id or actor_name");
@@ -432,6 +431,9 @@ export const validateCreateShow = [
                 }
                 if (actor.profile_url && typeof actor.profile_url !== "string") {
                     throw new Error("Actor profile_url must be a string");
+                }
+                if (!actor.character_name || typeof actor.character_name !== "string" || !actor.character_name.trim()) {
+                    throw new Error("Each actor must include a valid 'character_name' (non-empty string)");
                 }
             }
             return true;
