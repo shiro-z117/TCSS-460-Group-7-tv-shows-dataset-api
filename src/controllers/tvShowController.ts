@@ -421,7 +421,6 @@ export async function createShow(req: Request, res: Response, next: NextFunction
 }
 
 
-
 export async function createActor(req: Request, res: Response, next: NextFunction) {
     try {
         const { actor_name, profile_url } = req.body;
@@ -483,6 +482,24 @@ export async function createCreator(req: Request, res: Response, next: NextFunct
             success: true,
             message: 'Creator created successfully',
             data: newCreator,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function updateActor(req: Request, res: Response, next: NextFunction) {
+    try {
+        const actorId = parseInt(req.params.id);
+        const { actor_name, profile_url } = req.body;
+
+        const updatedActor = await db.updateActor(actorId, actor_name, profile_url);
+
+        res.status(200).json({
+            success: true,
+            message: "Actor updated successfully",
+            data: updatedActor,
         });
     } catch (err) {
         next(err);

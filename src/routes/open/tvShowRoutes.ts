@@ -67,20 +67,11 @@ tvShowRoutes.post('/creators', apiKeyAuth, Validator.validateCreateCreator, TV.c
 
 // ============================== PATCH ENDPOINTS ==============================
 
-// PATCH /api/shows/:id/status - Update show status (Admin only)
+// PATCH /api/shows/:id/ - Update show data
 tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, TV.updateShowStatus);
 
-// PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, TV.updateShowDates);
-
-// PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, TV.updateShowMetrics);
-
-// PATCH /api/shows/:id/cast/:actorId - Update a cast member's character name (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, Validator.validateUpdateCastMember, TV.updateCastMember);
-
-// PATCH /api/shows/:id - Update a show (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.validateUpdateShow, TV.updateShow);
+// PATCH /api/actor/:id/ - Update actor data
+tvShowRoutes.patch('/actors/:id/', apiKeyAuth, TV.updateActor);
 
 // ============================== DELETE ENDPOINTS ==============================
 

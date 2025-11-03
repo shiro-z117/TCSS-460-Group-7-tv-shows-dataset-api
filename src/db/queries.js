@@ -1160,6 +1160,68 @@ export const createCreator = async (creator_name) => {
 
 
 // ===================================================
+// UPDATE ACTOR
+// ===================================================
+export const updateActor = async (actorId, actor_name, profile_url) => {
+  try {
+    if (!actorId) {
+      throw new Error("MISSING_ACTOR_ID");
+    }
+
+    // Check if actor exists
+    const existingActor = await pool.query(
+      "SELECT id FROM actors WHERE id = $1",
+      [actorId]
+    );
+
+    if (existingActor.rows.length === 0) {
+      throw new Error("ACTOR_NOT_FOUND");
+    }
+
+    // Build dynamic update query
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+
+    if (actor_name !== undefined) {
+      fields.push(`actor_name = $${paramIndex++}`);
+      values.push(actor_name);
+    }
+
+    if (profile_url !== undefined) {
+      fields.push(`profile_url = $${paramIndex++}`);
+      values.push(profile_url); // may be null — that’s okay
+    }
+
+    if (fields.length === 0) {
+      // nothing to update, return current record
+      const { rows } = await pool.query(
+        "SELECT * FROM actors WHERE id = $1",
+        [actorId]
+      );
+      return rows[0];
+    }
+
+    values.push(actorId);
+
+    const query = `
+      UPDATE actors
+      SET ${fields.join(", ")}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in updateActor:", error);
+    throw error;
+  }
+};
+
+
+
+// ===================================================
 // UPDATE SHOW STATUS
 // ===================================================
 export const updateShowStatus = async (showId, status) => {
