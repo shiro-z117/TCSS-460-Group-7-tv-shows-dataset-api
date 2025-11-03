@@ -25,7 +25,21 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ### Patrick
 
-### Linda Miao
+### Linda Miao - MiddleWay create & testing
+### MiddleWay created completed
+- validateLogin – validates email and password format.
+- validateRegister – ensures valid email, password, and matching confirmation fields.
+- validatePasswordResetRequest – validates user email for reset.
+- validatePasswordReset – checks reset token and new password.
+- validatePasswordChange – validates old vs. new password fields.
+- validatePhoneSend – checks for valid carrier.
+- validatePhoneVerify – validates 6-digit verification code.
+- validateEmailToken – ensures token parameter presence.
+- validateUserIdParam – validates numeric or UUID user ID parameter.
+- passwordStrength (optional) – verifies strong password requirements.
+- validatePagination – validates pagination parameters (page, limit).
+### Testing completing.
+  
 
 ### Shiannel - Database, Deployment, & Admin API Endpoints
 ### What Was Completed
@@ -54,6 +68,8 @@ Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/i
 ### Patrick
 
 ### Linda Miao
+### Challenges:
+To test is a little challenge that conflict with existing file that I can not change by my role. But finally, that all can pass test by Bao's support. 
 
 ### Shiannel - Database, Deployment, & Admin API Endpoints
 ### Challenges: 
