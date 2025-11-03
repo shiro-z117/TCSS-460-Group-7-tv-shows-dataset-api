@@ -6,6 +6,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 ### Documentation: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs
+### Link to the Credential API: https://github.com/shinobitiger310/TCSS460-Group7-Credential-API/tree/main
 
 ---
 
