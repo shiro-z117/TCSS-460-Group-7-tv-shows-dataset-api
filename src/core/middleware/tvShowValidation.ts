@@ -147,167 +147,6 @@ export async function checkCreatorIdExists(req: Request, res: Response, next: Ne
 }
 
 
-export async function checkActorDuplicate(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { actor_name } = req.body;
-
-        if (!actor_name || typeof actor_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'actor_name is required and must be a string',
-            });
-        }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM actors WHERE actor_name = $1',
-            [actor_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Actor with name "${actor_name}" already exists`,
-                data: rows[0]
-            });
-        }
-
-        next();
-    } catch (err) {
-        console.error('Error in checkActorDuplicate:', err);
-        next(err);
-    }
-}
-
-
-export async function checkNetworkDuplicate(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { network_name } = req.body;
-
-        if (!network_name || typeof network_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'network_name is required and must be a string',
-            });
-        }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM networks WHERE network_name = $1',
-            [network_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Network with name "${network_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
-        next();
-    } catch (err) {
-        console.error('Error in checkNetworkDuplicate:', err);
-        next(err);
-    }
-}
-
-
-export async function checkStudioDuplicate(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { studio_name } = req.body;
-
-        if (!studio_name || typeof studio_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'studio_name is required and must be a string',
-            });
-        }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM studios WHERE studio_name = $1',
-            [studio_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Studio with name "${studio_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
-        next();
-    } catch (err) {
-        console.error('Error in checkStudioDuplicate:', err);
-        next(err);
-    }
-}
-
-
-export async function checkCreatorDuplicate(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { creator_name } = req.body;
-
-        if (!creator_name || typeof creator_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'creator_name is required and must be a string',
-            });
-        }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM creators WHERE creator_name = $1',
-            [creator_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Creator with name "${creator_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
-        next();
-    } catch (err) {
-        console.error('Error in checkCreatorDuplicate:', err);
-        next(err);
-    }
-}
-
-
-export async function validateCountry(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { country } = req.body;
-        if (!country) {
-            return next();
-        }
-        const { rows } = await pool.query('SELECT country_code FROM countries');
-        const validCountries = rows.map(r => r.country_code);
-
-        if (!validCountries.includes(country)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid country',
-                validValues: validCountries
-            });
-        }
-
-        next();
-    } catch (err) {
-        next(err);
-    }
-}
-
-
-// helper function to send error messages
-export const validate = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) return next();
-    // Don’t inspect; just forward
-    return sendValidationError(res, "An error has occurred (see details below) ", errors.array());
-};
-
-
 export const validateCreateShow = [
     body("name")
         .notEmpty()
@@ -597,6 +436,167 @@ export const validateCreateShow = [
         next();
     }
 ];
+
+
+export async function validateCreateActor(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { actor_name } = req.body;
+
+        if (!actor_name || typeof actor_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'actor_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM actors WHERE actor_name = $1',
+            [actor_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Actor with name "${actor_name}" already exists`,
+                data: rows[0]
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkActorDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function validateCreateNetwork(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { network_name } = req.body;
+
+        if (!network_name || typeof network_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'network_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM networks WHERE network_name = $1',
+            [network_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Network with name "${network_name}" already exists`,
+                data: rows[0],
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkNetworkDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function validateCreateStudio(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { studio_name } = req.body;
+
+        if (!studio_name || typeof studio_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'studio_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM studios WHERE studio_name = $1',
+            [studio_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Studio with name "${studio_name}" already exists`,
+                data: rows[0],
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkStudioDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function validateCreateCreator(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { creator_name } = req.body;
+
+        if (!creator_name || typeof creator_name !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'creator_name is required and must be a string',
+            });
+        }
+
+        const { rows } = await pool.query(
+            'SELECT id FROM creators WHERE creator_name = $1',
+            [creator_name.trim()]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Creator with name "${creator_name}" already exists`,
+                data: rows[0],
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error in checkCreatorDuplicate:', err);
+        next(err);
+    }
+}
+
+
+export async function validateCountry(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { country } = req.body;
+        if (!country) {
+            return next();
+        }
+        const { rows } = await pool.query('SELECT country_code FROM countries');
+        const validCountries = rows.map(r => r.country_code);
+
+        if (!validCountries.includes(country)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid country',
+                validValues: validCountries
+            });
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+// helper function to send error messages
+export const validate = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) return next();
+    // Don’t inspect; just forward
+    return sendValidationError(res, "An error has occurred (see details below) ", errors.array());
+};
 
 
 // Validation for updating a show (PATCH - all fields optional)
