@@ -468,7 +468,6 @@ export const validateCreateShow = [
             logo_url?: string;
             country?: string;
         }>) => {
-            // This MODIFIES req.body by returning the trimmed version
             return networksArray.map(network => ({
                 ...network,
                 network_name: network.network_name?.trim(),
@@ -477,7 +476,6 @@ export const validateCreateShow = [
             }));
         })
         .custom(async (networksArray) => {
-            // Now validate the already-trimmed values
             const { rows: countryRows } = await pool.query("SELECT country_code FROM countries");
             const validCountries = countryRows.map(r => r.country_code);
 
