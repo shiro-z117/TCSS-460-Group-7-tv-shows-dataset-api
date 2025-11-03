@@ -24,7 +24,15 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ## Production Version Sprint Contributions
 
 ### Patrick
-
+- Organized Credentials API Plan
+- Implented endpoints
+  - GET /admin/users/:id
+  - PUT /admin/users/:id
+  - DELETE /admin/users/:id
+  - PUT /admin/users/:id/password
+- Added Tests for endpoints in Postman
+- Created Auth Middleware
+- Made Unit tests for Auth Middleware
 ### Linda Miao - MiddleWay create & testing
 ### MiddleWay created completed
 - validateLogin – validates email and password format.
@@ -66,15 +74,7 @@ Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/i
 ## Production Version Sprint Comments
 
 ### Patrick
-- Organized Credentials API Plan
-- Implented endpoints
-  - GET /admin/users/:id
-  - PUT /admin/users/:id
-  - DELETE /admin/users/:id
-  - PUT /admin/users/:id/password
-- Added Tests for endpoints in Postman
-- Created Auth Middleware
-- Made Unit tests for Auth Middleware
+Was easier to organize this sprint since we had done it for the web api.
 
 ### Linda Miao
 ### Challenges:
