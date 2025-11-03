@@ -23,10 +23,52 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ## Production Version Sprint Contributions
 
+### Patrick
+
+### Linda Miao
+
+### Shiannel - Database, Deployment, & Admin API Endpoints
+### What Was Completed
+- Set up and hosted PostgreSQL database on Supabase with a complete users table schema
+- Deployed Credentials API to Render and connected to Supabase database with environment variables
+- Configured production environment and verified database connectivity
+- Created Swagger/OpenAPI documentation for 9 admin endpoints at /api-docs
+- Implemented 5 admin endpoints with role-based access control:
+   - POST /admin/users/create (create users with specified roles)
+   - GET /admin/users (list users with pagination and filters)
+   - GET /admin/users/search (search users by name/email/username)
+   - PUT /admin/users/:id/role (change user roles with hierarchy enforcement)
+   - GET /admin/users/stats/dashboard (comprehensive dashboard statistics)
+   - 
+Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/index.ts
+
+### Shiraz
+
+### Bao
+
+
 ---
 
 ## Production Version Sprint Comments
 
+### Patrick
+
+### Linda Miao
+
+### Shiannel - Database, Deployment, & Admin API Endpoints
+### Challenges: 
+First time deploying to the cloud took some trial and error to get the database connection working. 
+Working with Render and Supabase was new territory for me and was a struggle to get used to and 
+figure out what was wrong.
+
+#### What Went Well:
+Already knew Swagger from last week, so the documentation was much faster this time
+Team communicated well on Discord - no code conflicts when merging this week
+Admin endpoints all worked after testing locally
+
+### Shiraz
+
+### Bao
 ---
 
 ## Beta II Sprint Meetings
