@@ -908,28 +908,28 @@ export const deleteCreator = async (creatorId) => {
 // CREATE NEW TV SHOW
 // ===================================================
 export const createShow = async (showData) => {
-    const {
-      name,
-      original_name,
-      first_air_date,
-      last_air_date,
-      seasons,
-      episodes,
-      status,
-      overview,
-      popularity,
-      tmdb_rating,
-      vote_count,
-      poster_url,
-      backdrop_url,
-      genres = [],
-      actors = [],
-      creators = [],
-      networks = [],
-      studios = [],
-    } = showData;
+  const {
+    name,
+    original_name,
+    first_air_date,
+    last_air_date,
+    seasons,
+    episodes,
+    status,
+    overview,
+    popularity,
+    tmdb_rating,
+    vote_count,
+    poster_url,
+    backdrop_url,
+    genres = [],
+    actors = [],
+    creators = [],
+    networks = [],
+    studios = [],
+  } = showData;
 
-    try {
+  try {
     // Generate unique ID for new show
     const { rows: idRows } = await pool.query('SELECT MAX(id) AS max_id FROM tv_shows');
     const id = (idRows[0].max_id || 0) + 1;
@@ -951,21 +951,90 @@ export const createShow = async (showData) => {
 
     const newShow = result.rows[0];
 
-    // Insert into junction table show_genres
-    if (genres.length > 0) {
-      for (const genreName of genres) {
-        const { rows: genreRows } = await pool.query(
-          'SELECT id FROM genres WHERE genre_name = $1',
-          [genreName]
+    // Handle genres
+    const uniqueGenres = [...new Set(genres)];
+    for (const genreName of uniqueGenres) {
+      const { rows: genreRows } = await pool.query(
+        'SELECT id FROM genres WHERE genre_name = $1',
+        [genreName]
+      );
+      if (genreRows.length > 0) {
+        await pool.query(
+          'INSERT INTO show_genres (id, tv_show_id, genre_id) VALUES (gen_random_uuid(), $1, $2)',
+          [newShow.id, genreRows[0].id]
         );
-        if (genreRows.length > 0) {
-          await pool.query(
-            'INSERT INTO show_genres (id, tv_show_id, genre_id) VALUES (gen_random_uuid(), $1, $2)',
-            [newShow.id, genreRows[0].id]
-          );
-        }
       }
     }
+
+    // Helper nested function for each type
+    const handleAssociations = async (items, type) => {
+      const tableMap = {
+        actor: { table: 'actors', junction: 'show_actors', idField: 'actor_id', nameField: 'actor_name', extraFields: ['profile_url'] },
+        creator: { table: 'creators', junction: 'show_creators', idField: 'creator_id', nameField: 'creator_name', extraFields: [] },
+        network: { table: 'networks', junction: 'show_networks', idField: 'network_id', nameField: 'network_name', extraFields: ['logo_url', 'country'] },
+        studio: { table: 'studios', junction: 'show_studios', idField: 'studio_id', nameField: 'studio_name', extraFields: ['logo_url', 'country'] },
+      };
+      const { table, junction, idField, nameField, extraFields } = tableMap[type];
+
+      // IDs-only mode
+      const invalidIds = [];
+      const idsOnly = items.every(i => 'id' in i && Object.keys(i).length === 1);
+
+      if (idsOnly) {
+        for (const item of items) {
+          const { rows } = await pool.query(`SELECT id FROM ${table} WHERE id = $1`, [item.id]);
+          if (rows.length === 0) invalidIds.push(item.id);
+          else {
+            await pool.query(
+              `INSERT INTO ${junction} (id, tv_show_id, ${idField}) VALUES (gen_random_uuid(), $1, $2)`,
+              [newShow.id, item.id]
+            );
+          }
+        }
+        if (invalidIds.length) throw new Error(`Invalid IDs for ${type}: ${invalidIds.join(', ')}`);
+        return;
+      }
+
+      // Full object mode
+      for (const item of items) {
+        const trimmedName = item[nameField]?.trim();
+        if (!trimmedName) continue; // skip invalid
+        // Check if exists
+        const { rows: existingRows } = await pool.query(`SELECT * FROM ${table} WHERE ${nameField} = $1`, [trimmedName]);
+        let rowId;
+        if (existingRows.length > 0) {
+          rowId = existingRows[0].id;
+        } else {
+          // Validate country for networks/studios
+          if ((type === 'network' || type === 'studio') && item.country) {
+            const { rows: countryRows } = await pool.query('SELECT country_code FROM countries');
+            const validCountries = countryRows.map(r => r.country_code);
+            if (!validCountries.includes(item.country)) {
+              throw new Error(`Invalid country for ${type}: ${item.country}. Valid values: ${validCountries.join(', ')}`);
+            }
+          }
+          // Create new row
+          const fieldList = [nameField, ...extraFields];
+          const valueList = [trimmedName, ...extraFields.map(f => item[f] || null)];
+          const placeholders = fieldList.map((_, idx) => `$${idx + 1}`).join(',');
+          const insertQuery = `INSERT INTO ${table} (${fieldList.join(',')}) VALUES (${placeholders}) RETURNING id`;
+          const { rows: insertedRows } = await pool.query(insertQuery, valueList);
+          rowId = insertedRows[0].id;
+        }
+        // Insert into junction
+        await pool.query(
+          `INSERT INTO ${junction} (id, tv_show_id, ${idField}) VALUES (gen_random_uuid(), $1, $2)`,
+          [newShow.id, rowId]
+        );
+      }
+    };
+    
+    // Process optional arrays
+    if (actors.length > 10) throw new Error("Maximum of 10 actors allowed");
+    await handleAssociations(actors, 'actor');
+    await handleAssociations(creators, 'creator');
+    await handleAssociations(networks, 'network');
+    await handleAssociations(studios, 'studio');
 
     return newShow;
 
@@ -974,8 +1043,6 @@ export const createShow = async (showData) => {
     throw error;
   }
 };
-
-
 
 
 // ===================================================
