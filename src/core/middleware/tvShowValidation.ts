@@ -847,16 +847,3 @@ export const validateUpdateShow = [
 
     validate
 ];
-
-
-// Validation for updating a cast member
-export const validateUpdateCastMember = [
-    body('character_name')
-        .notEmpty()
-        .withMessage('Character name is required')
-        .isString()
-        .withMessage('Character name must be a string')
-        .trim(),
-
-    validate
-];
