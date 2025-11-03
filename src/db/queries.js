@@ -1220,6 +1220,169 @@ export const updateActor = async (actorId, actor_name, profile_url) => {
 };
 
 
+// ===================================================
+// UPDATE NETWORK
+// ===================================================
+export const updateNetwork = async (networkId, network_name, logo_url, country) => {
+  try {
+    if (!networkId) {
+      throw new Error("MISSING_NETWORK_ID");
+    }
+
+    const existingNetwork = await pool.query(
+      "SELECT id FROM networks WHERE id = $1",
+      [networkId]
+    );
+
+    if (existingNetwork.rows.length === 0) {
+      throw new Error("NETWORK_NOT_FOUND");
+    }
+
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+
+    if (network_name !== undefined) {
+      fields.push(`network_name = $${paramIndex++}`);
+      values.push(network_name);
+    }
+
+    if (logo_url !== undefined) {
+      fields.push(`logo_url = $${paramIndex++}`);
+      values.push(logo_url);
+    }
+
+    if (country !== undefined) {
+      fields.push(`country = $${paramIndex++}`);
+      values.push(country);
+    }
+
+    if (fields.length === 0) {
+      const { rows } = await pool.query(
+        "SELECT * FROM networks WHERE id = $1",
+        [networkId]
+      );
+      return rows[0];
+    }
+
+    values.push(networkId);
+
+    const query = `
+      UPDATE networks
+      SET ${fields.join(", ")}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in updateNetwork:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// UPDATE STUDIO
+// ===================================================
+export const updateStudio = async (studioId, studio_name, logo_url, country) => {
+  try {
+    if (!studioId) {
+      throw new Error("MISSING_STUDIO_ID");
+    }
+
+    const existingStudio = await pool.query(
+      "SELECT id FROM studios WHERE id = $1",
+      [studioId]
+    );
+
+    if (existingStudio.rows.length === 0) {
+      throw new Error("STUDIO_NOT_FOUND");
+    }
+
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+
+    if (studio_name !== undefined) {
+      fields.push(`studio_name = $${paramIndex++}`);
+      values.push(studio_name);
+    }
+
+    if (logo_url !== undefined) {
+      fields.push(`logo_url = $${paramIndex++}`);
+      values.push(logo_url);
+    }
+
+    if (country !== undefined) {
+      fields.push(`country = $${paramIndex++}`);
+      values.push(country);
+    }
+
+    if (fields.length === 0) {
+      const { rows } = await pool.query(
+        "SELECT * FROM studios WHERE id = $1",
+        [studioId]
+      );
+      return rows[0];
+    }
+
+    values.push(studioId);
+
+    const query = `
+      UPDATE studios
+      SET ${fields.join(", ")}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database error in updateStudio:", error);
+    throw error;
+  }
+};
+
+
+// ===================================================
+// UPDATE CREATOR
+// ===================================================
+export const updateCreator = async (creatorId, creator_name) => {
+  try {
+    if (!creatorId) {
+      throw new Error("MISSING_CREATOR_ID");
+    }
+
+    const existingCreator = await pool.query(
+      "SELECT id FROM creators WHERE id = $1",
+      [creatorId]
+    );
+
+    if (existingCreator.rows.length === 0) {
+      throw new Error("CREATOR_NOT_FOUND");
+    }
+
+    if (creator_name !== undefined) {
+      const result = await pool.query(
+        "UPDATE creators SET creator_name = $1 WHERE id = $2 RETURNING *",
+        [creator_name, creatorId]
+      );
+      return result.rows[0];
+    }
+
+    const { rows } = await pool.query(
+      "SELECT * FROM creators WHERE id = $1",
+      [creatorId]
+    );
+    return rows[0];
+  } catch (error) {
+    console.error("Database error in updateCreator:", error);
+    throw error;
+  }
+};
+
 
 // ===================================================
 // UPDATE SHOW STATUS

@@ -626,6 +626,143 @@ export const validateUpdateActor = [
 ];
 
 
+export const validateUpdateNetwork = [
+    param("id")
+        .notEmpty()
+        .withMessage("Network ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Network ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM networks WHERE id = $1", [id]);
+            if (rows.length === 0) throw new Error("Network not found");
+            return true;
+        }),
+
+    body("network_name")
+        .optional({ nullable: false })
+        .isString()
+        .withMessage("network_name must be a string")
+        .notEmpty()
+        .withMessage("network_name cannot be null")
+        .trim(),
+
+    body("logo_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("logo_url must be a string")
+        .trim(),
+
+    body("country")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("country must be a string")
+        .trim()
+        .custom(async (country) => {
+            if (!country) return true;
+            const { rows } = await pool.query("SELECT country_code FROM countries");
+            const validCountries = rows.map(r => r.country_code);
+            if (!validCountries.includes(country)) throw new Error(`Invalid country code: ${country}`);
+            return true;
+        }),
+
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
+        }
+        next();
+    }
+];
+
+
+export const validateUpdateStudio = [
+    param("id")
+        .notEmpty()
+        .withMessage("Studio ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Studio ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM studios WHERE id = $1", [id]);
+            if (rows.length === 0) throw new Error("Studio not found");
+            return true;
+        }),
+
+    body("studio_name")
+        .optional({ nullable: false })
+        .isString()
+        .withMessage("studio_name must be a string")
+        .notEmpty()
+        .withMessage("studio_name cannot be null")
+        .trim(),
+
+    body("logo_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("logo_url must be a string")
+        .trim(),
+
+    body("country")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("country must be a string")
+        .trim()
+        .custom(async (country) => {
+            if (!country) return true;
+            const { rows } = await pool.query("SELECT country_code FROM countries");
+            const validCountries = rows.map(r => r.country_code);
+            if (!validCountries.includes(country)) throw new Error(`Invalid country code: ${country}`);
+            return true;
+        }),
+
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
+        }
+        next();
+    }
+];
+
+
+export const validateUpdateCreator = [
+    param("id")
+        .notEmpty()
+        .withMessage("Creator ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Creator ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM creators WHERE id = $1", [id]);
+            if (rows.length === 0) throw new Error("Creator not found");
+            return true;
+        }),
+
+    body("creator_name")
+        .optional({ nullable: false })
+        .isString()
+        .withMessage("creator_name must be a string")
+        .notEmpty()
+        .withMessage("creator_name cannot be null")
+        .trim(),
+
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
+        }
+        next();
+    }
+];
+
+
 // helper function to send error messages
 export const validate = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

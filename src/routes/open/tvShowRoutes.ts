@@ -73,6 +73,15 @@ tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, TV.updateShowStatus);
 // PATCH /api/actor/:id/ - Update actor data
 tvShowRoutes.patch('/actors/:id/', apiKeyAuth, Validator.validateUpdateActor, TV.updateActor);
 
+// PATCH /api/network/:id/ - Update network data
+tvShowRoutes.patch('/actors/:id/', apiKeyAuth, Validator.validateUpdateNetwork, TV.updateNetwork);
+
+// PATCH /api/studio/:id/ - Update studio data
+tvShowRoutes.patch('/actors/:id/', apiKeyAuth, Validator.validateUpdateStudio, TV.updateStudio);
+
+// PATCH /api/creator/:id/ - Update creator data
+tvShowRoutes.patch('/actors/:id/', apiKeyAuth, Validator.validateUpdateCreator, TV.updateCreator);
+
 // ============================== DELETE ENDPOINTS ==============================
 
 // DELETE /api/shows/:id - delete a show by ID

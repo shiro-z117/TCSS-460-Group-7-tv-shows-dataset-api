@@ -507,6 +507,60 @@ export async function updateActor(req: Request, res: Response, next: NextFunctio
 }
 
 
+export async function updateNetwork(req: Request, res: Response, next: NextFunction) {
+    try {
+        const networkId = parseInt(req.params.id);
+        const { network_name, logo_url, country } = req.body;
+
+        const updatedNetwork = await db.updateNetwork(networkId, network_name, logo_url, country);
+
+        res.status(200).json({
+            success: true,
+            message: "Network updated successfully",
+            data: updatedNetwork,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function updateStudio(req: Request, res: Response, next: NextFunction) {
+    try {
+        const studioId = parseInt(req.params.id);
+        const { studio_name, logo_url, country } = req.body;
+
+        const updatedStudio = await db.updateStudio(studioId, studio_name, logo_url, country);
+
+        res.status(200).json({
+            success: true,
+            message: "Studio updated successfully",
+            data: updatedStudio,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+export async function updateCreator(req: Request, res: Response, next: NextFunction) {
+    try {
+        const creatorId = parseInt(req.params.id);
+        const { creator_name } = req.body;
+
+        const updatedCreator = await db.updateCreator(creatorId, creator_name);
+
+        res.status(200).json({
+            success: true,
+            message: "Creator updated successfully",
+            data: updatedCreator,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export async function updateShow(req: Request, res: Response, next: NextFunction) {
     try {
         const showId = parseInt(req.params.id);
