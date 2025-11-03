@@ -397,6 +397,7 @@ export const validateCreateShow = [
     body("genres")
         .isArray({ min: 1 })
         .withMessage("Genres must be an array with at least one value")
+        .customSanitizer((genresArray: string[]) => genresArray.map(genre => genre.trim()))
         .custom(async (genresArray) => {
             const { rows } = await pool.query("SELECT genre_name FROM genres");
             const validGenres = rows.map((r) => r.genre_name);
@@ -418,6 +419,17 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray({ max: 10 })
         .withMessage("Actors must be an array with maximum 10 items")
+        .customSanitizer((actorsArray: Array<{
+            id?: number;
+            actor_name?: string;
+            character_name?: string;
+        }>) => {
+            return actorsArray.map(actor => ({
+                ...actor,
+                actor_name: actor.actor_name?.trim(),
+                character_name: actor.character_name?.trim(),
+            }));
+        })
         .custom(async (actorsArray) => {
             for (const actor of actorsArray) {
                 if (!actor.id && !actor.actor_name) {
@@ -443,6 +455,15 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Creators must be an array")
+        .customSanitizer((creatorsArray: Array<{
+            id?: number;
+            creator_name?: string;
+        }>) => {
+            return creatorsArray.map(creator => ({
+                ...creator,
+                creator_name: creator.creator_name?.trim(),
+            }));
+        })
         .custom((creatorsArray) => {
             for (const creator of creatorsArray) {
                 if (!creator.id && !creator.creator_name) {
