@@ -19,6 +19,12 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Planned credentials API
 - Planned review of dataset API
 
+### Discussion 2
+- **Date:** Sunday, November 2, 2025
+- **Time:** 8:00 PM - 9:00 PM (45 minutes)
+- **Location:** Discord
+#### Actions:
+- Checked in with group to ensure APIs are working
 ---
 
 ## Production Version Sprint Contributions
@@ -65,6 +71,8 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/index.ts
 
 ### Shiraz
+- Verified that each endpoint is working as intended, and fixed it if not
+- Cleaned up API codebase
 
 ### Bao - Worked with Linda for MiddleWay create & testing
 
@@ -92,6 +100,7 @@ Team communicated well on Discord - no code conflicts when merging this week
 Admin endpoints all worked after testing locally
 
 ### Shiraz
+API is now fully functional, but the code is a little inconsistent 
 
 ### Bao
 ---
