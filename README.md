@@ -6,6 +6,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 
 ### Live API: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com 
 ### Documentation: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs
+### Link to the Credential API: https://github.com/shinobitiger310/TCSS460-Group7-Credential-API
 
 ---
 
@@ -19,13 +20,91 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 - Planned credentials API
 - Planned review of dataset API
 
+### Discussion 2
+- **Date:** Sunday, November 2, 2025
+- **Time:** 8:00 PM - 9:00 PM (45 minutes)
+- **Location:** Discord
+#### Actions:
+- Checked in with group to ensure APIs are working
 ---
 
 ## Production Version Sprint Contributions
 
+### Patrick
+- Organized Credentials API Plan
+- Implented endpoints
+  - GET /admin/users/:id
+  - PUT /admin/users/:id
+  - DELETE /admin/users/:id
+  - PUT /admin/users/:id/password
+- Added Tests for endpoints in Postman
+- Created Auth Middleware
+- Made Unit tests for Auth Middleware
+### Linda Miao - MiddleWay create & testing
+### MiddleWay created completed
+- validateLogin – validates email and password format.
+- validateRegister – ensures valid email, password, and matching confirmation fields.
+- validatePasswordResetRequest – validates user email for reset.
+- validatePasswordReset – checks reset token and new password.
+- validatePasswordChange – validates old vs. new password fields.
+- validatePhoneSend – checks for valid carrier.
+- validatePhoneVerify – validates 6-digit verification code.
+- validateEmailToken – ensures token parameter presence.
+- validateUserIdParam – validates numeric or UUID user ID parameter.
+- passwordStrength (optional) – verifies strong password requirements.
+- validatePagination – validates pagination parameters (page, limit).
+### Testing completing.
+  
+
+### Shiannel - Database, Deployment, & Admin API Endpoints
+### What Was Completed
+- Set up and hosted PostgreSQL database on Supabase with a complete users table schema
+- Deployed Credentials API to Render and connected to Supabase database with environment variables
+- Configured production environment and verified database connectivity
+- Created Swagger/OpenAPI documentation for 9 admin endpoints at /api-docs
+- Implemented 5 admin endpoints with role-based access control:
+   - POST /admin/users/create (create users with specified roles)
+   - GET /admin/users (list users with pagination and filters)
+   - GET /admin/users/search (search users by name/email/username)
+   - PUT /admin/users/:id/role (change user roles with hierarchy enforcement)
+   - GET /admin/users/stats/dashboard (comprehensive dashboard statistics)
+   - 
+Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/index.ts
+
+### Shiraz
+- Verified that each endpoint is working as intended, and fixed it if not
+- Cleaned up API codebase
+
+### Bao - Worked with Linda for MiddleWay create & testing
+- Clone the template for credential API
+- Tried to deploy the server early
 ---
 
 ## Production Version Sprint Comments
+
+### Patrick
+Was easier to organize this sprint since we had done it for the web api.
+
+### Linda Miao
+### Challenges:
+To test is a little challenge that conflict with existing file that I can not change by my role. But finally, that's all passing test by Bao's support. 
+
+### Shiannel - Database, Deployment, & Admin API Endpoints
+### Challenges: 
+First time deploying to the cloud took some trial and error to get the database connection working. 
+Working with Render and Supabase was new territory for me and was a struggle to get used to and 
+figure out what was wrong.
+
+#### What Went Well:
+Already knew Swagger from last week, so the documentation was much faster this time
+Team communicated well on Discord - no code conflicts when merging this week
+Admin endpoints all worked after testing locally
+
+### Shiraz
+API is now fully functional, but the code is a little inconsistent 
+
+### Bao
+I tried to deploy the server early but I did not communicate well with my teammate so the work is duplicated 
 
 ---
 
