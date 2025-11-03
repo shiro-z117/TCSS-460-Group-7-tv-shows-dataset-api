@@ -4,19 +4,19 @@ import * as db from '../db/queries.js'; // <-- .js required
 
 
 export async function getHealth(
-  req: Request,
-  res: Response,
-  next: NextFunction
+    req: Request,
+    res: Response,
+    next: NextFunction
 ) {
-  try {
-    // Call database function
-    const health = await db.getHealth();
+    try {
+        // Call database function
+        const health = await db.getHealth();
 
-    // Return health status
-    res.json(health);
-  } catch (err) {
-    next(err);
-  }
+        // Return health status
+        res.json(health);
+    } catch (err) {
+        next(err);
+    }
 }
 
 
@@ -54,29 +54,29 @@ export async function getShows(req: Request, res: Response, next: NextFunction) 
 
 
 export async function getShowById(req: Request, res: Response, next: NextFunction) {
-  try {
-    const id = parseInt(req.params.id);
+    try {
+        const id = parseInt(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid show ID",
-      });
+        if (isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid show ID",
+            });
+        }
+
+        const show = await db.getShowById(id);
+
+        if (!show) {
+            return res.status(404).json({
+                success: false,
+                message: "Show not found",
+            });
+        }
+
+        res.json({ success: true, data: show });
+    } catch (err) {
+        next(err);
     }
-
-    const show = await db.getShowById(id);
-
-    if (!show) {
-      return res.status(404).json({
-        success: false,
-        message: "Show not found",
-      });
-    }
-
-    res.json({ success: true, data: show });
-  } catch (err) {
-    next(err);
-  }
 }
 
 
@@ -140,91 +140,91 @@ export async function getNetworks(req: Request, res: Response, next: NextFunctio
 
 
 export async function getStudios(req: Request, res: Response, next: NextFunction) {
-  try {
-    const q = req.query.q as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    try {
+        const q = req.query.q as string;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
 
-    // Destructure returned values
-    const { studios, total } = await db.getStudios(q, page, limit);
+        // Destructure returned values
+        const { studios, total } = await db.getStudios(q, page, limit);
 
-    // Match the output style of other endpoints
-    res.json({
-      success: true,
-      data: studios,
-      page,
-      limit,
-      total,
-    });
-  } catch (err) {
-    next(err);
-  }
+        // Match the output style of other endpoints
+        res.json({
+            success: true,
+            data: studios,
+            page,
+            limit,
+            total,
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 
 export async function getYearsFirst(req: Request, res: Response, next: NextFunction) {
-  try {
-    const min = req.query.min ? parseInt(req.query.min as string) : undefined;
-    const max = req.query.max ? parseInt(req.query.max as string) : undefined;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    try {
+        const min = req.query.min ? parseInt(req.query.min as string) : undefined;
+        const max = req.query.max ? parseInt(req.query.max as string) : undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
 
-    const { data, total } = await db.getYearsFirst(min, max, page, limit);
+        const { data, total } = await db.getYearsFirst(min, max, page, limit);
 
-    res.json({
-      success: true,
-      data, // already an array of numbers
-      page,
-      limit,
-      total,
-    });
-  } catch (err) {
-    next(err);
-  }
+        res.json({
+            success: true,
+            data, // already an array of numbers
+            page,
+            limit,
+            total,
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 
 export async function getYearsLast(req: Request, res: Response, next: NextFunction) {
-  try {
-    const min = req.query.min ? parseInt(req.query.min as string) : undefined;
-    const max = req.query.max ? parseInt(req.query.max as string) : undefined;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    try {
+        const min = req.query.min ? parseInt(req.query.min as string) : undefined;
+        const max = req.query.max ? parseInt(req.query.max as string) : undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
 
-    const { data, total } = await db.getYearsLast(min, max, page, limit);
+        const { data, total } = await db.getYearsLast(min, max, page, limit);
 
-    res.json({
-      success: true,
-      data, // already an array of numbers
-      page,
-      limit,
-      total,
-    });
-  } catch (err) {
-    next(err);
-  }
+        res.json({
+            success: true,
+            data, // already an array of numbers
+            page,
+            limit,
+            total,
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 
 export async function getEpisodes(req: Request, res: Response, next: NextFunction) {
-  try {
-    const min = req.query.min ? parseInt(req.query.min as string) : undefined;
-    const max = req.query.max ? parseInt(req.query.max as string) : undefined;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    try {
+        const min = req.query.min ? parseInt(req.query.min as string) : undefined;
+        const max = req.query.max ? parseInt(req.query.max as string) : undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50;
 
-    const { data, total } = await db.getEpisodes(min, max, page, limit);
+        const { data, total } = await db.getEpisodes(min, max, page, limit);
 
-    res.json({
-      success: true,
-      data, // already an array of numbers
-      page,
-      limit,
-      total,
-    });
-  } catch (err) {
-    next(err);
-  }
+        res.json({
+            success: true,
+            data, // already an array of numbers
+            page,
+            limit,
+            total,
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 
@@ -232,14 +232,14 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
     try {
         // gets show ID from URL path
         const showId = parseInt(req.params.id as string);
-        
+
         // gets optional type filter from query params
         const type = req.query.type as string;
-        
+
         // gets pagination params (default: page 1, limit 20)
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
-        
+
         // validate show ID
         if (!showId || showId <= 0) {
             return res.status(400).json({
@@ -247,7 +247,7 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
                 error: 'Invalid show ID'
             });
         }
-        
+
         // validate type if provided
         if (type && !['poster', 'backdrop'].includes(type)) {
             return res.status(400).json({
@@ -255,7 +255,7 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
                 error: 'Invalid type. Use: poster or backdrop'
             });
         }
-        
+
         // validate pagination params
         if (page < 1 || limit < 1 || limit > 100) {
             return res.status(400).json({
@@ -263,10 +263,10 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
                 error: 'Invalid pagination parameters. Page must be >= 1, limit must be 1-100'
             });
         }
-        
+
         // calls db func
         const data = await db.getShowImages(showId, type, page, limit);
-        
+
         // rturn response
         res.json({
             success: true,
@@ -275,8 +275,8 @@ export async function getShowImages(req: Request, res: Response, next: NextFunct
             limit,
             total: data.length
         });
-        
-        } catch (err) { next(err); }
+
+    } catch (err) { next(err); }
 }
 
 
@@ -284,11 +284,11 @@ export async function getShowCast(req: Request, res: Response, next: NextFunctio
     try {
         // gets show ID from URL path
         const showId = parseInt(req.params.id as string);
-        
+
         // gets pagination params (default: page 1, limit 10, max 50)
         const page = parseInt(req.query.page as string) || 1;
         const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
-        
+
         // validate show ID
         if (!showId || showId <= 0) {
             return res.status(400).json({
@@ -296,7 +296,7 @@ export async function getShowCast(req: Request, res: Response, next: NextFunctio
                 error: 'Invalid show ID'
             });
         }
-        
+
         // validate pagination params
         if (page < 1 || limit < 1) {
             return res.status(400).json({
@@ -304,10 +304,10 @@ export async function getShowCast(req: Request, res: Response, next: NextFunctio
                 error: 'Invalid pagination parameters. Page and limit must be >= 1'
             });
         }
-        
+
         // calls db function
         const data = await db.getShowCast(showId, page, limit);
-        
+
         // return response
         res.json({
             success: true,
@@ -316,7 +316,7 @@ export async function getShowCast(req: Request, res: Response, next: NextFunctio
             limit,
             total: data.length
         });
-        
+
     } catch (err) { next(err); }
 
 }
@@ -346,9 +346,9 @@ export async function deleteActor(req: Request, res: Response, next: NextFunctio
         const deletedActor = await db.deleteActor(actorId);
 
         res.status(200).json({
-          success: true,
-          data: deletedActor,
-          message: "Actor deleted successfully",
+            success: true,
+            data: deletedActor,
+            message: "Actor deleted successfully",
         });
     } catch (err: any) {
         next(err);
@@ -362,9 +362,9 @@ export async function deleteNetwork(req: Request, res: Response, next: NextFunct
         const deletedNetwork = await db.deleteNetwork(networkId);
 
         res.status(200).json({
-          success: true,
-          data: deletedNetwork,
-          message: "Network deleted successfully",
+            success: true,
+            data: deletedNetwork,
+            message: "Network deleted successfully",
         });
     } catch (err: any) {
         next(err);
@@ -378,9 +378,9 @@ export async function deleteStudio(req: Request, res: Response, next: NextFuncti
         const deletedStudio = await db.deleteStudio(studioId);
 
         res.status(200).json({
-          success: true,
-          data: deletedStudio,
-          message: "Studio deleted successfully",
+            success: true,
+            data: deletedStudio,
+            message: "Studio deleted successfully",
         });
     } catch (err: any) {
         next(err);
@@ -394,9 +394,9 @@ export async function deleteCreator(req: Request, res: Response, next: NextFunct
         const deletedCreator = await db.deleteCreator(creatorId);
 
         res.status(200).json({
-          success: true,
-          data: deletedCreator,
-          message: "Creator deleted successfully",
+            success: true,
+            data: deletedCreator,
+            message: "Creator deleted successfully",
         });
     } catch (err: any) {
         next(err);
@@ -405,19 +405,19 @@ export async function deleteCreator(req: Request, res: Response, next: NextFunct
 
 
 export async function createShow(req: Request, res: Response, next: NextFunction) {
-  try {
-    const newShow = await db.createShow(req.body);
+    try {
+        const newShow = await db.createShow(req.body);
 
-    res.status(201)
-      .location(`/api/shows/${newShow.id}`)
-      .json({
-        success: true,
-        message: 'Show created successfully',
-        data: newShow
-      });
-  } catch (err: any) {
-    next(err);
-  }
+        res.status(201)
+            .location(`/api/shows/${newShow.id}`)
+            .json({
+                success: true,
+                message: 'Show created successfully',
+                data: newShow
+            });
+    } catch (err: any) {
+        next(err);
+    }
 }
 
 
