@@ -69,7 +69,7 @@ Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/i
 
 ### Linda Miao
 ### Challenges:
-To test is a little challenge that conflict with existing file that I can not change by my role. But finally, that all can pass test by Bao's support. 
+To test is a little challenge that conflict with existing file that I can not change by my role. But finally, that's all passing test by Bao's support. 
 
 ### Shiannel - Database, Deployment, & Admin API Endpoints
 ### Challenges: 
