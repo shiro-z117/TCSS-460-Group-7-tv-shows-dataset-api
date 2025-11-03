@@ -104,7 +104,8 @@ Admin endpoints all worked after testing locally
 API is now fully functional, but the code is a little inconsistent 
 
 ### Bao
-- I tried to deploy the server early but I did not communicate well with my teammate so the work is duplicated
+I tried to deploy the server early but I did not communicate well with my teammate so the work is duplicated 
+
 ---
 
 ## Beta II Sprint Meetings
