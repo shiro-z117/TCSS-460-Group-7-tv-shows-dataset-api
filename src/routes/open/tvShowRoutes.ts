@@ -68,33 +68,33 @@ tvShowRoutes.post('/creators', apiKeyAuth, Validator.validateCreateCreator, TV.c
 // ============================== PATCH ENDPOINTS ==============================
 
 // PATCH /api/shows/:id/status - Update show status (Admin only)
-tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, Validator.checkShowIdExists, TV.updateShowStatus);
+tvShowRoutes.patch('/shows/:id/status', apiKeyAuth, TV.updateShowStatus);
 
 // PATCH /api/shows/:id/dates - Update show dates (Admin only)
-tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, Validator.checkShowIdExists, TV.updateShowDates);
+tvShowRoutes.patch('/shows/:id/dates', apiKeyAuth, TV.updateShowDates);
 
 // PATCH /api/shows/:id/metrics - Update show metrics (Admin only)
-tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, Validator.checkShowIdExists, TV.updateShowMetrics);
+tvShowRoutes.patch('/shows/:id/metrics', apiKeyAuth, TV.updateShowMetrics);
 
 // PATCH /api/shows/:id/cast/:actorId - Update a cast member's character name (Admin only - requires API key)
 tvShowRoutes.patch('/shows/:id/cast/:actorId', apiKeyAuth, Validator.validateUpdateCastMember, TV.updateCastMember);
 
 // PATCH /api/shows/:id - Update a show (Admin only - requires API key)
-tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.checkShowIdExists, Validator.validateUpdateShow, TV.updateShow);
+tvShowRoutes.patch('/shows/:id', apiKeyAuth, Validator.validateUpdateShow, TV.updateShow);
 
 // ============================== DELETE ENDPOINTS ==============================
 
 // DELETE /api/shows/:id - delete a show by ID
-tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.checkShowIdExists, TV.deleteShow);
+tvShowRoutes.delete('/shows/:id', apiKeyAuth, Validator.validateDeleteShow, TV.deleteShow);
 
 // DELETE /api/actors/:id - delete an actor by ID
-tvShowRoutes.delete('/actors/:id', apiKeyAuth, Validator.checkActorIdExists, TV.deleteActor);
+tvShowRoutes.delete('/actors/:id', apiKeyAuth, Validator.validateDeleteActor, TV.deleteActor);
 
 // DELETE /api/networks/:id - delete a network by ID
-tvShowRoutes.delete('/networks/:id', apiKeyAuth, Validator.checkNetworkIdExists, TV.deleteNetwork);
+tvShowRoutes.delete('/networks/:id', apiKeyAuth, Validator.validateDeleteNetwork, TV.deleteNetwork);
 
 // DELETE /api/studios/:id - delete a studio by ID
-tvShowRoutes.delete('/studios/:id', apiKeyAuth, Validator.checkStudioIdExists, TV.deleteStudio);
+tvShowRoutes.delete('/studios/:id', apiKeyAuth, Validator.validateDeleteStudio, TV.deleteStudio);
 
 // DELETE /api/creators/:id - delete a creator by ID
-tvShowRoutes.delete('/creators/:id', apiKeyAuth, Validator.checkCreatorIdExists, TV.deleteCreator);
+tvShowRoutes.delete('/creators/:id', apiKeyAuth, Validator.validateDeleteCreator, TV.deleteCreator);

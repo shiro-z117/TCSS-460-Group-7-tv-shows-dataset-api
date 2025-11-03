@@ -4,147 +4,134 @@ import { Request, Response, NextFunction } from 'express';
 import { sendValidationError } from "../utilities/responseUtils";
 import pool from '../../db/connection.js';
 
-export async function checkShowIdExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const showId = parseInt(req.params.id);
 
-        // Validate ID is a valid number
-        if (isNaN(showId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid show ID'
-            });
-            return;
+export const validateDeleteShow = [
+    body("id")
+        .notEmpty()
+        .withMessage("Show ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Show ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM tv_shows WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Show not found");
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Show not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
-
-        // Check if show exists
-        const { rows } = await pool.query('SELECT id FROM tv_shows WHERE id = $1', [showId]);
-        if (rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: 'Show not found'
-            });
-            return;
-        }
-
-        // Show exists, continue to next middleware (auth)
         next();
-    } catch (err) {
-        next(err);
     }
-}
+];
 
 
-export async function checkActorIdExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const actorId = parseInt(req.params.id);
-
-        if (isNaN(actorId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid actor ID'
-            });
-            return;
+export const validateDeleteActor = [
+    body("id")
+        .notEmpty()
+        .withMessage("Actor ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Actor ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Actor not found");
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Actor not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query('SELECT id FROM actors WHERE id = $1', [actorId]);
-        if (rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: 'Actor not found'
-            });
-            return;
-        }
-
         next();
-    } catch (err) {
-        next(err);
     }
-}
+];
 
 
-export async function checkNetworkIdExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const networkId = parseInt(req.params.id);
-
-        if (isNaN(networkId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid network ID'
-            });
-            return;
+export const validateDeleteNetwork = [
+    body("id")
+        .notEmpty()
+        .withMessage("Network ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Network ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM networks WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Network not found");
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Network not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query('SELECT id FROM networks WHERE id = $1', [networkId]);
-        if (rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: 'Network not found'
-            });
-            return;
-        }
-
         next();
-    } catch (err) {
-        next(err);
     }
-}
+];
 
 
-export async function checkStudioIdExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const studioId = parseInt(req.params.id);
-
-        if (isNaN(studioId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid studio ID'
-            });
-            return;
+export const validateDeleteStudio = [
+    body("id")
+        .notEmpty()
+        .withMessage("Studio ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Studio ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM studios WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Studio not found");
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Studio not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query('SELECT id FROM studios WHERE id = $1', [studioId]);
-        if (rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: 'Studio not found'
-            });
-            return;
-        }
-
         next();
-    } catch (err) {
-        next(err);
     }
-}
+];
 
-
-export async function checkCreatorIdExists(req: Request, res: Response, next: NextFunction) {
-    try {
-        const creatorId = parseInt(req.params.id);
-
-        if (isNaN(creatorId)) {
-            res.status(400).json({
-                success: false,
-                message: 'Invalid creator ID'
-            });
-            return;
+export const validateDeleteCreator = [
+    body("id")
+        .notEmpty()
+        .withMessage("Creator ID is required")
+        .isInt({ min: 1 })
+        .withMessage("Creator ID must be a positive integer")
+        .toInt()
+        .custom(async (id) => {
+            const { rows } = await pool.query("SELECT id FROM creators WHERE id = $1", [id]);
+            if (rows.length === 0) {
+                throw new Error("Creator not found");
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors.array().some(err => err.msg === "Creator not found");
+            const status = notFound ? 404 : 400;
+            return res.status(status).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query('SELECT id FROM creators WHERE id = $1', [creatorId]);
-        if (rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: 'Creator not found'
-            });
-            return;
-        }
-
         next();
-    } catch (err) {
-        next(err);
     }
-}
+];
 
 
 export const validateCreateShow = [
