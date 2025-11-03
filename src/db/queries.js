@@ -908,7 +908,6 @@ export const deleteCreator = async (creatorId) => {
 // CREATE NEW TV SHOW
 // ===================================================
 export const createShow = async (showData) => {
-  try {
     const {
       name,
       original_name,
@@ -923,9 +922,14 @@ export const createShow = async (showData) => {
       vote_count,
       poster_url,
       backdrop_url,
-      genres = []
+      genres = [],
+      actors = [],
+      creators = [],
+      networks = [],
+      studios = [],
     } = showData;
 
+    try {
     // Generate unique ID for new show
     const { rows: idRows } = await pool.query('SELECT MAX(id) AS max_id FROM tv_shows');
     const id = (idRows[0].max_id || 0) + 1;
