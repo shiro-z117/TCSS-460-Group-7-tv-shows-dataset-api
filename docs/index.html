@@ -229,145 +229,17 @@
 
         <div class="quick-start">
             <h2>🚀 Quick Start Guide</h2>
-            
+
             <h3>Base URL</h3>
             <p><strong>Production:</strong> <code>https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com</code></p>
             <p><strong>Local Development:</strong> <code>http://localhost:3000</code></p>
-            
+
             <h3>Getting Started</h3>
             <ol>
-                <li>No authentication required for Beta Sprint</li>
                 <li>All endpoints return JSON responses</li>
-                <li>Health check endpoint available for monitoring</li>
-                <li>Use the interactive documentation below to test endpoints</li>
+                <li>Use the interactive documentation below to explore and test all available endpoints</li>
+                <li>Click "Try it out" on any endpoint to test it directly from your browser</li>
             </ol>
-
-            <h3>Example Request</h3>
-            <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows</code></pre>
-            
-            <h3>Example Response</h3>
-            <pre><code>[
-  {
-    "id": 1,
-    "name": "Breaking Bad",
-    "genres": "Drama, Crime, Thriller",
-    "first_air_date": "2008-01-20",
-    "seasons": 5,
-    "tmdb_rating": 9.3
-  }
-]</code></pre>
-        </div>
-
-        <div class="quick-start">
-            <h2>✨ API Features</h2>
-            <div class="feature-grid">
-                <div class="feature-box">
-                    <h4>🏥 Health Check</h4>
-                    <p>Monitor API status and uptime</p>
-                </div>
-                <div class="feature-box">
-                    <h4>📋 All Shows</h4>
-                    <p>Retrieve complete TV shows database</p>
-                </div>
-                <div class="feature-box">
-                    <h4>🔍 Genre Filtering</h4>
-                    <p>Find shows by specific genres</p>
-                </div>
-                <div class="feature-box">
-                    <h4>⚡ Fast Performance</h4>
-                    <p>Optimized queries with PostgreSQL</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="quick-start">
-            <h2>📚 Available Endpoints</h2>
-            
-            <div class="endpoint-card">
-                <h3>
-                    <span class="method">GET</span>
-                    <span class="path">/health</span>
-                </h3>
-                <p><strong>Description:</strong> Health check endpoint to verify API is running</p>
-                <p><strong>Response:</strong> Returns API status</p>
-                <p><strong>Example:</strong></p>
-                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/health</code></pre>
-                <p><strong>Response:</strong></p>
-                <pre><code>{
-  "status": "healthy",
-  "message": "API is running"
-}</code></pre>
-            </div>
-
-            <div class="endpoint-card">
-                <h3>
-                    <span class="method">GET</span>
-                    <span class="path">/api/shows</span>
-                </h3>
-                <p><strong>Description:</strong> Retrieve all TV shows from the database</p>
-                <p><strong>Returns:</strong> Array of TV show objects</p>
-                <p><strong>Example:</strong></p>
-                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows</code></pre>
-            </div>
-
-            <div class="endpoint-card">
-                <h3>
-                    <span class="method">GET</span>
-                    <span class="path">/api/shows/by-genre/{genre}</span>
-                </h3>
-                <p><strong>Description:</strong> Filter TV shows by genre</p>
-                <p><strong>Path Parameter:</strong> <code>genre</code> - The genre to filter by (e.g., Drama, Comedy, Action)</p>
-                <p><strong>Example:</strong></p>
-                <pre><code>curl https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api/shows/by-genre/Drama</code></pre>
-                <p><strong>Common Genres:</strong> Drama, Comedy, Action, Sci-Fi, Horror, Thriller, Romance, Crime</p>
-            </div>
-        </div>
-
-        <div class="quick-start">
-            <h2>📊 Response Format</h2>
-            
-            <h3>TV Show Object</h3>
-            <pre><code>{
-  "id": 1,
-  "name": "Breaking Bad",
-  "original_name": "Breaking Bad",
-  "first_air_date": "2008-01-20",
-  "last_air_date": "2013-09-29",
-  "seasons": 5,
-  "episodes": 62,
-  "status": "Ended",
-  "genres": "Drama, Crime, Thriller",
-  "overview": "A high school chemistry teacher...",
-  "popularity": 234.5,
-  "tmdb_rating": 9.3,
-  "vote_count": 15234
-}</code></pre>
-        </div>
-
-        <div class="quick-start">
-            <h2>⚠️ Error Responses</h2>
-            <p>If something goes wrong, the API returns an error:</p>
-            <pre><code>{
-  "error": "Genre not found",
-  "message": "No TV shows found for the specified genre"
-}</code></pre>
-
-            <h3>Common Status Codes</h3>
-            <ul>
-                <li><code>200 OK</code> - Request successful</li>
-                <li><code>404 Not Found</code> - Resource not found</li>
-                <li><code>500 Internal Server Error</code> - Server error</li>
-            </ul>
-        </div>
-
-        <div class="quick-start">
-            <h2>💡 Usage Tips</h2>
-            <ul>
-                <li>Use the health endpoint to check if the API is up before making requests</li>
-                <li>Genre filtering is case-sensitive (use "Drama" not "drama")</li>
-                <li>The API returns all shows at once (no pagination in Beta Sprint)</li>
-                <li>Try the interactive documentation below to test endpoints live!</li>
-            </ul>
         </div>
     </div>
 
@@ -382,7 +254,7 @@
     <script>
         window.onload = function() {
             const ui = SwaggerUIBundle({
-                url: './swagger.yaml',
+                url: '/api-docs/swagger.yaml',
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
