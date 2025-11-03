@@ -508,6 +508,19 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Studios must be an array")
+        .customSanitizer((studiosArray: Array<{
+            id?: number;
+            studio_name?: string;
+            logo_url?: string;
+            country?: string;
+        }>) => {
+            return studiosArray.map(studio => ({
+                ...studio,
+                studio_name: studio.studio_name?.trim(),
+                logo_url: studio.logo_url?.trim(),
+                country: studio.country?.trim(),
+            }));
+        })
         .custom(async (studiosArray) => {
             const { rows: countryRows } = await pool.query("SELECT country_code FROM countries");
             const validCountries = countryRows.map(r => r.country_code);
