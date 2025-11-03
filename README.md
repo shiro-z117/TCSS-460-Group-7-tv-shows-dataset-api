@@ -76,8 +76,8 @@ Files: docs/swagger.yaml, src/controllers/adminController.ts, src/routes/admin/i
 - Cleaned up API codebase
 
 ### Bao - Worked with Linda for MiddleWay create & testing
-
-
+- Clone the template for credential API
+- Tried to deploy the server early
 ---
 
 ## Production Version Sprint Comments
@@ -104,6 +104,7 @@ Admin endpoints all worked after testing locally
 API is now fully functional, but the code is a little inconsistent 
 
 ### Bao
+- I tried to deploy the server early but I did not communicate well with my teammate so the work is duplicated
 ---
 
 ## Beta II Sprint Meetings
