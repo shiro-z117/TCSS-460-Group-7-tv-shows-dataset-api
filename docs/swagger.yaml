@@ -1,56 +1,45 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: TV Shows API
+  title: TV Show API
   description: |
-    API for managing a TV show dataset with authentication via API key.
-    
-    ## Authentication
-    Most endpoints require an API key passed in the `X-API-Key` header.
-    
-    ## Pagination
-    List endpoints support pagination using `page` and `limit` query parameters.
-    - Default page: 1
-    - Default limit: 20 (or 50 for vocab endpoints)
-    - Maximum limit: 100
+    A comprehensive API for managing TV shows, including shows, actors, networks, studios, and creators.
+    All endpoints require API key authentication.
   version: 1.0.0
   contact:
-    name: TCSS 460 Project Team
+    name: API Support
 
 servers:
-  - url: http://localhost:3000/api
-    description: Development server
-  - url: https://api.tvshows.com/api
+  - url: https://api.example.com
     description: Production server
-
-tags:
-  - name: Health
-    description: System health and status
-  - name: Filter Vocabulary
-    description: Get distinct values for filters (genres, networks, etc.)
-  - name: TV Shows
-    description: Browse and search TV shows
-  - name: Images & Cast
-    description: Show images and cast information
-  - name: Admin - Shows
-    description: Create, update, and delete shows (API key required)
-  - name: Admin - Seasons & Cast
-    description: Manage seasons and cast members (API key required)
+  - url: http://localhost:3000
+    description: Development server
 
 security:
   - ApiKeyAuth: []
 
+tags:
+  - name: Health
+    description: Service health check
+  - name: Shows
+    description: TV show management
+  - name: Metadata
+    description: Genres, networks, statuses, studios, and other metadata
+  - name: People
+    description: Actors and creators
+  - name: Images
+    description: Show images and media
+
 paths:
-  # HEALTH ENDPOINT
-  /health:
+  /api/health:
     get:
       tags:
         - Health
       summary: Check API health
-      description: Liveness/readiness check - verifies service is up and database is reachable
-      security: []
+      description: Returns the health status of the API service and database connection
+      operationId: getHealth
       responses:
         '200':
-          description: Service is healthy
+          description: Health status retrieved successfully
           content:
             application/json:
               schema:
@@ -58,398 +47,115 @@ paths:
                 properties:
                   status:
                     type: string
-                    example: "ok"
+                    enum: [ok, error]
+                    example: ok
                   db:
                     type: string
                     enum: [ok, down]
-                    example: "ok"
+                    example: ok
                   uptime:
                     type: number
                     format: float
-                    description: Uptime in seconds
-                    example: 123.45
-        '500':
-          description: Service is unhealthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: "error"
-                  db:
-                    type: string
-                    example: "down"
+                    description: Server uptime in seconds
+                    example: 3456.78
 
-  # FILTER VOCABULARY ENDPOINTS
-  /genres:
+  /api/shows:
     get:
       tags:
-        - Filter Vocabulary
-      summary: Get list of genres
-      description: Returns distinct list of genres for filtering
+        - Shows
+      summary: Search and filter TV shows
+      description: Advanced search with filters, pagination, and sorting capabilities
+      operationId: getShows
       parameters:
         - name: q
           in: query
-          description: Search term (substring match)
-          required: false
+          description: Search query (matches name or original_name)
           schema:
             type: string
-            example: "dram"
-        - name: page
-          in: query
-          description: Page number
-          required: false
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: Items per page
-          required: false
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved genres
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                example: ["Drama", "Comedy", "Action", "Thriller"]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /networks:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get list of networks
-      description: Returns distinct list of TV networks
-      parameters:
-        - name: q
-          in: query
-          description: Search term (substring match)
-          required: false
-          schema:
-            type: string
-            example: "bbc"
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved networks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                example: ["HBO", "Netflix", "BBC", "NBC"]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /statuses:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get list of show statuses
-      description: Returns distinct list of show statuses
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved statuses
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                example: ["Ended", "Canceled", "Returning Series", "Pilot"]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /studios:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get list of studios
-      description: Returns distinct list of production studios/companies
-      parameters:
-        - name: q
-          in: query
-          description: Search term (substring match)
-          required: false
-          schema:
-            type: string
-            example: "warner"
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved studios
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                example: ["Warner Bros", "HBO Studios", "BBC Studios"]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /years/first:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get list of first air years
-      description: Returns distinct first air years from the dataset
-      parameters:
-        - name: min
-          in: query
-          description: Minimum year
-          schema:
-            type: integer
-            example: 1990
-        - name: max
-          in: query
-          description: Maximum year
-          schema:
-            type: integer
-            example: 2020
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved years
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-                example: [1990, 1991, 1992, 2000, 2010, 2020]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /years/last:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get list of last air years
-      description: Returns distinct last air years from the dataset
-      parameters:
-        - name: min
-          in: query
-          description: Minimum year
-          schema:
-            type: integer
-            example: 2005
-        - name: max
-          in: query
-          description: Maximum year
-          schema:
-            type: integer
-            example: 2024
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved years
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-                example: [2005, 2010, 2015, 2020, 2024]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /seasons:
-    get:
-      tags:
-        - Filter Vocabulary
-      summary: Get season counts
-      description: Returns distinct season counts or bucketed ranges
-      parameters:
-        - name: buckets
-          in: query
-          description: Return bucketed ranges instead of individual counts
-          schema:
-            type: boolean
-            default: false
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Successfully retrieved seasons
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - type: array
-                    items:
-                      type: integer
-                    example: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-                  - type: array
-                    items:
-                      type: string
-                    example: ["1", "2-3", "4-6", "7+"]
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  # MAIN SHOW ENDPOINTS
-  /shows:
-    get:
-      tags:
-        - TV Shows
-      summary: Search and browse TV shows
-      description: |
-        Paginated list of shows with powerful search and filtering capabilities.
-        
-        **Search:** Use 'q' parameter to search by title or original title
-        
-        **Filters:** genre, network, status, studio, actor (comma-separated for multiple values)
-        
-        **Match Logic:** 'match' parameter controls AND/OR behavior across filter categories
-        - match=all (default): Show must match ALL filter categories
-        - match=any: Show can match ANY filter category
-        
-        **ID-based filters:** Use network_id or actor_id for faster, exact lookups
-        
-        **Sorting:** Sort by title, popularity, rating, air dates, or episode count
-      parameters:
-        - name: q
-          in: query
-          description: Search term (matches title or original_title)
-          schema:
-            type: string
-            example: "Breaking Bad"
+          example: Breaking Bad
         - name: genre
           in: query
-          description: Filter by genre (comma-separated for multiple)
+          description: Filter by genre name(s), comma-separated
           schema:
             type: string
-            example: "Drama,Thriller"
+          example: Drama,Crime
+        - name: genre_id
+          in: query
+          description: Filter by genre ID(s), comma-separated
+          schema:
+            type: string
+          example: 18,80
         - name: network
           in: query
-          description: Filter by network name (comma-separated)
+          description: Filter by network name(s), comma-separated
           schema:
             type: string
-            example: "HBO,Netflix"
+          example: AMC
         - name: network_id
           in: query
-          description: Filter by network ID (comma-separated, faster)
+          description: Filter by network ID(s), comma-separated
           schema:
             type: string
-            example: "5,7"
-        - name: status
-          in: query
-          description: Filter by show status
-          schema:
-            type: string
-            example: "Returning Series"
+          example: 174
         - name: studio
           in: query
-          description: Filter by studio (comma-separated)
+          description: Filter by studio name(s), comma-separated
           schema:
             type: string
-            example: "Warner Bros"
+          example: Sony Pictures Television
+        - name: studio_id
+          in: query
+          description: Filter by studio ID(s), comma-separated
+          schema:
+            type: string
+          example: 3
         - name: actor
           in: query
-          description: Filter by actor name (comma-separated)
+          description: Filter by actor name(s), comma-separated
           schema:
             type: string
-            example: "Bryan Cranston"
+          example: Bryan Cranston
         - name: actor_id
           in: query
-          description: Filter by actor ID (comma-separated, faster)
+          description: Filter by actor ID(s), comma-separated
           schema:
             type: string
-            example: "1337"
+          example: 17
+        - name: status
+          in: query
+          description: Filter by status (exact match)
+          schema:
+            type: string
+          example: Ended
         - name: match
           in: query
-          description: Match logic (all=AND across categories, any=OR across categories)
+          description: Match logic for filters
           schema:
             type: string
             enum: [all, any]
             default: all
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
         - name: sort
           in: query
-          description: Field to sort by
+          description: Sort field
           schema:
             type: string
-            enum: [title, popularity, rating, first_air_date, last_air_date, episodes]
-            default: title
+            enum: [id, title, popularity, rating, first_air_date, last_air_date, episodes]
+            default: id
         - name: order
           in: query
           description: Sort order
@@ -457,213 +163,195 @@ paths:
             type: string
             enum: [asc, desc]
             default: asc
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-            maximum: 100
       responses:
         '200':
-          description: Successfully retrieved shows
+          description: Shows retrieved successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: true
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/TVShow'
+                      $ref: '#/components/schemas/ShowSummary'
                   page:
                     type: integer
+                    example: 1
                   limit:
                     type: integer
+                    example: 20
                   total:
                     type: integer
-              examples:
-                basic_search:
-                  summary: Search by title
-                  value:
-                    data:
-                      - id: 1
-                        title: "Breaking Bad"
-                        genres: "Drama, Crime, Thriller"
-                        status: "Ended"
-                    page: 1
-                    limit: 20
-                    total: 1
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    
+                    example: 150
+
     post:
       tags:
-        - Admin - Shows
+        - Shows
       summary: Create a new TV show
-      description: Add a new show to the database (requires API key)
+      description: Create a new TV show entry in the database
+      operationId: createShow
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TVShowInput'
+              $ref: '#/components/schemas/CreateShowRequest'
       responses:
         '201':
           description: Show created successfully
-          headers:
-            Location:
-              description: URL of the created show
-              schema:
-                type: string
-                example: "/shows/12345"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TVShow'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: TV show created successfully
+                  data:
+                    $ref: '#/components/schemas/Show'
         '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '409':
-          description: Show already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                error: "Show already exists"
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/ValidationError'
 
-  /shows/random:
+  /api/shows/{id}:
     get:
       tags:
-        - TV Shows
-      summary: Get a random TV show
-      description: Returns one random show, optionally filtered by genre, network, status, studio, or actor
-      parameters:
-        - name: genre
-          in: query
-          schema:
-            type: string
-            example: "Comedy"
-        - name: network
-          in: query
-          schema:
-            type: string
-            example: "NBC"
-        - name: status
-          in: query
-          schema:
-            type: string
-            example: "Returning Series"
-        - name: studio
-          in: query
-          schema:
-            type: string
-            example: "HBO Studios"
-        - name: actor
-          in: query
-          schema:
-            type: string
-            example: "Jennifer Aniston"
-      responses:
-        '200':
-          description: Successfully retrieved random show
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TVShow'
-        '404':
-          description: No shows match the filters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                error: "No shows found matching the criteria"
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /shows/{id}:
-    get:
-      tags:
-        - TV Shows
-      summary: Get a TV show by ID
-      description: Retrieves full details for a single show by its unique ID
+        - Shows
+      summary: Get show by ID
+      description: Retrieve detailed information about a specific TV show
+      operationId: getShowById
       parameters:
         - name: id
           in: path
           required: true
+          description: The show ID
           schema:
             type: integer
-            example: 12345
+            minimum: 1
       responses:
         '200':
-          description: Successfully retrieved show
+          description: Show retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TVShow'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ShowDetail'
+        '400':
+          $ref: '#/components/responses/InvalidId'
         '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    
-    delete:
-      tags:
-        - Admin - Shows
-      summary: Delete a TV show
-      description: Remove a show from the database (requires API key)
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 12345
-      responses:
-        '204':
-          description: Show deleted successfully (no content in response body)
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/NotFound'
 
-  /shows/{id}/status:
     patch:
       tags:
-        - Admin - Shows
-      summary: Update show status
-      description: Update the status of a TV show (requires API key)
+        - Shows
+      summary: Update a TV show
+      description: Update a TV show's information. All fields are optional.
+      operationId: updateShow
       parameters:
         - name: id
           in: path
           required: true
+          description: The show ID
           schema:
             type: integer
-            example: 12345
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShowRequest'
+      responses:
+        '200':
+          description: Show updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Show'
+                  message:
+                    type: string
+                    example: Show updated successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Shows
+      summary: Delete a TV show
+      description: Delete a TV show from the database
+      operationId: deleteShow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The show ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  example: 1
+      responses:
+        '200':
+          description: Show deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Show deleted successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/shows/{id}/status:
+    patch:
+      tags:
+        - Shows
+      summary: Update show status
+      description: Update a show's status
+      operationId: updateShowStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The show ID
+          schema:
+            type: integer
+            minimum: 1
       requestBody:
         required: true
         content:
@@ -675,8 +363,7 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [Ended, Returning Series, Canceled, In Production, Planned, Pilot]
-                  example: "Ended"
+                  example: Ended
       responses:
         '200':
           description: Status updated successfully
@@ -685,39 +372,32 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    example: 12345
-                  status:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
                     type: string
-                    example: "Ended"
-                  name:
-                    type: string
-                    example: "Breaking Bad"
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                    example: 1 field(s) updated
+                  data:
+                    $ref: '#/components/schemas/Show'
         '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/NotFound'
 
-  /shows/{id}/dates:
+  /api/shows/{id}/dates:
     patch:
       tags:
-        - Admin - Shows
-      summary: Update show air dates
-      description: Update first and/or last air dates for a TV show (requires API key)
+        - Shows
+      summary: Update show dates
+      description: Update a show's first and/or last air dates
+      operationId: updateShowDates
       parameters:
         - name: id
           in: path
           required: true
+          description: The show ID
           schema:
             type: integer
-            example: 12345
+            minimum: 1
       requestBody:
         required: true
         content:
@@ -728,13 +408,12 @@ paths:
                 first_air_date:
                   type: string
                   format: date
-                  description: First air date in ISO-8601 format
-                  example: "2015-01-10"
+                  example: 2008-01-20
                 last_air_date:
                   type: string
                   format: date
-                  description: Last air date in ISO-8601 format
-                  example: "2019-06-30"
+                  example: 2013-09-29
+              minProperties: 1
       responses:
         '200':
           description: Dates updated successfully
@@ -743,44 +422,45 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    example: 12345
-                  first_air_date:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
                     type: string
-                    format: date
-                    example: "2015-01-10"
-                  last_air_date:
-                    type: string
-                    format: date
-                    example: "2019-06-30"
-                  name:
-                    type: string
-                    example: "Better Call Saul"
+                    example: 2 field(s) updated
+                  data:
+                    $ref: '#/components/schemas/Show'
         '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+          description: No fields provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: At least one date field must be provided
         '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/NotFound'
 
-  /shows/{id}/metrics:
+  /api/shows/{id}/metrics:
     patch:
       tags:
-        - Admin - Shows
+        - Shows
       summary: Update show metrics
-      description: Update numeric fields like rating, popularity, and vote count (requires API key)
+      description: Update a show's metrics (rating, popularity, vote count)
+      operationId: updateShowMetrics
       parameters:
         - name: id
           in: path
           required: true
+          description: The show ID
           schema:
             type: integer
-            example: 12345
+            minimum: 1
       requestBody:
         required: true
         content:
@@ -788,20 +468,22 @@ paths:
             schema:
               type: object
               properties:
-                rating:
+                tmdb_rating:
                   type: number
                   format: float
-                  description: TMDb rating score
-                  example: 8.4
-                vote_count:
-                  type: integer
-                  description: Number of votes
-                  example: 3210
+                  minimum: 0
+                  maximum: 10
+                  example: 9.0
                 popularity:
                   type: number
                   format: float
-                  description: Popularity score
-                  example: 456.78
+                  minimum: 0
+                  example: 500.0
+                vote_count:
+                  type: integer
+                  minimum: 0
+                  example: 15000
+              minProperties: 1
       responses:
         '200':
           description: Metrics updated successfully
@@ -810,159 +492,194 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    example: 12345
-                  rating:
-                    type: number
-                    format: float
-                    example: 8.4
-                  vote_count:
-                    type: integer
-                    example: 3210
-                  popularity:
-                    type: number
-                    format: float
-                    example: 456.78
-                  name:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
                     type: string
-                    example: "Breaking Bad"
+                    example: 3 field(s) updated
+                  data:
+                    $ref: '#/components/schemas/Show'
         '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  # IMAGES & CAST ENDPOINTS
-  /shows/{id}/images:
-    get:
-      tags:
-        - Images & Cast
-      summary: Get images for a TV show
-      description: Retrieves poster, backdrop, and logo links for a show
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-        - name: type
-          in: query
-          description: Filter by image type
-          required: false
-          schema:
-            type: string
-            enum: [poster, backdrop, logo]
-            example: "poster"
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-            maximum: 50
-      responses:
-        '200':
-          description: Successfully retrieved images
+          description: No fields provided
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: At least one metric field must be provided
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/shows/{id}/images:
+    get:
+      tags:
+        - Images
+      summary: Get show images
+      description: Retrieve images associated with a TV show
+      operationId: getShowImages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The show ID
+          schema:
+            type: integer
+            minimum: 1
+        - name: type
+          in: query
+          description: Filter by image type
+          schema:
+            type: string
+            enum: [poster, backdrop]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Images retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Image'
                   page:
                     type: integer
+                    example: 1
                   limit:
                     type: integer
+                    example: 20
                   total:
                     type: integer
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /shows/{id}/cast:
-    get:
-      tags:
-        - Images & Cast
-      summary: Get cast members for a TV show
-      description: Retrieves up to N billed cast members with character and profile information
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-        - name: limit
-          in: query
-          description: Number of cast members to return
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
-            default: 10
-        - name: order
-          in: query
-          description: Sort order
-          required: false
-          schema:
-            type: string
-            enum: [credit, name]
-            default: credit
-      responses:
-        '200':
-          description: Successfully retrieved cast
+                    example: 45
+        '400':
+          description: Invalid parameters
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: Invalid show ID
+
+  /api/shows/{id}/cast:
+    get:
+      tags:
+        - Shows
+      summary: Get show cast
+      description: Retrieve the cast members for a specific TV show
+      operationId: getShowCast
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The show ID
+          schema:
+            type: integer
+            minimum: 1
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Cast retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/CastMember'
                   page:
                     type: integer
+                    example: 1
                   limit:
                     type: integer
+                    example: 20
                   total:
                     type: integer
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    
-    post:
+                    example: 25
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: Invalid show ID
+
+  /api/shows/{id}/cast/{actorId}:
+    patch:
       tags:
-        - Admin - Seasons & Cast
-      summary: Add a cast member
-      description: Add a new cast member to a show (requires API key)
+        - Shows
+      summary: Update cast member
+      description: Update a cast member's character name for a specific show
+      operationId: updateCastMember
       parameters:
         - name: id
           in: path
           required: true
+          description: The show ID
           schema:
             type: integer
-            example: 123
+            minimum: 1
+        - name: actorId
+          in: path
+          required: true
+          description: The actor ID
+          schema:
+            type: integer
+            minimum: 1
       requestBody:
         required: true
         content:
@@ -970,188 +687,792 @@ paths:
             schema:
               type: object
               required:
-                - person_name
-                - character
+                - character_name
               properties:
-                person_name:
+                character_name:
                   type: string
-                  example: "Bryan Cranston"
-                character:
-                  type: string
-                  example: "Walter White"
-                order:
-                  type: integer
-                  example: 1
-                profile_url:
-                  type: string
-                  example: "https://image.tmdb.org/t/p/original/actor.jpg"
-      responses:
-        '201':
-          description: Cast member added successfully
-          headers:
-            Location:
-              schema:
-                type: string
-                example: "/shows/123/cast/456"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CastMember'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /shows/{id}/cast/{castId}:
-    patch:
-      tags:
-        - Admin - Seasons & Cast
-      summary: Update a cast member
-      description: Partial update of cast member information (requires API key)
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-        - name: castId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 456
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                character:
-                  type: string
-                  example: "Director X"
-                order:
-                  type: integer
-                  example: 2
-                profile_url:
-                  type: string
-                  example: "https://image.tmdb.org/t/p/original/new-actor.jpg"
+                  example: Heisenberg / Walter White
       responses:
         '200':
           description: Cast member updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CastMember'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      tv_show_id:
+                        type: integer
+                        example: 1
+                      actor_id:
+                        type: integer
+                        example: 17
+                      character_name:
+                        type: string
+                        example: Heisenberg / Walter White
+                  message:
+                    type: string
+                    example: Cast member updated successfully
         '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+          $ref: '#/components/responses/ValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Cast member not found for this show
 
-  /shows/{id}/cast/{actorId}:
-    delete:
+  /api/genres:
+    get:
       tags:
-        - Admin - Seasons & Cast
-      summary: Delete a cast member
-      description: Remove a cast member from a show (requires API key)
+        - Metadata
+      summary: Get genres
+      description: Retrieve a list of all genres in the database
+      operationId: getGenres
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: q
+          in: query
+          description: Search query to filter genres
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
           schema:
             type: integer
-            example: 123
-        - name: actorId
-          in: path
-          required: true
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
           schema:
             type: integer
-            example: 321
+            minimum: 1
+            default: 50
       responses:
-        '204':
-          description: Cast member deleted successfully (no content in response body)
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        '200':
+          description: Genres retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Genre'
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 25
 
-  # SEASONS ENDPOINT
-  /shows/{id}/seasons/{seasonNumber}:
-    patch:
+  /api/networks:
+    get:
       tags:
-        - Admin - Seasons & Cast
-      summary: Update a season
-      description: Partial update of season information (requires API key)
+        - Metadata
+      summary: Get networks
+      description: Retrieve a list of all networks in the database
+      operationId: getNetworks
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: q
+          in: query
+          description: Search query to filter networks
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
           schema:
             type: integer
-            example: 123
-        - name: seasonNumber
-          in: path
-          required: true
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
           schema:
             type: integer
-            example: 3
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Networks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Network'
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 87
+
+    post:
+      tags:
+        - Metadata
+      summary: Create a network
+      description: Add a new network to the database
+      operationId: createNetwork
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - network_name
               properties:
-                episode_count:
-                  type: integer
-                  example: 12
-                name:
+                network_name:
                   type: string
-                  example: "Season 3 (Extended)"
+                  example: AMC
+                logo_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/amc-logo.png
+                country:
+                  type: string
+                  nullable: true
+                  example: US
       responses:
-        '200':
-          description: Season updated successfully
+        '201':
+          description: Network created successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  season_number:
-                    type: integer
-                    example: 3
-                  episode_count:
-                    type: integer
-                    example: 12
-                  name:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
                     type: string
-                    example: "Season 3 (Extended)"
+                    example: Network created successfully
+                  data:
+                    $ref: '#/components/schemas/Network'
         '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+          $ref: '#/components/responses/ValidationError'
+
+  /api/networks/{id}:
+    delete:
+      tags:
+        - Metadata
+      summary: Delete a network
+      description: Delete a network from the database
+      operationId: deleteNetwork
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The network ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  example: 174
+      responses:
+        '200':
+          description: Network deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Network deleted successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/NotFound'
+
+  /api/statuses:
+    get:
+      tags:
+        - Metadata
+      summary: Get statuses
+      description: Retrieve a list of all possible show statuses
+      operationId: getStatuses
+      parameters:
+        - name: q
+          in: query
+          description: Search query to filter statuses
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Status'
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 5
+
+  /api/studios:
+    get:
+      tags:
+        - Metadata
+      summary: Get studios
+      description: Retrieve a list of all studios in the database
+      operationId: getStudios
+      parameters:
+        - name: q
+          in: query
+          description: Search query to filter studios
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Studios retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Studio'
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 134
+
+    post:
+      tags:
+        - Metadata
+      summary: Create a studio
+      description: Add a new studio to the database
+      operationId: createStudio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - studio_name
+              properties:
+                studio_name:
+                  type: string
+                  example: Sony Pictures Television
+                logo_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/sony-logo.png
+                country:
+                  type: string
+                  nullable: true
+                  example: US
+      responses:
+        '201':
+          description: Studio created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Studio created successfully
+                  data:
+                    $ref: '#/components/schemas/Studio'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/studios/{id}:
+    delete:
+      tags:
+        - Metadata
+      summary: Delete a studio
+      description: Delete a studio from the database
+      operationId: deleteStudio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The studio ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  example: 3
+      responses:
+        '200':
+          description: Studio deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Studio deleted successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/years/first:
+    get:
+      tags:
+        - Metadata
+      summary: Get first air date years
+      description: Retrieve a range of years from first air dates in the database
+      operationId: getYearsFirst
+      parameters:
+        - name: min
+          in: query
+          description: Minimum year to filter
+          schema:
+            type: integer
+        - name: max
+          in: query
+          description: Maximum year to filter
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Years retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: integer
+                    example: [1950, 1951, 1952, 1953, 1954, 1955]
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 75
+
+  /api/years/last:
+    get:
+      tags:
+        - Metadata
+      summary: Get last air date years
+      description: Retrieve a range of years from last air dates in the database
+      operationId: getYearsLast
+      parameters:
+        - name: min
+          in: query
+          description: Minimum year to filter
+          schema:
+            type: integer
+        - name: max
+          in: query
+          description: Maximum year to filter
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Years retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: integer
+                    example: [2020, 2021, 2022, 2023, 2024, 2025]
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 75
+
+  /api/episodes:
+    get:
+      tags:
+        - Metadata
+      summary: Get episode counts
+      description: Retrieve a range of episode counts from the database
+      operationId: getEpisodes
+      parameters:
+        - name: min
+          in: query
+          description: Minimum episode count to filter
+          schema:
+            type: integer
+        - name: max
+          in: query
+          description: Maximum episode count to filter
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        '200':
+          description: Episode counts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: integer
+                    example: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 50
+                  total:
+                    type: integer
+                    example: 500
+
+  /api/actors:
+    post:
+      tags:
+        - People
+      summary: Create an actor
+      description: Add a new actor to the database
+      operationId: createActor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - actor_name
+              properties:
+                actor_name:
+                  type: string
+                  example: Bryan Cranston
+                profile_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/bryan-cranston.jpg
+      responses:
+        '201':
+          description: Actor created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Actor created successfully
+                  data:
+                    $ref: '#/components/schemas/Actor'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/actors/{id}:
+    delete:
+      tags:
+        - People
+      summary: Delete an actor
+      description: Delete an actor from the database
+      operationId: deleteActor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The actor ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  example: 17
+      responses:
+        '200':
+          description: Actor deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Actor deleted successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/creators:
+    post:
+      tags:
+        - People
+      summary: Create a creator
+      description: Add a new creator to the database
+      operationId: createCreator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - creator_name
+              properties:
+                creator_name:
+                  type: string
+                  example: Vince Gilligan
+      responses:
+        '201':
+          description: Creator created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Creator created successfully
+                  data:
+                    $ref: '#/components/schemas/Creator'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/creators/{id}:
+    delete:
+      tags:
+        - People
+      summary: Delete a creator
+      description: Delete a creator from the database
+      operationId: deleteCreator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The creator ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  example: 1
+      responses:
+        '200':
+          description: Creator deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Creator deleted successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   securitySchemes:
@@ -1159,238 +1480,519 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
-      description: API key required for admin endpoints
+      description: API key for authentication
 
   schemas:
-    TVShow:
+    Show:
       type: object
       properties:
         id:
           type: integer
-          description: Unique identifier for the TV show
           example: 1
         name:
           type: string
-          description: Current name of the TV show
-          example: "Breaking Bad"
+          example: Breaking Bad
         original_name:
           type: string
-          description: Original name of the TV show
-          example: "Breaking Bad"
+          example: Breaking Bad
         first_air_date:
           type: string
-          format: date
-          description: Date of the first episode
-          example: "2008-01-20"
+          format: date-time
+          example: 2008-01-20T00:00:00.000Z
         last_air_date:
           type: string
-          format: date
-          description: Date of the last episode
-          example: "2013-09-29"
+          format: date-time
+          example: 2013-09-29T00:00:00.000Z
         seasons:
           type: integer
-          description: Number of seasons
           example: 5
         episodes:
           type: integer
-          description: Total number of episodes
           example: 62
         status:
           type: string
-          description: Current status of the TV show
-          enum: [Ended, Returning Series, Canceled, In Production, Planned, Pilot]
-          example: "Ended"
-        genres:
-          type: string
-          description: Comma-separated list of genres
-          example: "Drama, Crime, Thriller"
+          example: Ended
         overview:
           type: string
-          description: Brief description or synopsis of the TV show
-          example: "A high school chemistry teacher turned methamphetamine manufacturer"
+          nullable: true
+          example: A high school chemistry teacher diagnosed with cancer...
         popularity:
           type: number
           format: float
-          description: Popularity score
-          example: 345.678
+          nullable: true
+          example: 489.234
         tmdb_rating:
           type: number
           format: float
-          description: TMDb rating score
+          nullable: true
           example: 8.9
         vote_count:
           type: integer
-          description: Number of votes
+          nullable: true
           example: 12543
+        poster_url:
+          type: string
+          nullable: true
+          example: https://example.com/poster.jpg
+        backdrop_url:
+          type: string
+          nullable: true
+          example: https://example.com/backdrop.jpg
 
-    TVShowInput:
+    ShowSummary:
+      allOf:
+        - $ref: '#/components/schemas/Show'
+        - type: object
+          properties:
+            genres:
+              type: array
+              items:
+                type: string
+              example: [Drama, Crime, Thriller]
+
+    ShowDetail:
+      allOf:
+        - $ref: '#/components/schemas/Show'
+        - type: object
+          properties:
+            genres:
+              type: array
+              items:
+                $ref: '#/components/schemas/Genre'
+            networks:
+              type: array
+              items:
+                $ref: '#/components/schemas/Network'
+            studios:
+              type: array
+              items:
+                $ref: '#/components/schemas/Studio'
+            creators:
+              type: array
+              items:
+                $ref: '#/components/schemas/Creator'
+            cast:
+              type: array
+              items:
+                $ref: '#/components/schemas/CastMember'
+
+    CreateShowRequest:
       type: object
       required:
         - name
+        - original_name
         - first_air_date
+        - last_air_date
+        - seasons
+        - episodes
         - status
+        - genres
       properties:
         name:
           type: string
-          description: Current name of the TV show
-          example: "Better Call Saul"
+          example: Breaking Bad
         original_name:
           type: string
-          description: Original name of the TV show
-          example: "Better Call Saul"
+          example: Breaking Bad
         first_air_date:
           type: string
           format: date
-          description: Date of the first episode
-          example: "2015-02-08"
+          example: 2008-01-20
         last_air_date:
           type: string
           format: date
-          description: Date of the last episode (optional)
-          example: "2022-08-15"
+          example: 2013-09-29
         seasons:
           type: integer
-          description: Number of seasons
-          example: 6
+          minimum: 1
+          example: 5
         episodes:
           type: integer
-          description: Total number of episodes
-          example: 63
+          minimum: 1
+          example: 62
         status:
           type: string
-          description: Current status of the TV show
-          enum: [Ended, Returning Series, Canceled, In Production, Planned, Pilot]
-          example: "Ended"
-        genres:
-          type: string
-          description: Comma-separated list of genres
-          example: "Drama, Crime"
+          example: Ended
         overview:
           type: string
-          description: Brief description or synopsis of the TV show
-          example: "The trials and tribulations of criminal lawyer Jimmy McGill"
+          nullable: true
+          example: A high school chemistry teacher diagnosed with cancer...
         popularity:
           type: number
           format: float
-          description: Popularity score
-          example: 234.567
+          minimum: 0
+          nullable: true
+          example: 489.234
         tmdb_rating:
           type: number
           format: float
-          description: TMDb rating score
-          example: 8.7
+          minimum: 0
+          maximum: 10
+          nullable: true
+          example: 8.9
         vote_count:
           type: integer
-          description: Number of votes
-          example: 8432
+          minimum: 0
+          nullable: true
+          example: 12543
+        poster_url:
+          type: string
+          nullable: true
+          example: https://example.com/poster.jpg
+        backdrop_url:
+          type: string
+          nullable: true
+          example: https://example.com/backdrop.jpg
+        genres:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          example: [Drama, Crime, Thriller]
+        actors:
+          type: array
+          maxItems: 10
+          nullable: true
+          items:
+            oneOf:
+              - type: object
+                required:
+                  - id
+                  - character_name
+                properties:
+                  id:
+                    type: integer
+                    example: 17
+                  character_name:
+                    type: string
+                    example: Walter White
+              - type: object
+                required:
+                  - actor_name
+                  - character_name
+                properties:
+                  actor_name:
+                    type: string
+                    example: Aaron Paul
+                  character_name:
+                    type: string
+                    example: Jesse Pinkman
+                  profile_url:
+                    type: string
+                    nullable: true
+                    example: https://example.com/aaron-paul.jpg
+        networks:
+          type: array
+          maxItems: 5
+          nullable: true
+          items:
+            oneOf:
+              - type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    example: 174
+              - type: object
+                required:
+                  - network_name
+                properties:
+                  network_name:
+                    type: string
+                    example: AMC+
+                  logo_url:
+                    type: string
+                    nullable: true
+                    example: https://example.com/amc-plus-logo.png
+                  country:
+                    type: string
+                    nullable: true
+                    example: US
+        studios:
+          type: array
+          maxItems: 5
+          nullable: true
+          items:
+            oneOf:
+              - type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    example: 3
+              - type: object
+                required:
+                  - studio_name
+                properties:
+                  studio_name:
+                    type: string
+                    example: Sony Pictures Television
+                  logo_url:
+                    type: string
+                    nullable: true
+                    example: https://example.com/sony-logo.png
+                  country:
+                    type: string
+                    nullable: true
+                    example: US
+        creators:
+          type: array
+          maxItems: 5
+          nullable: true
+          items:
+            oneOf:
+              - type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+              - type: object
+                required:
+                  - creator_name
+                properties:
+                  creator_name:
+                    type: string
+                    example: Peter Gould
+
+    UpdateShowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Breaking Bad
+        original_name:
+          type: string
+          example: Breaking Bad
+        first_air_date:
+          type: string
+          format: date
+          example: 2008-01-20
+        last_air_date:
+          type: string
+          format: date
+          example: 2013-09-29
+        seasons:
+          type: integer
+          minimum: 0
+          example: 5
+        episodes:
+          type: integer
+          minimum: 0
+          example: 62
+        status:
+          type: string
+          example: Ended
+        overview:
+          type: string
+          example: Updated overview...
+        popularity:
+          type: number
+          format: float
+          minimum: 0
+          example: 500.0
+        tmdb_rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 10
+          example: 9.0
+        vote_count:
+          type: integer
+          minimum: 0
+          example: 15000
+        poster_url:
+          type: string
+          example: https://example.com/new-poster.jpg
+        backdrop_url:
+          type: string
+          example: https://example.com/new-backdrop.jpg
+
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 18
+        genre_name:
+          type: string
+          example: Drama
+
+    Network:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 174
+        network_name:
+          type: string
+          example: AMC
+        logo_url:
+          type: string
+          nullable: true
+          example: https://example.com/amc-logo.png
+        country:
+          type: string
+          nullable: true
+          example: US
+
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Returning Series
+
+    Studio:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        studio_name:
+          type: string
+          example: Sony Pictures Television
+        logo_url:
+          type: string
+          nullable: true
+          example: https://example.com/sony-logo.png
+        country:
+          type: string
+          nullable: true
+          example: US
+
+    Actor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 17
+        actor_name:
+          type: string
+          example: Bryan Cranston
+        profile_url:
+          type: string
+          nullable: true
+          example: https://example.com/bryan-cranston.jpg
+
+    Creator:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        creator_name:
+          type: string
+          example: Vince Gilligan
+
+    CastMember:
+      type: object
+      properties:
+        actor_id:
+          type: integer
+          example: 17
+        actor_name:
+          type: string
+          example: Bryan Cranston
+        character_name:
+          type: string
+          example: Walter White
+        profile_url:
+          type: string
+          nullable: true
+          example: https://example.com/bryan-cranston.jpg
 
     Image:
       type: object
       properties:
         id:
           type: integer
-          description: Unique image ID
           example: 1
+        tv_show_id:
+          type: integer
+          example: 1
+        image_url:
+          type: string
+          example: https://example.com/image1.jpg
         type:
           type: string
-          enum: [poster, backdrop, logo]
-          description: Type of image
-          example: "poster"
-        url:
-          type: string
-          description: Image URL
-          example: "https://image.tmdb.org/t/p/original/poster.jpg"
+          enum: [poster, backdrop]
+          example: poster
         width:
           type: integer
-          description: Image width in pixels
-          example: 1920
+          nullable: true
+          example: 1000
         height:
           type: integer
-          description: Image height in pixels
-          example: 1080
+          nullable: true
+          example: 1500
+        language:
+          type: string
+          nullable: true
+          example: en
 
-    CastMember:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique cast member ID
-          example: 1
-        person_name:
-          type: string
-          description: Actor's name
-          example: "Bryan Cranston"
-        character:
-          type: string
-          description: Character name
-          example: "Walter White"
-        order:
-          type: integer
-          description: Billing order
-          example: 1
-        profile_url:
-          type: string
-          description: Actor's profile image URL
-          example: "https://image.tmdb.org/t/p/original/actor.jpg"
-
-    Error:
+    ValidationError:
       type: object
       properties:
         success:
           type: boolean
           example: false
-        error:
-          type: string
-          description: Error message
-          example: "Invalid request parameters"
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: field
+              msg:
+                type: string
+                example: Name is required
+              path:
+                type: string
+                example: name
+              location:
+                type: string
+                example: body
 
   responses:
-    BadRequestError:
-      description: Bad request - Invalid input parameters
+    ValidationError:
+      description: Validation error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            success: false
-            error: "Invalid request parameters"
-    
-    UnauthorizedError:
-      description: Unauthorized - Invalid or missing API key
+            $ref: '#/components/schemas/ValidationError'
+
+    NotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            success: false
-            error: "Invalid or missing API key"
-    
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Show not found
+
+    InvalidId:
+      description: Invalid ID parameter
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            success: false
-            error: "Insufficient permissions"
-    
-    NotFoundError:
-      description: Not found - Resource does not exist
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            success: false
-            error: "Resource not found"
-    
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            success: false
-            error: "Internal server error"
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Invalid show ID
