@@ -438,156 +438,159 @@ export const validateCreateShow = [
 ];
 
 
-export async function validateCreateActor(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { actor_name } = req.body;
+export const validateCreateActor = [
+    body("actor_name")
+        .notEmpty()
+        .withMessage("actor_name is required")
+        .isString()
+        .withMessage("actor_name must be a string")
+        .trim()
+        .custom(async (actor_name) => {
+            const { rows } = await pool.query(
+                "SELECT id FROM actors WHERE actor_name = $1",
+                [actor_name]
+            );
+            if (rows.length > 0) {
+                throw new Error(`Actor with name "${actor_name}" already exists`);
+            }
+            return true;
+        }),
 
-        if (!actor_name || typeof actor_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'actor_name is required and must be a string',
-            });
+    body("profile_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("profile_url must be a string")
+        .trim(),
+
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM actors WHERE actor_name = $1',
-            [actor_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Actor with name "${actor_name}" already exists`,
-                data: rows[0]
-            });
-        }
-
         next();
-    } catch (err) {
-        console.error('Error in checkActorDuplicate:', err);
-        next(err);
     }
-}
+];
 
 
-export async function validateCreateNetwork(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { network_name } = req.body;
-
-        if (!network_name || typeof network_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'network_name is required and must be a string',
-            });
+export const validateCreateNetwork = [
+    body("network_name")
+        .notEmpty()
+        .withMessage("network_name is required")
+        .isString()
+        .withMessage("network_name must be a string")
+        .trim()
+        .custom(async (network_name) => {
+            const { rows } = await pool.query(
+                "SELECT id FROM networks WHERE network_name = $1",
+                [network_name]
+            );
+            if (rows.length > 0) {
+                throw new Error(`Network with name "${network_name}" already exists`);
+            }
+            return true;
+        }),
+    body("logo_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("logo_url must be a string")
+        .trim(),
+    body("country")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("country must be a string")
+        .trim()
+        .custom(async (country) => {
+            if (country) {
+                const { rows } = await pool.query("SELECT country_code FROM countries");
+                const validCountries = rows.map(r => r.country_code);
+                if (!validCountries.includes(country)) {
+                    throw new Error(`Invalid country: "${country}". Valid values: ${validCountries.join(", ")}`);
+                }
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM networks WHERE network_name = $1',
-            [network_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Network with name "${network_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
         next();
-    } catch (err) {
-        console.error('Error in checkNetworkDuplicate:', err);
-        next(err);
     }
-}
+];
 
 
-export async function validateCreateStudio(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { studio_name } = req.body;
-
-        if (!studio_name || typeof studio_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'studio_name is required and must be a string',
-            });
+export const validateCreateStudio = [
+    body("studio_name")
+        .notEmpty()
+        .withMessage("studio_name is required")
+        .isString()
+        .withMessage("studio_name must be a string")
+        .trim()
+        .custom(async (studio_name) => {
+            const { rows } = await pool.query(
+                "SELECT id FROM studios WHERE studio_name = $1",
+                [studio_name]
+            );
+            if (rows.length > 0) {
+                throw new Error(`Studio with name "${studio_name}" already exists`);
+            }
+            return true;
+        }),
+    body("logo_url")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("logo_url must be a string")
+        .trim(),
+    body("country")
+        .optional({ nullable: true })
+        .isString()
+        .withMessage("country must be a string")
+        .trim()
+        .custom(async (country) => {
+            if (country) {
+                const { rows } = await pool.query("SELECT country_code FROM countries");
+                const validCountries = rows.map(r => r.country_code);
+                if (!validCountries.includes(country)) {
+                    throw new Error(`Invalid country: "${country}". Valid values: ${validCountries.join(", ")}`);
+                }
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM studios WHERE studio_name = $1',
-            [studio_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Studio with name "${studio_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
         next();
-    } catch (err) {
-        console.error('Error in checkStudioDuplicate:', err);
-        next(err);
     }
-}
+];
 
 
-export async function validateCreateCreator(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { creator_name } = req.body;
-
-        if (!creator_name || typeof creator_name !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'creator_name is required and must be a string',
-            });
+export const validateCreateCreator = [
+    body("creator_name")
+        .notEmpty()
+        .withMessage("creator_name is required")
+        .isString()
+        .withMessage("creator_name must be a string")
+        .trim()
+        .custom(async (creator_name) => {
+            const { rows } = await pool.query(
+                "SELECT id FROM creators WHERE creator_name = $1",
+                [creator_name]
+            );
+            if (rows.length > 0) {
+                throw new Error(`Creator with name "${creator_name}" already exists`);
+            }
+            return true;
+        }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
         }
-
-        const { rows } = await pool.query(
-            'SELECT id FROM creators WHERE creator_name = $1',
-            [creator_name.trim()]
-        );
-
-        if (rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: `Creator with name "${creator_name}" already exists`,
-                data: rows[0],
-            });
-        }
-
         next();
-    } catch (err) {
-        console.error('Error in checkCreatorDuplicate:', err);
-        next(err);
     }
-}
-
-
-export async function validateCountry(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { country } = req.body;
-        if (!country) {
-            return next();
-        }
-        const { rows } = await pool.query('SELECT country_code FROM countries');
-        const validCountries = rows.map(r => r.country_code);
-
-        if (!validCountries.includes(country)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid country',
-                validValues: validCountries
-            });
-        }
-
-        next();
-    } catch (err) {
-        next(err);
-    }
-}
+];
 
 
 // helper function to send error messages

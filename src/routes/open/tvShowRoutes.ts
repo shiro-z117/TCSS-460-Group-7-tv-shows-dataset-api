@@ -57,10 +57,10 @@ tvShowRoutes.post('/shows', apiKeyAuth, Validator.validateCreateShow, TV.createS
 tvShowRoutes.post('/actors', apiKeyAuth, Validator.validateCreateActor, TV.createActor);
 
 // POST /api/networks - Add a network to the database
-tvShowRoutes.post('/networks', apiKeyAuth, Validator.validateCreateNetwork, Validator.validateCountry, TV.createNetwork);
+tvShowRoutes.post('/networks', apiKeyAuth, Validator.validateCreateNetwork, TV.createNetwork);
 
 // POST /api/studios - Add a studio to the database
-tvShowRoutes.post('/studios', apiKeyAuth, Validator.validateCreateStudio, Validator.validateCountry, TV.createStudio);
+tvShowRoutes.post('/studios', apiKeyAuth, Validator.validateCreateStudio, TV.createStudio);
 
 // POST /api/creators - Add a creator to the database
 tvShowRoutes.post('/creators', apiKeyAuth, Validator.validateCreateCreator, TV.createCreator);
