@@ -4,6 +4,23 @@ info:
   description: |
     A comprehensive API for managing TV shows, including shows, actors, networks, studios, and creators.
     All endpoints require API key authentication.
+    
+    ## Known Issues
+    We do NOT recommend implementing code working around these issues, we are working to get the API to work as intended,
+    issues are listed only for clarity.
+
+    #### 1. PATCH /api/shows/:id - General Show Update Not Working
+    **Issue:** This endpoint is currently not working. Implementation issues prevent it from updating show data as intended. The endpoint is completely non-functional.
+
+    **Impact:** Cannot perform general show updates through this endpoint.
+
+    ---
+
+    #### 2. GET /api/shows - Some Filters Not Working as Intended
+    **Issue:** Some filters in the advanced search functionality are not working as intended. Specific filter parameters may not properly filter results or may return incorrect data.
+
+    **Impact:** Search results may be incomplete or incorrect when using certain filter combinations.
+
   version: 1.0.0
   contact:
     name: API Support
@@ -884,6 +901,59 @@ paths:
           $ref: '#/components/responses/ValidationError'
 
   /api/networks/{id}:
+    patch:
+      tags:
+        - Metadata
+      summary: Update a network
+      description: Update a network's information. All fields are optional.
+      operationId: updateNetwork
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The network ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                network_name:
+                  type: string
+                  example: AMC Networks
+                logo_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/amc-logo-updated.png
+                country:
+                  type: string
+                  nullable: true
+                  example: US
+      responses:
+        '200':
+          description: Network updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Network'
+                  message:
+                    type: string
+                    example: Network updated successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
     delete:
       tags:
         - Metadata
@@ -1080,6 +1150,59 @@ paths:
           $ref: '#/components/responses/ValidationError'
 
   /api/studios/{id}:
+    patch:
+      tags:
+        - Metadata
+      summary: Update a studio
+      description: Update a studio's information. All fields are optional.
+      operationId: updateStudio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The studio ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                studio_name:
+                  type: string
+                  example: Sony Pictures Television Studios
+                logo_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/sony-logo-updated.png
+                country:
+                  type: string
+                  nullable: true
+                  example: US
+      responses:
+        '200':
+          description: Studio updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Studio'
+                  message:
+                    type: string
+                    example: Studio updated successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
     delete:
       tags:
         - Metadata
@@ -1343,6 +1466,55 @@ paths:
           $ref: '#/components/responses/ValidationError'
 
   /api/actors/{id}:
+    patch:
+      tags:
+        - People
+      summary: Update an actor
+      description: Update an actor's information. All fields are optional.
+      operationId: updateActor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The actor ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actor_name:
+                  type: string
+                  example: Bryan Cranston
+                profile_url:
+                  type: string
+                  nullable: true
+                  example: https://example.com/bryan-cranston-updated.jpg
+      responses:
+        '200':
+          description: Actor updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Actor'
+                  message:
+                    type: string
+                    example: Actor updated successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
     delete:
       tags:
         - People
@@ -1428,6 +1600,51 @@ paths:
           $ref: '#/components/responses/ValidationError'
 
   /api/creators/{id}:
+    patch:
+      tags:
+        - People
+      summary: Update a creator
+      description: Update a creator's information. All fields are optional.
+      operationId: updateCreator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The creator ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                creator_name:
+                  type: string
+                  example: Vincent Gilligan
+      responses:
+        '200':
+          description: Creator updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Creator'
+                  message:
+                    type: string
+                    example: Creator updated successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
     delete:
       tags:
         - People
@@ -1473,6 +1690,22 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '404':
           $ref: '#/components/responses/NotFound'
+
+x-known-issues:
+  - endpoint: PATCH /api/shows/:id
+    title: General Show Update Not Working
+    description: |
+      **Issue:** This endpoint is currently not working. Implementation issues prevent it from updating show data as intended. The endpoint is completely non-functional.
+
+      **Impact:** Cannot perform general show updates through this endpoint.
+  - endpoint: GET /api/shows
+    title: Some Filters Not Working as Intended
+    description: |
+      **Issue:** Some filters in the advanced search functionality are not working as intended. Specific filter parameters may not properly filter results or may return incorrect data.
+
+      **Impact:** Search results may be incomplete or incorrect when using certain filter combinations.
+
+      **Workaround:** Test filter combinations individually to determine which work correctly. Simple searches may work better than complex filtered queries.
 
 components:
   securitySchemes:
