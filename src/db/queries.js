@@ -1515,7 +1515,7 @@ export const updateShow = async (showId, updateData) => {
 export const updateShowRelations = async (showId, relations) => {
   const relationNotes = [];
 
-  // Helper to process add/remove for a junction table
+  // Helper to process add/remove for most junction tables
   const processRelation = async (
     table,
     fieldName,
@@ -1527,34 +1527,70 @@ export const updateShowRelations = async (showId, relations) => {
         throw new Error(`Missing operation for ${fieldName}`);
       }
 
-      if (item.operation === "add") {
-        // Check for duplicate first
-        let duplicateCheckQuery = `SELECT 1 FROM ${table} WHERE tv_show_id = $1 AND ${fieldName}_id = $2`;
-        const duplicateValues = [showId, item.id];
+      // Special handling for genres
+      if (fieldName === "genre") {
+        const genreId = extraColumns.genre_id;
+        if (item.operation === "add") {
+          const existing = await pool.query(
+            "SELECT 1 FROM show_genres WHERE tv_show_id = $1 AND genre_id = $2",
+            [showId, genreId]
+          );
+          if (existing.rows.length > 0) {
+            relationNotes.push(
+              `Skipped adding genre "${item.name}" because it already exists.`
+            );
+            continue;
+          }
 
-        // Add extraColumns to WHERE clause for uniqueness check
-        const extraKeys = Object.keys(extraColumns);
-        extraKeys.forEach((key, idx) => {
-          duplicateCheckQuery += ` AND ${key} = $${idx + 3}`;
-          duplicateValues.push(extraColumns[key]);
+          await pool.query(
+            "INSERT INTO show_genres (tv_show_id, genre_id) VALUES ($1, $2)",
+            [showId, genreId]
+          );
+        } else if (item.operation === "remove") {
+          const result = await pool.query(
+            "DELETE FROM show_genres WHERE tv_show_id = $1 AND genre_id = $2",
+            [showId, genreId]
+          );
+          if (result.rowCount === 0) {
+            relationNotes.push(
+              `No genre relation found for "${item.name}" to remove.`
+            );
+          }
+        } else {
+          throw new Error(`Invalid operation for genre: ${item.operation}`);
+        }
+        continue; // skip the generic logic
+      }
+
+      // Generic handling for other tables (actors, studios, networks, creators)
+      const columns = [
+        "tv_show_id",
+        `${fieldName}_id`,
+        ...Object.keys(extraColumns),
+      ];
+      const values = [showId, item.id, ...Object.values(extraColumns)];
+
+      if (item.operation === "add") {
+        // Check for duplicates
+        let duplicateQuery = `SELECT 1 FROM ${table} WHERE tv_show_id = $1 AND ${fieldName}_id = $2`;
+        const duplicateValues = [showId, item.id];
+        Object.entries(extraColumns).forEach(([k, v], i) => {
+          duplicateQuery += ` AND ${k} = $${i + 3}`;
+          duplicateValues.push(v);
         });
 
         const duplicateResult = await pool.query(
-          duplicateCheckQuery,
+          duplicateQuery,
           duplicateValues
         );
-
         if (duplicateResult.rows.length > 0) {
           relationNotes.push(
             `Skipped adding ${fieldName} ID ${item.id} because it already exists.`
           );
-          continue; // Skip insert
+          continue;
         }
 
-        const columns = ["tv_show_id", `${fieldName}_id`, ...extraKeys];
-        const values = [showId, item.id, ...Object.values(extraColumns)];
         const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
-
         await pool.query(
           `INSERT INTO ${table} (${columns.join(
             ","
@@ -1563,18 +1599,16 @@ export const updateShowRelations = async (showId, relations) => {
         );
       } else if (item.operation === "remove") {
         const whereClauses = [`tv_show_id = $1`, `${fieldName}_id = $2`];
-        const values = [showId, item.id];
-
+        const whereValues = [showId, item.id];
         Object.entries(extraColumns).forEach(([k, v], i) => {
           whereClauses.push(`${k} = $${i + 3}`);
-          values.push(v);
+          whereValues.push(v);
         });
 
         const result = await pool.query(
           `DELETE FROM ${table} WHERE ${whereClauses.join(" AND ")}`,
-          values
+          whereValues
         );
-
         if (result.rowCount === 0) {
           relationNotes.push(
             `No ${fieldName} relation found for ID ${item.id} to remove.`
@@ -1588,14 +1622,17 @@ export const updateShowRelations = async (showId, relations) => {
     }
   };
 
-  // Genres (by name)
+  // --- Genres ---
   if (relations.genres) {
     for (const genre of relations.genres) {
       if (!genre.name) {
-        throw new Error(`Missing genre name for operation ${genre.operation}`);
+        relationNotes.push(
+          `Skipped genre with missing name for operation "${genre.operation}".`
+        );
+        continue;
       }
 
-      // Lookup genre id from genres table
+      // Lookup genre_id from genres table
       const result = await pool.query(
         "SELECT id FROM genres WHERE genre_name = $1",
         [genre.name]
@@ -1612,11 +1649,14 @@ export const updateShowRelations = async (showId, relations) => {
     }
   }
 
-  // Actors (id + character_name)
+  // --- Actors ---
   if (relations.actors) {
     for (const actor of relations.actors) {
       if (!actor.character_name) {
-        throw new Error(`Missing character_name for actor ID ${actor.id}`);
+        relationNotes.push(
+          `Skipped actor ID ${actor.id} with missing character_name.`
+        );
+        continue;
       }
       await processRelation("show_actors", "actor", [actor], {
         character_name: actor.character_name,
@@ -1624,20 +1664,21 @@ export const updateShowRelations = async (showId, relations) => {
     }
   }
 
-  // Studios
+  // --- Studios ---
   if (relations.studios) {
     await processRelation("show_studios", "studio", relations.studios);
   }
 
-  // Networks
+  // --- Networks ---
   if (relations.networks) {
     await processRelation("show_networks", "network", relations.networks);
   }
 
-  // Creators
+  // --- Creators ---
   if (relations.creators) {
     await processRelation("show_creators", "creator", relations.creators);
   }
 
   return relationNotes;
 };
+
