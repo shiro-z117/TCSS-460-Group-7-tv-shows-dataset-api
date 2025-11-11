@@ -98,12 +98,14 @@ export const getShows = async (filters = {}) => {
         .map((_, i) => `$${paramIndex + i}`)
         .join(",");
       conditions.push(`tv.id IN (
-          SELECT sn.tv_show_id
-          FROM show_networks sn
-          JOIN networks n ON sn.network_id = n.id
-          WHERE n.network_name IN (${networkPlaceholders})
+      SELECT sn.tv_show_id
+      FROM show_networks sn
+      JOIN networks n ON sn.network_id = n.id
+      WHERE ${networkValues
+        .map((_, i) => `n.network_name ILIKE $${paramIndex + i}`)
+        .join(" OR ")}
       )`);
-      params.push(...networkValues);
+      params.push(...networkValues.map((n) => `%${n}%`));
       paramIndex += networkValues.length;
     }
 
@@ -114,12 +116,14 @@ export const getShows = async (filters = {}) => {
         .map((_, i) => `$${paramIndex + i}`)
         .join(",");
       conditions.push(`tv.id IN (
-          SELECT ss.tv_show_id
-          FROM show_studios ss
-          JOIN studios s ON ss.studio_id = s.id
-          WHERE s.studio_name IN (${studioPlaceholders})
+      SELECT ss.tv_show_id
+      FROM show_studios ss
+      JOIN studios s ON ss.studio_id = s.id
+      WHERE ${studioValues
+        .map((_, i) => `s.studio_name ILIKE $${paramIndex + i}`)
+        .join(" OR ")}
       )`);
-      params.push(...studioValues);
+      params.push(...studioValues.map((s) => `%${s}%`));
       paramIndex += studioValues.length;
     }
 
@@ -130,12 +134,14 @@ export const getShows = async (filters = {}) => {
         .map((_, i) => `$${paramIndex + i}`)
         .join(",");
       conditions.push(`tv.id IN (
-          SELECT sa.tv_show_id
-          FROM show_actors sa
-          JOIN actors a ON sa.actor_id = a.id
-          WHERE a.actor_name IN (${actorPlaceholders})
+      SELECT sa.tv_show_id
+      FROM show_actors sa
+      JOIN actors a ON sa.actor_id = a.id
+      WHERE ${actorValues
+        .map((_, i) => `a.actor_name ILIKE $${paramIndex + i}`)
+        .join(" OR ")}
       )`);
-      params.push(...actorValues);
+      params.push(...actorValues.map((a) => `%${a}%`));
       paramIndex += actorValues.length;
     }
 
