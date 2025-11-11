@@ -5,7 +5,6 @@
 
 const pool = require("./connection");
 
-
 // ===================================================
 // GET SERVICE HEALTH STATUS
 // ===================================================
@@ -34,7 +33,6 @@ export const getHealth = async () => {
   }
 };
 
-
 // ===================================================
 // ADVANCED SHOW BROWSE/SEARCH WITH FILTERS, PAGINATION, AND SORTING
 // ===================================================
@@ -47,10 +45,6 @@ export const getShows = async (filters = {}) => {
       status = "",
       studio = "",
       actor = "",
-      genre_id = "",
-      network_id = "",
-      studio_id = "",
-      actor_id = "",
       match = "all", // 'all' or 'any'
       page = 1,
       limit = 20,
@@ -81,128 +75,68 @@ export const getShows = async (filters = {}) => {
       paramIndex++;
     }
 
-    // Genre filter (name-based or ID-based)
-    if (genre || genre_id) {
-      const genreValues = genre_id
-        ? genre_id.split(",").map((g) => g.trim())
-        : genre.split(",").map((g) => g.trim());
-      const isIdBased = !!genre_id;
-
-      if (isIdBased) {
-        const genrePlaceholders = genreValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sg.tv_show_id FROM show_genres sg
-                    WHERE sg.genre_id IN (${genrePlaceholders})
-                )`);
-        params.push(...genreValues);
-        paramIndex += genreValues.length;
-      } else {
-        const genrePlaceholders = genreValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sg.tv_show_id FROM show_genres sg
-                    JOIN genres g ON sg.genre_id = g.id
-                    WHERE g.genre_name IN (${genrePlaceholders})
-                )`);
-        params.push(...genreValues);
-        paramIndex += genreValues.length;
-      }
+    // Genre filter (name-based only)
+    if (genre) {
+      const genreValues = genre.split(",").map((g) => g.trim());
+      const genrePlaceholders = genreValues
+        .map((_, i) => `$${paramIndex + i}`)
+        .join(",");
+      conditions.push(`tv.id IN (
+          SELECT sg.tv_show_id
+          FROM show_genres sg
+          JOIN genres g ON sg.genre_id = g.id
+          WHERE g.genre_name IN (${genrePlaceholders})
+      )`);
+      params.push(...genreValues);
+      paramIndex += genreValues.length;
     }
 
-    // Network filter (name-based or ID-based)
-    if (network || network_id) {
-      const networkValues = network_id
-        ? network_id.split(",").map((n) => n.trim())
-        : network.split(",").map((n) => n.trim());
-      const isIdBased = !!network_id;
-
-      if (isIdBased) {
-        const networkPlaceholders = networkValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sn.tv_show_id FROM show_networks sn
-                    WHERE sn.network_id IN (${networkPlaceholders})
-                )`);
-        params.push(...networkValues);
-        paramIndex += networkValues.length;
-      } else {
-        const networkPlaceholders = networkValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sn.tv_show_id FROM show_networks sn
-                    JOIN networks n ON sn.network_id = n.id
-                    WHERE n.network_name IN (${networkPlaceholders})
-                )`);
-        params.push(...networkValues);
-        paramIndex += networkValues.length;
-      }
+    // Network filter (name-based only)
+    if (network) {
+      const networkValues = network.split(",").map((n) => n.trim());
+      const networkPlaceholders = networkValues
+        .map((_, i) => `$${paramIndex + i}`)
+        .join(",");
+      conditions.push(`tv.id IN (
+          SELECT sn.tv_show_id
+          FROM show_networks sn
+          JOIN networks n ON sn.network_id = n.id
+          WHERE n.network_name IN (${networkPlaceholders})
+      )`);
+      params.push(...networkValues);
+      paramIndex += networkValues.length;
     }
 
-    // Studio filter (name-based or ID-based)
-    if (studio || studio_id) {
-      const studioValues = studio_id
-        ? studio_id.split(",").map((s) => s.trim())
-        : studio.split(",").map((s) => s.trim());
-      const isIdBased = !!studio_id;
-
-      if (isIdBased) {
-        const studioPlaceholders = studioValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT ss.tv_show_id FROM show_studios ss
-                    WHERE ss.studio_id IN (${studioPlaceholders})
-                )`);
-        params.push(...studioValues);
-        paramIndex += studioValues.length;
-      } else {
-        const studioPlaceholders = studioValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT ss.tv_show_id FROM show_studios ss
-                    JOIN studios s ON ss.studio_id = s.id
-                    WHERE s.studio_name IN (${studioPlaceholders})
-                )`);
-        params.push(...studioValues);
-        paramIndex += studioValues.length;
-      }
+    // Studio filter (name-based only)
+    if (studio) {
+      const studioValues = studio.split(",").map((s) => s.trim());
+      const studioPlaceholders = studioValues
+        .map((_, i) => `$${paramIndex + i}`)
+        .join(",");
+      conditions.push(`tv.id IN (
+          SELECT ss.tv_show_id
+          FROM show_studios ss
+          JOIN studios s ON ss.studio_id = s.id
+          WHERE s.studio_name IN (${studioPlaceholders})
+      )`);
+      params.push(...studioValues);
+      paramIndex += studioValues.length;
     }
 
-    // Actor filter (name-based or ID-based)
-    if (actor || actor_id) {
-      const actorValues = actor_id
-        ? actor_id.split(",").map((a) => a.trim())
-        : actor.split(",").map((a) => a.trim());
-      const isIdBased = !!actor_id;
-
-      if (isIdBased) {
-        const actorPlaceholders = actorValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sa.tv_show_id FROM show_actors sa
-                    WHERE sa.actor_id IN (${actorPlaceholders})
-                )`);
-        params.push(...actorValues);
-        paramIndex += actorValues.length;
-      } else {
-        const actorPlaceholders = actorValues
-          .map((_, i) => `$${paramIndex + i}`)
-          .join(",");
-        conditions.push(`tv.id IN (
-                    SELECT sa.tv_show_id FROM show_actors sa
-                    JOIN actors a ON sa.actor_id = a.id
-                    WHERE a.actor_name IN (${actorPlaceholders})
-                )`);
-        params.push(...actorValues);
-        paramIndex += actorValues.length;
-      }
+    // Actor filter (name-based only)
+    if (actor) {
+      const actorValues = actor.split(",").map((a) => a.trim());
+      const actorPlaceholders = actorValues
+        .map((_, i) => `$${paramIndex + i}`)
+        .join(",");
+      conditions.push(`tv.id IN (
+          SELECT sa.tv_show_id
+          FROM show_actors sa
+          JOIN actors a ON sa.actor_id = a.id
+          WHERE a.actor_name IN (${actorPlaceholders})
+      )`);
+      params.push(...actorValues);
+      paramIndex += actorValues.length;
     }
 
     // Build WHERE clause based on match logic
@@ -262,7 +196,6 @@ export const getShows = async (filters = {}) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // GET SHOW BY ID (RETURNS FULL DETAILS)
@@ -334,7 +267,6 @@ export const getShowById = async (showId) => {
   }
 };
 
-
 // ===================================================
 // GET LIST OF STATUS TYPES
 // ===================================================
@@ -381,7 +313,6 @@ export const getStatuses = async (searchQuery = "", page = 1, limit = 50) => {
   }
 };
 
-
 // ===================================================
 // GET LIST OF GENRES
 // ===================================================
@@ -422,7 +353,6 @@ export const getGenres = async (searchQuery = "", page = 1, limit = 50) => {
   }
 };
 
-
 // ===================================================
 // GET LIST OF NETWORKS
 // ===================================================
@@ -462,7 +392,6 @@ export const getNetworks = async (searchQuery = "", page = 1, limit = 50) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // GET LIST OF STUDIOS
@@ -507,7 +436,6 @@ export const getStudios = async (q = "", page = 1, limit = 50) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // GET LIST OF FIRST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
@@ -554,7 +482,6 @@ export const getYearsFirst = async (min, max, page = 1, limit = 50) => {
   }
 };
 
-
 // ===================================================
 // GET LIST OF LAST AIR YEARS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
@@ -600,7 +527,6 @@ export const getYearsLast = async (min, max, page = 1, limit = 50) => {
   }
 };
 
-
 // ===================================================
 // GET LIST OF EPISODE COUNTS WITH OPTIONAL MIN/MAX FILTERS
 // ===================================================
@@ -645,7 +571,6 @@ export const getEpisodes = async (min, max, page = 1, limit = 50) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // GET SHOW IMAGES
@@ -723,7 +648,6 @@ export const getShowImages = async (showId, type, page = 1, limit = 20) => {
   }
 };
 
-
 // ===================================================
 // GET SHOW CAST MEMBERS
 // ===================================================
@@ -766,7 +690,6 @@ export const getShowCast = async (showId, page = 1, limit = 10) => {
   }
 };
 
-
 // ===================================================
 // DELETE TV SHOW BY ID
 // ===================================================
@@ -795,7 +718,6 @@ export const deleteShow = async (showId) => {
   }
 };
 
-
 // ===================================================
 // DELETE ACTOR BY ID
 // ===================================================
@@ -821,7 +743,6 @@ export const deleteActor = async (actorId) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // DELETE NETWORK BY ID
@@ -849,7 +770,6 @@ export const deleteNetwork = async (networkId) => {
   }
 };
 
-
 // ===================================================
 // DELETE STUDIO BY ID
 // ===================================================
@@ -876,7 +796,6 @@ export const deleteStudio = async (studioId) => {
   }
 };
 
-
 // ===================================================
 // DELETE CREATOR BY ID
 // ===================================================
@@ -902,7 +821,6 @@ export const deleteCreator = async (creatorId) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // CREATE NEW TV SHOW
@@ -931,7 +849,9 @@ export const createShow = async (showData) => {
 
   try {
     // Generate unique ID for new show
-    const { rows: idRows } = await pool.query('SELECT MAX(id) AS max_id FROM tv_shows');
+    const { rows: idRows } = await pool.query(
+      "SELECT MAX(id) AS max_id FROM tv_shows"
+    );
     const id = (idRows[0].max_id || 0) + 1;
 
     // Insert into tv_shows
@@ -943,9 +863,20 @@ export const createShow = async (showData) => {
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
       RETURNING *`,
       [
-        id, name, original_name, first_air_date, last_air_date,
-        seasons, episodes, status, overview, popularity,
-        tmdb_rating, vote_count, poster_url, backdrop_url
+        id,
+        name,
+        original_name,
+        first_air_date,
+        last_air_date,
+        seasons,
+        episodes,
+        status,
+        overview,
+        popularity,
+        tmdb_rating,
+        vote_count,
+        poster_url,
+        backdrop_url,
       ]
     );
 
@@ -955,12 +886,12 @@ export const createShow = async (showData) => {
     const uniqueGenres = [...new Set(genres)];
     for (const genreName of uniqueGenres) {
       const { rows: genreRows } = await pool.query(
-        'SELECT id FROM genres WHERE genre_name = $1',
+        "SELECT id FROM genres WHERE genre_name = $1",
         [genreName]
       );
       if (genreRows.length > 0) {
         await pool.query(
-          'INSERT INTO show_genres (id, tv_show_id, genre_id) VALUES (gen_random_uuid(), $1, $2)',
+          "INSERT INTO show_genres (id, tv_show_id, genre_id) VALUES (gen_random_uuid(), $1, $2)",
           [newShow.id, genreRows[0].id]
         );
       }
@@ -969,24 +900,54 @@ export const createShow = async (showData) => {
     // Helper nested function for junctioned types
     const handleAssociations = async (items, type) => {
       const tableMap = {
-        actor: { table: 'actors', junction: 'show_actors', idField: 'actor_id', nameField: 'actor_name', extraFields: ['profile_url'] },
-        creator: { table: 'creators', junction: 'show_creators', idField: 'creator_id', nameField: 'creator_name', extraFields: [] },
-        network: { table: 'networks', junction: 'show_networks', idField: 'network_id', nameField: 'network_name', extraFields: ['logo_url', 'country'] },
-        studio: { table: 'studios', junction: 'show_studios', idField: 'studio_id', nameField: 'studio_name', extraFields: ['logo_url', 'country'] },
+        actor: {
+          table: "actors",
+          junction: "show_actors",
+          idField: "actor_id",
+          nameField: "actor_name",
+          extraFields: ["profile_url"],
+        },
+        creator: {
+          table: "creators",
+          junction: "show_creators",
+          idField: "creator_id",
+          nameField: "creator_name",
+          extraFields: [],
+        },
+        network: {
+          table: "networks",
+          junction: "show_networks",
+          idField: "network_id",
+          nameField: "network_name",
+          extraFields: ["logo_url", "country"],
+        },
+        studio: {
+          table: "studios",
+          junction: "show_studios",
+          idField: "studio_id",
+          nameField: "studio_name",
+          extraFields: ["logo_url", "country"],
+        },
       };
-      const { table, junction, idField, nameField, extraFields } = tableMap[type];
+      const { table, junction, idField, nameField, extraFields } =
+        tableMap[type];
 
       // IDs-only mode
       const invalidIds = [];
-      const idsOnly = items.every(i => 'id' in i && Object.keys(i).length === 1);
+      const idsOnly = items.every(
+        (i) => "id" in i && Object.keys(i).length === 1
+      );
       if (idsOnly) {
         for (const item of items) {
-          const { rows } = await pool.query(`SELECT id FROM ${table} WHERE id = $1`, [item.id]);
+          const { rows } = await pool.query(
+            `SELECT id FROM ${table} WHERE id = $1`,
+            [item.id]
+          );
           if (rows.length === 0) {
             invalidIds.push(item.id);
           } else {
             // === HANDLE CHARACTER_NAME FOR ACTORS (ID-ONLY MODE) ===
-            if (type === 'actor') {
+            if (type === "actor") {
               await pool.query(
                 `INSERT INTO ${junction} (id, tv_show_id, ${idField}, character_name)
                  VALUES (gen_random_uuid(), $1, $2, $3)`,
@@ -1001,7 +962,8 @@ export const createShow = async (showData) => {
             }
           }
         }
-        if (invalidIds.length) throw new Error(`Invalid IDs for ${type}: ${invalidIds.join(', ')}`);
+        if (invalidIds.length)
+          throw new Error(`Invalid IDs for ${type}: ${invalidIds.join(", ")}`);
         return;
       }
 
@@ -1010,28 +972,47 @@ export const createShow = async (showData) => {
         const trimmedName = item[nameField]?.trim();
         if (!trimmedName) continue; // skip invalid
         // Check if exists
-        const { rows: existingRows } = await pool.query(`SELECT * FROM ${table} WHERE ${nameField} = $1`, [trimmedName]);
+        const { rows: existingRows } = await pool.query(
+          `SELECT * FROM ${table} WHERE ${nameField} = $1`,
+          [trimmedName]
+        );
         let rowId;
         if (existingRows.length > 0) {
           rowId = existingRows[0].id;
         } else {
           // Validate country for networks/studios
-          if ((type === 'network' || type === 'studio') && item.country) {
-            const { rows: countryRows } = await pool.query('SELECT country_code FROM countries');
-            const validCountries = countryRows.map(r => r.country_code);
+          if ((type === "network" || type === "studio") && item.country) {
+            const { rows: countryRows } = await pool.query(
+              "SELECT country_code FROM countries"
+            );
+            const validCountries = countryRows.map((r) => r.country_code);
             if (!validCountries.includes(item.country)) {
-              throw new Error(`Invalid country for ${type}: ${item.country}. Valid values: ${validCountries.join(', ')}`);
+              throw new Error(
+                `Invalid country for ${type}: ${
+                  item.country
+                }. Valid values: ${validCountries.join(", ")}`
+              );
             }
           }
           // Create new row
           const fieldList = [nameField, ...extraFields];
-          const valueList = [trimmedName, ...extraFields.map(f => item[f] || null)];
-          const placeholders = fieldList.map((_, idx) => `$${idx + 1}`).join(',');
-          const insertQuery = `INSERT INTO ${table} (${fieldList.join(',')}) VALUES (${placeholders}) RETURNING id`;
-          const { rows: insertedRows } = await pool.query(insertQuery, valueList);
+          const valueList = [
+            trimmedName,
+            ...extraFields.map((f) => item[f] || null),
+          ];
+          const placeholders = fieldList
+            .map((_, idx) => `$${idx + 1}`)
+            .join(",");
+          const insertQuery = `INSERT INTO ${table} (${fieldList.join(
+            ","
+          )}) VALUES (${placeholders}) RETURNING id`;
+          const { rows: insertedRows } = await pool.query(
+            insertQuery,
+            valueList
+          );
           rowId = insertedRows[0].id;
         }
-        if (type === 'actor') {
+        if (type === "actor") {
           await pool.query(
             `INSERT INTO ${junction} (id, tv_show_id, ${idField}, character_name)
              VALUES (gen_random_uuid(), $1, $2, $3)`,
@@ -1049,19 +1030,17 @@ export const createShow = async (showData) => {
 
     // Process optional arrays
     if (actors.length > 10) throw new Error("Maximum of 10 actors allowed");
-    await handleAssociations(actors, 'actor');
-    await handleAssociations(creators, 'creator');
-    await handleAssociations(networks, 'network');
-    await handleAssociations(studios, 'studio');
+    await handleAssociations(actors, "actor");
+    await handleAssociations(creators, "creator");
+    await handleAssociations(networks, "network");
+    await handleAssociations(studios, "studio");
 
     return getShowById(newShow.id);
-
   } catch (error) {
     console.error("Database error in createShow:", error);
     throw error;
   }
 };
-
 
 // ===================================================
 // CREATE ACTOR
@@ -1086,11 +1065,14 @@ export const createActor = async (actor_name, profile_url = null) => {
   }
 };
 
-
 // ===================================================
 // CREATE NETWORK
 // ===================================================
-export const createNetwork = async (network_name, logo_url = null, country = null) => {
+export const createNetwork = async (
+  network_name,
+  logo_url = null,
+  country = null
+) => {
   try {
     if (!network_name) {
       throw new Error("MISSING_NETWORK_NAME");
@@ -1110,11 +1092,14 @@ export const createNetwork = async (network_name, logo_url = null, country = nul
   }
 };
 
-
 // ===================================================
 // CREATE STUDIO
 // ===================================================
-export const createStudio = async (studio_name, logo_url = null, country = null) => {
+export const createStudio = async (
+  studio_name,
+  logo_url = null,
+  country = null
+) => {
   try {
     if (!studio_name) {
       throw new Error("MISSING_STUDIO_NAME");
@@ -1133,7 +1118,6 @@ export const createStudio = async (studio_name, logo_url = null, country = null)
     throw error;
   }
 };
-
 
 // ===================================================
 // CREATE CREATOR
@@ -1157,7 +1141,6 @@ export const createCreator = async (creator_name) => {
     throw error;
   }
 };
-
 
 // ===================================================
 // UPDATE ACTOR
@@ -1195,10 +1178,9 @@ export const updateActor = async (actorId, actor_name, profile_url) => {
 
     if (fields.length === 0) {
       // nothing to update, return current record
-      const { rows } = await pool.query(
-        "SELECT * FROM actors WHERE id = $1",
-        [actorId]
-      );
+      const { rows } = await pool.query("SELECT * FROM actors WHERE id = $1", [
+        actorId,
+      ]);
       return rows[0];
     }
 
@@ -1219,11 +1201,15 @@ export const updateActor = async (actorId, actor_name, profile_url) => {
   }
 };
 
-
 // ===================================================
 // UPDATE NETWORK
 // ===================================================
-export const updateNetwork = async (networkId, network_name, logo_url, country) => {
+export const updateNetwork = async (
+  networkId,
+  network_name,
+  logo_url,
+  country
+) => {
   try {
     if (!networkId) {
       throw new Error("MISSING_NETWORK_ID");
@@ -1282,11 +1268,15 @@ export const updateNetwork = async (networkId, network_name, logo_url, country) 
   }
 };
 
-
 // ===================================================
 // UPDATE STUDIO
 // ===================================================
-export const updateStudio = async (studioId, studio_name, logo_url, country) => {
+export const updateStudio = async (
+  studioId,
+  studio_name,
+  logo_url,
+  country
+) => {
   try {
     if (!studioId) {
       throw new Error("MISSING_STUDIO_ID");
@@ -1321,10 +1311,9 @@ export const updateStudio = async (studioId, studio_name, logo_url, country) => 
     }
 
     if (fields.length === 0) {
-      const { rows } = await pool.query(
-        "SELECT * FROM studios WHERE id = $1",
-        [studioId]
-      );
+      const { rows } = await pool.query("SELECT * FROM studios WHERE id = $1", [
+        studioId,
+      ]);
       return rows[0];
     }
 
@@ -1344,7 +1333,6 @@ export const updateStudio = async (studioId, studio_name, logo_url, country) => 
     throw error;
   }
 };
-
 
 // ===================================================
 // UPDATE CREATOR
@@ -1372,17 +1360,15 @@ export const updateCreator = async (creatorId, creator_name) => {
       return result.rows[0];
     }
 
-    const { rows } = await pool.query(
-      "SELECT * FROM creators WHERE id = $1",
-      [creatorId]
-    );
+    const { rows } = await pool.query("SELECT * FROM creators WHERE id = $1", [
+      creatorId,
+    ]);
     return rows[0];
   } catch (error) {
     console.error("Database error in updateCreator:", error);
     throw error;
   }
 };
-
 
 // ===================================================
 // UPDATE TV SHOW
