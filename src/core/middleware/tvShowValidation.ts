@@ -865,6 +865,25 @@ export const validateUpdateCreator = [
 
 // Validation for updating a show (PATCH - all fields optional)
 export const validateUpdateShow = [
+    param("id")
+        .notEmpty()
+        .withMessage("Show ID is required")
+        .bail()
+        .isInt({ min: 1 })
+        .withMessage("Show ID must be a positive integer")
+        .bail()
+        .custom(async (id: string) => {
+            const showId = parseInt(id, 10);
+            const result = await pool.query(
+                "SELECT id FROM tv_shows WHERE id = $1",
+                [showId]
+            );
+            if (result.rows.length === 0) {
+                throw new Error(`Show with ID ${showId} does not exist`);
+            }
+            return true;
+        }),
+
     body("name")
         .optional()
         .isString()

@@ -564,7 +564,7 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
         const showId = parseInt(req.params.id);
 
         // Build update object for scalar fields
-        const updateData: any = {};
+        const updateData: Record<string, any> = {};
         if (req.body.name !== undefined) updateData.name = req.body.name;
         if (req.body.original_name !== undefined) updateData.original_name = req.body.original_name;
         if (req.body.first_air_date !== undefined) updateData.first_air_date = req.body.first_air_date;
@@ -579,10 +579,7 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
         if (req.body.poster_url !== undefined) updateData.poster_url = req.body.poster_url;
         if (req.body.backdrop_url !== undefined) updateData.backdrop_url = req.body.backdrop_url;
 
-        // Update scalar fields first
-        const updatedShow = await db.updateShow(showId, updateData);
-
-        // Handle junctioned relations
+        // Collect junctioned relations
         const relations = {
             genres: req.body.genres,
             actors: req.body.actors,
@@ -591,9 +588,26 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
             creators: req.body.creators,
         };
 
-        // Only call updateShowRelations if at least one junctioned field is provided
+        // If there is literally nothing to update (no scalars, no relations), throw error
+        const hasScalars = Object.keys(updateData).length > 0;
+        const hasRelations = Object.values(relations).some((field) => field !== undefined && field.length > 0);
+
+        if (!hasScalars && !hasRelations) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one field or relation must be provided to update",
+            });
+        }
+
+        // Update scalar fields if present
+        let updatedShow;
+        if (hasScalars) {
+            updatedShow = await db.updateShow(showId, updateData);
+        }
+
+        // Update junctioned relations if present
         let relationNotes: string[] = [];
-        if (Object.values(relations).some((field) => field !== undefined)) {
+        if (hasRelations) {
             relationNotes = await db.updateShowRelations(showId, relations);
         }
 
@@ -601,16 +615,9 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
             success: true,
             data: updatedShow,
             message: "Show updated successfully",
-            notes: relationNotes.length > 0 ? relationNotes : undefined, // optional notes about missing remove operations
+            notes: relationNotes.length > 0 ? relationNotes : undefined,
         });
     } catch (err: any) {
-        if (err.message === "NO_FIELDS_TO_UPDATE") {
-            res.status(400).json({
-                success: false,
-                message: "At least one field must be provided to update",
-            });
-            return;
-        }
         next(err);
     }
 }
