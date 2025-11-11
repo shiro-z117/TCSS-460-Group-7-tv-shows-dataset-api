@@ -1510,3 +1510,112 @@ export const updateShow = async (showId, updateData) => {
     throw error;
   }
 };
+
+// used in conjunction with updateShow
+export const updateShowRelations = async (showId, relations) => {
+  const relationNotes = [];
+
+  // Helper to process add/remove for a junction table
+  const processRelation = async (
+    table,
+    fieldName,
+    items,
+    extraColumns = {}
+  ) => {
+    for (const item of items) {
+      if (!item.operation) {
+        throw new Error(`Missing operation for ${fieldName}`);
+      }
+
+      if (item.operation === "add") {
+        const columns = [
+          "tv_show_id",
+          `${fieldName}_id`,
+          ...Object.keys(extraColumns),
+        ];
+        const values = [showId, item.id, ...Object.values(extraColumns)];
+        const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
+        await pool.query(
+          `INSERT INTO ${table} (${columns.join(
+            ","
+          )}) VALUES (${placeholders})`,
+          values
+        );
+      } else if (item.operation === "remove") {
+        const whereClauses = [`tv_show_id = $1`, `${fieldName}_id = $2`];
+        const values = [showId, item.id];
+        Object.entries(extraColumns).forEach(([k, v], i) => {
+          whereClauses.push(`${k} = $${i + 3}`);
+          values.push(v);
+        });
+        const result = await pool.query(
+          `DELETE FROM ${table} WHERE ${whereClauses.join(" AND ")}`,
+          values
+        );
+        if (result.rowCount === 0) {
+          relationNotes.push(
+            `No ${fieldName} relation found for ID ${item.id} to remove.`
+          );
+        }
+      } else {
+        throw new Error(
+          `Invalid operation for ${fieldName}: ${item.operation}`
+        );
+      }
+    }
+  };
+
+  // Genres (by name, not id)
+  if (relations.genres) {
+    for (const genre of relations.genres) {
+      if (!genre.name) {
+        throw new Error(`Missing genre name for operation ${genre.operation}`);
+      }
+
+      // Lookup genre id from genres table
+      const result = await pool.query(
+        "SELECT id FROM genres WHERE genre_name = $1",
+        [genre.name]
+      );
+      if (result.rows.length === 0) {
+        throw new Error(`Genre name "${genre.name}" does not exist`);
+      }
+      const genreId = result.rows[0].id;
+
+      // Pass as extraColumns to processRelation
+      await processRelation("show_genres", "genre", [genre], {
+        genre_id: genreId,
+      });
+    }
+  }
+
+  // Actors (id + character_name)
+  if (relations.actors) {
+    for (const actor of relations.actors) {
+      if (!actor.character_name) {
+        throw new Error(`Missing character_name for actor ID ${actor.id}`);
+      }
+      await processRelation("show_actors", "actor", [actor], {
+        character_name: actor.character_name,
+      });
+    }
+  }
+
+  // Studios
+  if (relations.studios) {
+    await processRelation("show_studios", "studio", relations.studios);
+  }
+
+  // Networks
+  if (relations.networks) {
+    await processRelation("show_networks", "network", relations.networks);
+  }
+
+  // Creators
+  if (relations.creators) {
+    await processRelation("show_creators", "creator", relations.creators);
+  }
+
+  return relationNotes;
+};
+

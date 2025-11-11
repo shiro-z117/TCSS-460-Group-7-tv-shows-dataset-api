@@ -1,9 +1,8 @@
 // core/middleware/tvShowValidation.ts
-import { param, body, validationResult } from 'express-validator';
-import { Request, Response, NextFunction } from 'express';
+import { param, body, validationResult } from "express-validator";
+import { Request, Response, NextFunction } from "express";
 import { sendValidationError } from "../utilities/responseUtils";
-import pool from '../../db/connection.js';
-
+import pool from "../../db/connection.js";
 
 export const validateDeleteShow = [
     param("id")
@@ -13,7 +12,10 @@ export const validateDeleteShow = [
         .withMessage("Show ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM tv_shows WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM tv_shows WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) {
                 throw new Error("Show not found");
             }
@@ -22,14 +24,17 @@ export const validateDeleteShow = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Show not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Show not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateDeleteActor = [
     param("id")
@@ -39,7 +44,9 @@ export const validateDeleteActor = [
         .withMessage("Actor ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [id]);
+            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [
+                id,
+            ]);
             if (rows.length === 0) {
                 throw new Error("Actor not found");
             }
@@ -48,14 +55,17 @@ export const validateDeleteActor = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Actor not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Actor not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateDeleteNetwork = [
     param("id")
@@ -65,7 +75,10 @@ export const validateDeleteNetwork = [
         .withMessage("Network ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM networks WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM networks WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) {
                 throw new Error("Network not found");
             }
@@ -74,14 +87,17 @@ export const validateDeleteNetwork = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Network not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Network not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateDeleteStudio = [
     param("id")
@@ -91,7 +107,10 @@ export const validateDeleteStudio = [
         .withMessage("Studio ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM studios WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM studios WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) {
                 throw new Error("Studio not found");
             }
@@ -100,14 +119,17 @@ export const validateDeleteStudio = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Studio not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Studio not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateDeleteCreator = [
     param("id")
@@ -117,7 +139,10 @@ export const validateDeleteCreator = [
         .withMessage("Creator ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM creators WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM creators WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) {
                 throw new Error("Creator not found");
             }
@@ -126,14 +151,17 @@ export const validateDeleteCreator = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Creator not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Creator not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateCreateShow = [
     body("name")
@@ -224,7 +252,9 @@ export const validateCreateShow = [
     body("genres")
         .isArray({ min: 1 })
         .withMessage("Genres must be an array with at least one value")
-        .customSanitizer((genresArray: string[]) => genresArray.map(genre => genre.trim()))
+        .customSanitizer((genresArray: string[]) =>
+            genresArray.map((genre) => genre.trim())
+        )
         .custom(async (genresArray) => {
             const { rows } = await pool.query("SELECT genre_name FROM genres");
             const validGenres = rows.map((r) => r.genre_name);
@@ -232,7 +262,9 @@ export const validateCreateShow = [
             const seenGenres = new Set<string>();
             for (const genre of genresArray) {
                 if (!validGenres.includes(genre)) {
-                    throw new Error(`Invalid genre: ${genre}. Valid values: ${validGenres.join(", ")}`);
+                    throw new Error(
+                        `Invalid genre: ${genre}. Valid values: ${validGenres.join(", ")}`
+                    );
                 }
                 if (seenGenres.has(genre)) {
                     throw new Error(`Duplicate genre detected: ${genre}`);
@@ -246,17 +278,21 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray({ max: 10 })
         .withMessage("Actors must be an array with maximum 10 items")
-        .customSanitizer((actorsArray: Array<{
-            id?: number;
-            actor_name?: string;
-            character_name?: string;
-        }>) => {
-            return actorsArray.map(actor => ({
-                ...actor,
-                actor_name: actor.actor_name?.trim(),
-                character_name: actor.character_name?.trim(),
-            }));
-        })
+        .customSanitizer(
+            (
+                actorsArray: Array<{
+                    id?: number;
+                    actor_name?: string;
+                    character_name?: string;
+                }>
+            ) => {
+                return actorsArray.map((actor) => ({
+                    ...actor,
+                    actor_name: actor.actor_name?.trim(),
+                    character_name: actor.character_name?.trim(),
+                }));
+            }
+        )
         .custom(async (actorsArray) => {
             for (const actor of actorsArray) {
                 if (!actor.id && !actor.actor_name) {
@@ -271,8 +307,14 @@ export const validateCreateShow = [
                 if (actor.profile_url && typeof actor.profile_url !== "string") {
                     throw new Error("Actor profile_url must be a string");
                 }
-                if (!actor.character_name || typeof actor.character_name !== "string" || !actor.character_name.trim()) {
-                    throw new Error("Each actor must include a valid 'character_name' (non-empty string)");
+                if (
+                    !actor.character_name ||
+                    typeof actor.character_name !== "string" ||
+                    !actor.character_name.trim()
+                ) {
+                    throw new Error(
+                        "Each actor must include a valid 'character_name' (non-empty string)"
+                    );
                 }
             }
             return true;
@@ -282,15 +324,19 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Creators must be an array")
-        .customSanitizer((creatorsArray: Array<{
-            id?: number;
-            creator_name?: string;
-        }>) => {
-            return creatorsArray.map(creator => ({
-                ...creator,
-                creator_name: creator.creator_name?.trim(),
-            }));
-        })
+        .customSanitizer(
+            (
+                creatorsArray: Array<{
+                    id?: number;
+                    creator_name?: string;
+                }>
+            ) => {
+                return creatorsArray.map((creator) => ({
+                    ...creator,
+                    creator_name: creator.creator_name?.trim(),
+                }));
+            }
+        )
         .custom((creatorsArray) => {
             for (const creator of creatorsArray) {
                 if (!creator.id && !creator.creator_name) {
@@ -310,22 +356,28 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Networks must be an array")
-        .customSanitizer((networksArray: Array<{
-            id?: number;
-            network_name?: string;
-            logo_url?: string;
-            country?: string;
-        }>) => {
-            return networksArray.map(network => ({
-                ...network,
-                network_name: network.network_name?.trim(),
-                logo_url: network.logo_url?.trim(),
-                country: network.country?.trim(),
-            }));
-        })
+        .customSanitizer(
+            (
+                networksArray: Array<{
+                    id?: number;
+                    network_name?: string;
+                    logo_url?: string;
+                    country?: string;
+                }>
+            ) => {
+                return networksArray.map((network) => ({
+                    ...network,
+                    network_name: network.network_name?.trim(),
+                    logo_url: network.logo_url?.trim(),
+                    country: network.country?.trim(),
+                }));
+            }
+        )
         .custom(async (networksArray) => {
-            const { rows: countryRows } = await pool.query("SELECT country_code FROM countries");
-            const validCountries = countryRows.map(r => r.country_code);
+            const { rows: countryRows } = await pool.query(
+                "SELECT country_code FROM countries"
+            );
+            const validCountries = countryRows.map((r) => r.country_code);
 
             for (const network of networksArray) {
                 if (!network.id && !network.network_name) {
@@ -345,7 +397,10 @@ export const validateCreateShow = [
                         throw new Error("Network country must be a string");
                     }
                     if (!validCountries.includes(network.country)) {
-                        throw new Error(`Invalid network country: "${network.country}". Valid values: ${validCountries.join(", ")}`);
+                        throw new Error(
+                            `Invalid network country: "${network.country
+                            }". Valid values: ${validCountries.join(", ")}`
+                        );
                     }
                 }
             }
@@ -356,22 +411,28 @@ export const validateCreateShow = [
         .optional({ nullable: true })
         .isArray()
         .withMessage("Studios must be an array")
-        .customSanitizer((studiosArray: Array<{
-            id?: number;
-            studio_name?: string;
-            logo_url?: string;
-            country?: string;
-        }>) => {
-            return studiosArray.map(studio => ({
-                ...studio,
-                studio_name: studio.studio_name?.trim(),
-                logo_url: studio.logo_url?.trim(),
-                country: studio.country?.trim(),
-            }));
-        })
+        .customSanitizer(
+            (
+                studiosArray: Array<{
+                    id?: number;
+                    studio_name?: string;
+                    logo_url?: string;
+                    country?: string;
+                }>
+            ) => {
+                return studiosArray.map((studio) => ({
+                    ...studio,
+                    studio_name: studio.studio_name?.trim(),
+                    logo_url: studio.logo_url?.trim(),
+                    country: studio.country?.trim(),
+                }));
+            }
+        )
         .custom(async (studiosArray) => {
-            const { rows: countryRows } = await pool.query("SELECT country_code FROM countries");
-            const validCountries = countryRows.map(r => r.country_code);
+            const { rows: countryRows } = await pool.query(
+                "SELECT country_code FROM countries"
+            );
+            const validCountries = countryRows.map((r) => r.country_code);
 
             for (const studio of studiosArray) {
                 if (!studio.id && !studio.studio_name) {
@@ -387,7 +448,10 @@ export const validateCreateShow = [
                     throw new Error("Studio logo_url must be a string");
                 }
                 if (studio.country && !validCountries.includes(studio.country)) {
-                    throw new Error(`Invalid studio country: ${studio.country}. Valid values: ${validCountries.join(", ")}`);
+                    throw new Error(
+                        `Invalid studio country: ${studio.country
+                        }. Valid values: ${validCountries.join(", ")}`
+                    );
                 }
             }
             return true;
@@ -422,9 +486,8 @@ export const validateCreateShow = [
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateCreateActor = [
     body("actor_name")
@@ -439,7 +502,9 @@ export const validateCreateActor = [
                 [actor_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Actor with name "${actor_name}" already exists (id: ${rows[0].id})`);
+                throw new Error(
+                    `Actor with name "${actor_name}" already exists (id: ${rows[0].id})`
+                );
             }
             return true;
         }),
@@ -456,9 +521,8 @@ export const validateCreateActor = [
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateCreateNetwork = [
     body("network_name")
@@ -473,7 +537,9 @@ export const validateCreateNetwork = [
                 [network_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Network with name "${network_name}" already exists (id: ${rows[0].id})`);
+                throw new Error(
+                    `Network with name "${network_name}" already exists (id: ${rows[0].id})`
+                );
             }
             return true;
         }),
@@ -490,9 +556,13 @@ export const validateCreateNetwork = [
         .custom(async (country) => {
             if (country) {
                 const { rows } = await pool.query("SELECT country_code FROM countries");
-                const validCountries = rows.map(r => r.country_code);
+                const validCountries = rows.map((r) => r.country_code);
                 if (!validCountries.includes(country)) {
-                    throw new Error(`Invalid country: "${country}". Valid values: ${validCountries.join(", ")}`);
+                    throw new Error(
+                        `Invalid country: "${country}". Valid values: ${validCountries.join(
+                            ", "
+                        )}`
+                    );
                 }
             }
             return true;
@@ -503,9 +573,8 @@ export const validateCreateNetwork = [
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateCreateStudio = [
     body("studio_name")
@@ -520,7 +589,9 @@ export const validateCreateStudio = [
                 [studio_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Studio with name "${studio_name}" already exists (id: ${rows[0].id})`);
+                throw new Error(
+                    `Studio with name "${studio_name}" already exists (id: ${rows[0].id})`
+                );
             }
             return true;
         }),
@@ -537,9 +608,13 @@ export const validateCreateStudio = [
         .custom(async (country) => {
             if (country) {
                 const { rows } = await pool.query("SELECT country_code FROM countries");
-                const validCountries = rows.map(r => r.country_code);
+                const validCountries = rows.map((r) => r.country_code);
                 if (!validCountries.includes(country)) {
-                    throw new Error(`Invalid country: "${country}". Valid values: ${validCountries.join(", ")}`);
+                    throw new Error(
+                        `Invalid country: "${country}". Valid values: ${validCountries.join(
+                            ", "
+                        )}`
+                    );
                 }
             }
             return true;
@@ -550,9 +625,8 @@ export const validateCreateStudio = [
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateCreateCreator = [
     body("creator_name")
@@ -567,7 +641,9 @@ export const validateCreateCreator = [
                 [creator_name]
             );
             if (rows.length > 0) {
-                throw new Error(`Creator with name "${creator_name}" already exists (id: ${rows[0].id})`);
+                throw new Error(
+                    `Creator with name "${creator_name}" already exists (id: ${rows[0].id})`
+                );
             }
             return true;
         }),
@@ -577,9 +653,8 @@ export const validateCreateCreator = [
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateUpdateActor = [
     // Validate ID from URL param
@@ -590,7 +665,9 @@ export const validateUpdateActor = [
         .withMessage("Actor ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [id]);
+            const { rows } = await pool.query("SELECT id FROM actors WHERE id = $1", [
+                id,
+            ]);
             if (rows.length === 0) {
                 throw new Error("Actor not found");
             }
@@ -617,14 +694,17 @@ export const validateUpdateActor = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg === "Actor not found");
+            const notFound = errors
+                .array()
+                .some((err) => err.msg === "Actor not found");
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateUpdateNetwork = [
     param("id")
@@ -634,7 +714,10 @@ export const validateUpdateNetwork = [
         .withMessage("Network ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM networks WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM networks WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) throw new Error("Network not found");
             return true;
         }),
@@ -661,22 +744,26 @@ export const validateUpdateNetwork = [
         .custom(async (country) => {
             if (!country) return true;
             const { rows } = await pool.query("SELECT country_code FROM countries");
-            const validCountries = rows.map(r => r.country_code);
-            if (!validCountries.includes(country)) throw new Error(`Invalid country code: ${country}`);
+            const validCountries = rows.map((r) => r.country_code);
+            if (!validCountries.includes(country))
+                throw new Error(`Invalid country code: ${country}`);
             return true;
         }),
 
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const notFound = errors
+                .array()
+                .some((err) => err.msg.includes("not found"));
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateUpdateStudio = [
     param("id")
@@ -686,7 +773,10 @@ export const validateUpdateStudio = [
         .withMessage("Studio ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM studios WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM studios WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) throw new Error("Studio not found");
             return true;
         }),
@@ -713,22 +803,26 @@ export const validateUpdateStudio = [
         .custom(async (country) => {
             if (!country) return true;
             const { rows } = await pool.query("SELECT country_code FROM countries");
-            const validCountries = rows.map(r => r.country_code);
-            if (!validCountries.includes(country)) throw new Error(`Invalid country code: ${country}`);
+            const validCountries = rows.map((r) => r.country_code);
+            if (!validCountries.includes(country))
+                throw new Error(`Invalid country code: ${country}`);
             return true;
         }),
 
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const notFound = errors
+                .array()
+                .some((err) => err.msg.includes("not found"));
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
 
 export const validateUpdateCreator = [
     param("id")
@@ -738,7 +832,10 @@ export const validateUpdateCreator = [
         .withMessage("Creator ID must be a positive integer")
         .toInt()
         .custom(async (id) => {
-            const { rows } = await pool.query("SELECT id FROM creators WHERE id = $1", [id]);
+            const { rows } = await pool.query(
+                "SELECT id FROM creators WHERE id = $1",
+                [id]
+            );
             if (rows.length === 0) throw new Error("Creator not found");
             return true;
         }),
@@ -754,96 +851,172 @@ export const validateUpdateCreator = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const notFound = errors.array().some(err => err.msg.includes("not found"));
+            const notFound = errors
+                .array()
+                .some((err) => err.msg.includes("not found"));
             const status = notFound ? 404 : 400;
-            return res.status(status).json({ success: false, errors: errors.array() });
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
         }
         next();
-    }
+    },
 ];
-
-
-// helper function to send error messages
-export const validate = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) return next();
-    // Don’t inspect; just forward
-    return sendValidationError(res, "An error has occurred (see details below) ", errors.array());
-};
-
 
 // Validation for updating a show (PATCH - all fields optional)
 export const validateUpdateShow = [
-    body('name')
+    body("name")
         .optional()
         .isString()
-        .withMessage('Name must be a string')
+        .withMessage("Name must be a string")
         .trim(),
 
-    body('original_name')
+    body("original_name")
         .optional()
         .isString()
-        .withMessage('Original name must be a string')
+        .withMessage("Original name must be a string")
         .trim(),
 
-    body('first_air_date')
+    body("first_air_date")
         .optional()
         .isISO8601()
-        .withMessage('First air date must be a valid date (ISO 8601)'),
+        .withMessage("First air date must be a valid date (ISO 8601)"),
 
-    body('last_air_date')
+    body("last_air_date")
         .optional()
         .isISO8601()
-        .withMessage('Last air date must be a valid date (ISO 8601)'),
+        .withMessage("Last air date must be a valid date (ISO 8601)"),
 
-    body('seasons')
+    body("seasons")
         .optional()
         .isInt({ min: 0 })
-        .withMessage('Seasons must be a non-negative integer'),
+        .withMessage("Seasons must be a non-negative integer"),
 
-    body('episodes')
+    body("episodes")
         .optional()
         .isInt({ min: 0 })
-        .withMessage('Episodes must be a non-negative integer'),
+        .withMessage("Episodes must be a non-negative integer"),
 
-    body('status')
+    body("status")
         .optional()
         .isString()
-        .withMessage('Status must be a string')
+        .withMessage("Status must be a string")
         .trim(),
 
-    body('overview')
+    body("overview")
         .optional()
         .isString()
-        .withMessage('Overview must be a string')
+        .withMessage("Overview must be a string")
         .trim(),
 
-    body('popularity')
+    body("popularity")
         .optional()
         .isFloat({ min: 0 })
-        .withMessage('Popularity must be a non-negative number'),
+        .withMessage("Popularity must be a non-negative number"),
 
-    body('tmdb_rating')
+    body("tmdb_rating")
         .optional()
         .isFloat({ min: 0, max: 10 })
-        .withMessage('TMDB rating must be between 0 and 10'),
+        .withMessage("TMDB rating must be between 0 and 10"),
 
-    body('vote_count')
+    body("vote_count")
         .optional()
         .isInt({ min: 0 })
-        .withMessage('Vote count must be a non-negative integer'),
+        .withMessage("Vote count must be a non-negative integer"),
 
-    body('poster_url')
+    body("poster_url")
         .optional()
         .isString()
-        .withMessage('Poster URL must be a string')
+        .withMessage("Poster URL must be a string")
         .trim(),
 
-    body('backdrop_url')
+    body("backdrop_url")
         .optional()
         .isString()
-        .withMessage('Backdrop URL must be a string')
+        .withMessage("Backdrop URL must be a string")
         .trim(),
 
-    validate
+    // Junctioned fields
+    body("genres").optional().isArray().withMessage("Genres must be an array"),
+    body("genres.*.name")
+        .if(body("genres").exists())
+        .notEmpty()
+        .withMessage("Each genre must have a name"),
+    body("genres.*.operation")
+        .if(body("genres").exists())
+        .isIn(["add", "remove"])
+        .withMessage("Each genre must have a valid operation: add or remove"),
+
+    body("actors").optional().isArray().withMessage("Actors must be an array"),
+    body("actors.*.id")
+        .if(body("actors").exists())
+        .isInt({ min: 1 })
+        .withMessage("Each actor must have a valid id"),
+    body("actors.*.character_name")
+        .if(body("actors").exists())
+        .notEmpty()
+        .withMessage("Each actor must have a character_name"),
+    body("actors.*.operation")
+        .if(body("actors").exists())
+        .isIn(["add", "remove"])
+        .withMessage("Each actor must have a valid operation: add or remove"),
+    body("actors")
+        .if(body("actors").exists())
+        .custom((actors) => {
+            const addCount = actors.filter((a: any) => a.operation === "add").length;
+            if (addCount > 10)
+                throw new Error("Cannot add more than 10 actors at once");
+            return true;
+        }),
+
+    body("studios").optional().isArray().withMessage("Studios must be an array"),
+    body("studios.*.id")
+        .if(body("studios").exists())
+        .isInt({ min: 1 })
+        .withMessage("Each studio must have a valid id"),
+    body("studios.*.operation")
+        .if(body("studios").exists())
+        .isIn(["add", "remove"])
+        .withMessage("Each studio must have a valid operation: add or remove"),
+
+    body("networks")
+        .optional()
+        .isArray()
+        .withMessage("Networks must be an array"),
+    body("networks.*.id")
+        .if(body("networks").exists())
+        .isInt({ min: 1 })
+        .withMessage("Each network must have a valid id"),
+    body("networks.*.operation")
+        .if(body("networks").exists())
+        .isIn(["add", "remove"])
+        .withMessage("Each network must have a valid operation: add or remove"),
+
+    body("creators")
+        .optional()
+        .isArray()
+        .withMessage("Creators must be an array"),
+    body("creators.*.id")
+        .if(body("creators").exists())
+        .isInt({ min: 1 })
+        .withMessage("Each creator must have a valid id"),
+    body("creators.*.operation")
+        .if(body("creators").exists())
+        .isIn(["add", "remove"])
+        .withMessage("Each creator must have a valid operation: add or remove"),
+
+    // Single inline validation handler to replace `validate`
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const notFound = errors
+                .array()
+                .some((err) => err.msg.includes("not found"));
+            const status = notFound ? 404 : 400;
+            return res
+                .status(status)
+                .json({ success: false, errors: errors.array() });
+        }
+        next();
+    },
 ];
