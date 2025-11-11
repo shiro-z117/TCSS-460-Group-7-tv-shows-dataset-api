@@ -1528,13 +1528,33 @@ export const updateShowRelations = async (showId, relations) => {
       }
 
       if (item.operation === "add") {
-        const columns = [
-          "tv_show_id",
-          `${fieldName}_id`,
-          ...Object.keys(extraColumns),
-        ];
+        // Check for duplicate first
+        let duplicateCheckQuery = `SELECT 1 FROM ${table} WHERE tv_show_id = $1 AND ${fieldName}_id = $2`;
+        const duplicateValues = [showId, item.id];
+
+        // Add extraColumns to WHERE clause for uniqueness check
+        const extraKeys = Object.keys(extraColumns);
+        extraKeys.forEach((key, idx) => {
+          duplicateCheckQuery += ` AND ${key} = $${idx + 3}`;
+          duplicateValues.push(extraColumns[key]);
+        });
+
+        const duplicateResult = await pool.query(
+          duplicateCheckQuery,
+          duplicateValues
+        );
+
+        if (duplicateResult.rows.length > 0) {
+          relationNotes.push(
+            `Skipped adding ${fieldName} ID ${item.id} because it already exists.`
+          );
+          continue; // Skip insert
+        }
+
+        const columns = ["tv_show_id", `${fieldName}_id`, ...extraKeys];
         const values = [showId, item.id, ...Object.values(extraColumns)];
         const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
+
         await pool.query(
           `INSERT INTO ${table} (${columns.join(
             ","
@@ -1544,14 +1564,17 @@ export const updateShowRelations = async (showId, relations) => {
       } else if (item.operation === "remove") {
         const whereClauses = [`tv_show_id = $1`, `${fieldName}_id = $2`];
         const values = [showId, item.id];
+
         Object.entries(extraColumns).forEach(([k, v], i) => {
           whereClauses.push(`${k} = $${i + 3}`);
           values.push(v);
         });
+
         const result = await pool.query(
           `DELETE FROM ${table} WHERE ${whereClauses.join(" AND ")}`,
           values
         );
+
         if (result.rowCount === 0) {
           relationNotes.push(
             `No ${fieldName} relation found for ID ${item.id} to remove.`
@@ -1565,7 +1588,7 @@ export const updateShowRelations = async (showId, relations) => {
     }
   };
 
-  // Genres (by name, not id)
+  // Genres (by name)
   if (relations.genres) {
     for (const genre of relations.genres) {
       if (!genre.name) {
@@ -1578,11 +1601,11 @@ export const updateShowRelations = async (showId, relations) => {
         [genre.name]
       );
       if (result.rows.length === 0) {
-        throw new Error(`Genre name "${genre.name}" does not exist`);
+        relationNotes.push(`Genre "${genre.name}" does not exist, skipped.`);
+        continue;
       }
       const genreId = result.rows[0].id;
 
-      // Pass as extraColumns to processRelation
       await processRelation("show_genres", "genre", [genre], {
         genre_id: genreId,
       });
@@ -1618,4 +1641,3 @@ export const updateShowRelations = async (showId, relations) => {
 
   return relationNotes;
 };
-
