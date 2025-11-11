@@ -94,16 +94,13 @@ export const getShows = async (filters = {}) => {
     // Network filter (name-based only)
     if (network) {
       const networkValues = network.split(",").map((n) => n.trim());
-      const networkPlaceholders = networkValues
-        .map((_, i) => `$${paramIndex + i}`)
-        .join(",");
       conditions.push(`tv.id IN (
-      SELECT sn.tv_show_id
-      FROM show_networks sn
-      JOIN networks n ON sn.network_id = n.id
-      WHERE ${networkValues
-        .map((_, i) => `n.network_name ILIKE $${paramIndex + i}`)
-        .join(" OR ")}
+        SELECT sn.tv_show_id
+        FROM show_networks sn
+        JOIN networks n ON sn.network_id = n.id
+        WHERE ${networkValues
+          .map((_, i) => `n.network_name ILIKE $${paramIndex + i}`)
+          .join(" OR ")}
       )`);
       params.push(...networkValues.map((n) => `%${n}%`));
       paramIndex += networkValues.length;
@@ -112,16 +109,13 @@ export const getShows = async (filters = {}) => {
     // Studio filter (name-based only)
     if (studio) {
       const studioValues = studio.split(",").map((s) => s.trim());
-      const studioPlaceholders = studioValues
-        .map((_, i) => `$${paramIndex + i}`)
-        .join(",");
       conditions.push(`tv.id IN (
-      SELECT ss.tv_show_id
-      FROM show_studios ss
-      JOIN studios s ON ss.studio_id = s.id
-      WHERE ${studioValues
-        .map((_, i) => `s.studio_name ILIKE $${paramIndex + i}`)
-        .join(" OR ")}
+        SELECT ss.tv_show_id
+        FROM show_studios ss
+        JOIN studios s ON ss.studio_id = s.id
+        WHERE ${studioValues
+          .map((_, i) => `s.studio_name ILIKE $${paramIndex + i}`)
+          .join(" OR ")}
       )`);
       params.push(...studioValues.map((s) => `%${s}%`));
       paramIndex += studioValues.length;
@@ -130,16 +124,13 @@ export const getShows = async (filters = {}) => {
     // Actor filter (name-based only)
     if (actor) {
       const actorValues = actor.split(",").map((a) => a.trim());
-      const actorPlaceholders = actorValues
-        .map((_, i) => `$${paramIndex + i}`)
-        .join(",");
       conditions.push(`tv.id IN (
-      SELECT sa.tv_show_id
-      FROM show_actors sa
-      JOIN actors a ON sa.actor_id = a.id
-      WHERE ${actorValues
-        .map((_, i) => `a.actor_name ILIKE $${paramIndex + i}`)
-        .join(" OR ")}
+        SELECT sa.tv_show_id
+        FROM show_actors sa
+        JOIN actors a ON sa.actor_id = a.id
+        WHERE ${actorValues
+          .map((_, i) => `a.actor_name ILIKE $${paramIndex + i}`)
+          .join(" OR ")}
       )`);
       params.push(...actorValues.map((a) => `%${a}%`));
       paramIndex += actorValues.length;
