@@ -59,7 +59,7 @@ export const getShows = async (filters = {}) => {
     // Build WHERE conditions
     const conditions = [];
 
-    // Search query (matches name or original_name)
+    // Search query (partial or exact matches name or original_name)
     if (q) {
       params.push(`%${q}%`);
       conditions.push(
