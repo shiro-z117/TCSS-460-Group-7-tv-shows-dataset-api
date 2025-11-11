@@ -33,7 +33,9 @@ export async function getShows(req: Request, res: Response, next: NextFunction) 
             page: parseInt(req.query.page as string) || 1,
             limit: parseInt(req.query.limit as string) || 20,
             sort: req.query.sort as string || 'id',
-            order: req.query.order as string || 'asc'
+            order: req.query.order as string || 'asc',
+            rating_min: req.query.rating_min ? parseFloat(req.query.rating_min as string) : null,
+            rating_max: req.query.rating_max ? parseFloat(req.query.rating_max as string) : null,
         };
 
         const { shows, total, page, limit } = await db.getShows(filters);

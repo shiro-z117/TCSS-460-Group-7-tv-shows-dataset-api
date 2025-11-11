@@ -50,6 +50,8 @@ export const getShows = async (filters = {}) => {
       limit = 20,
       sort = "id",
       order = "asc",
+      rating_min = null,
+      rating_max = null,
     } = filters;
 
     const offset = (page - 1) * limit;
@@ -136,11 +138,45 @@ export const getShows = async (filters = {}) => {
       paramIndex += actorValues.length;
     }
 
+    const rangeConditions = [];
+    if (rating_min !== null || rating_max !== null) {
+      const clampRating = (val) => {
+        const num = parseFloat(val);
+        if (isNaN(num)) return null;
+        const clamped = Math.min(10, Math.max(0, num));
+        return Math.round(clamped * 10) / 10; // round to nearest 0.1
+      };
+
+      const min = clampRating(rating_min);
+      const max = clampRating(rating_max);
+
+      if (min !== null && max !== null) {
+        params.push(min, max);
+        rangeConditions.push(
+          `tv.tmdb_rating BETWEEN $${paramIndex} AND $${paramIndex + 1}`
+        );
+        paramIndex += 2;
+      } else if (min !== null) {
+        params.push(min);
+        rangeConditions.push(`tv.tmdb_rating >= $${paramIndex}`);
+        paramIndex++;
+      } else if (max !== null) {
+        params.push(max);
+        rangeConditions.push(`tv.tmdb_rating <= $${paramIndex}`);
+        paramIndex++;
+      }
+    }
+
     // Build WHERE clause based on match logic
     let whereClause = "";
     if (conditions.length > 0) {
       const connector = match === "any" ? " OR " : " AND ";
       whereClause = `WHERE ${conditions.join(connector)}`;
+    }
+    if (rangeConditions.length > 0) {
+      whereClause += whereClause
+        ? ` AND ${rangeConditions.join(" AND ")}`
+        : `WHERE ${rangeConditions.join(" AND ")}`;
     }
 
     // Validate and build ORDER BY clause
