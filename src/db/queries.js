@@ -1490,7 +1490,7 @@ export const updateShow = async (showId, updateData) => {
     }
 
     if (updates.length === 0) {
-      throw new Error("NO_FIELDS_TO_UPDATE");
+      return;
     }
 
     // Add WHERE clause parameter
@@ -1503,8 +1503,7 @@ export const updateShow = async (showId, updateData) => {
             RETURNING *
         `;
 
-    const result = await pool.query(query, values);
-    return result.rows[0];
+    await pool.query(query, values);
   } catch (error) {
     console.error("Database error in updateShow:", error);
     throw error;

@@ -600,9 +600,8 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
         }
 
         // Update scalar fields if present
-        let updatedShow;
         if (hasScalars) {
-            updatedShow = await db.updateShow(showId, updateData);
+            await db.updateShow(showId, updateData);
         }
 
         // Update junctioned relations if present
@@ -611,9 +610,11 @@ export async function updateShow(req: Request, res: Response, next: NextFunction
             relationNotes = await db.updateShowRelations(showId, relations);
         }
 
+        const showData = await db.getShowById(showId);
+
         res.status(200).json({
             success: true,
-            data: updatedShow,
+            data: showData,
             message: "Show updated successfully",
             notes: relationNotes.length > 0 ? relationNotes : undefined,
         });
