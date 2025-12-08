@@ -10,7 +10,7 @@ info:
     name: API Support
 
 servers:
-  - url: https://api.example.com
+  - url: https://cors-anywhere.herokuapp.com/https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com
     description: Production server
   - url: http://localhost:3000
     description: Development server
