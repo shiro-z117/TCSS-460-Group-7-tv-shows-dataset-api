@@ -4,22 +4,6 @@ info:
   description: |
     A comprehensive API for managing TV shows, including shows, actors, networks, studios, and creators.
     All endpoints require API key authentication.
-    
-    ## Known Issues
-    We do NOT recommend implementing code working around these issues, we are working to get the API to work as intended,
-    issues are listed only for clarity.
-
-    #### 1. PATCH /api/shows/:id - General Show Update Not Working
-    **Issue:** This endpoint is currently not working. Implementation issues prevent it from updating show data as intended. The endpoint is completely non-functional.
-
-    **Impact:** Cannot perform general show updates through this endpoint.
-
-    ---
-
-    #### 2. GET /api/shows - Some Filters Not Working as Intended
-    **Issue:** Some filters in the advanced search functionality are not working as intended. Specific filter parameters may not properly filter results or may return incorrect data.
-
-    **Impact:** Search results may be incomplete or incorrect when using certain filter combinations.
 
   version: 1.0.0
   contact:
@@ -81,7 +65,21 @@ paths:
       tags:
         - Shows
       summary: Search and filter TV shows
-      description: Advanced search with filters, pagination, and sorting capabilities
+      description: |
+        Advanced search with filters, pagination, and sorting capabilities.
+        
+        **Filter Logic:**
+        - Use `match=all` (default) to require all specified filters to match
+        - Use `match=any` to return shows matching any of the specified filters
+        
+        **Supported Filters:**
+        - Text search (`q`) - searches in show name and original name
+        - Genre filtering by name (comma-separated)
+        - Network filtering by name (comma-separated, case-insensitive)
+        - Studio filtering by name (comma-separated, case-insensitive)
+        - Actor filtering by name (comma-separated, case-insensitive)
+        - Status filtering (exact match)
+        - Rating range filtering (min/max, clamped between 0-10)
       operationId: getShows
       parameters:
         - name: q
@@ -96,54 +94,48 @@ paths:
           schema:
             type: string
           example: Drama,Crime
-        - name: genre_id
-          in: query
-          description: Filter by genre ID(s), comma-separated
-          schema:
-            type: string
-          example: 18,80
         - name: network
           in: query
           description: Filter by network name(s), comma-separated
           schema:
             type: string
           example: AMC
-        - name: network_id
-          in: query
-          description: Filter by network ID(s), comma-separated
-          schema:
-            type: string
-          example: 174
         - name: studio
           in: query
           description: Filter by studio name(s), comma-separated
           schema:
             type: string
           example: Sony Pictures Television
-        - name: studio_id
-          in: query
-          description: Filter by studio ID(s), comma-separated
-          schema:
-            type: string
-          example: 3
         - name: actor
           in: query
           description: Filter by actor name(s), comma-separated
           schema:
             type: string
           example: Bryan Cranston
-        - name: actor_id
-          in: query
-          description: Filter by actor ID(s), comma-separated
-          schema:
-            type: string
-          example: 17
         - name: status
           in: query
           description: Filter by status (exact match)
           schema:
             type: string
           example: Ended
+        - name: rating_min
+          in: query
+          description: Minimum TMDB rating (0-10, automatically clamped)
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 10
+          example: 7.5
+        - name: rating_max
+          in: query
+          description: Maximum TMDB rating (0-10, automatically clamped)
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 10
+          example: 9.5
         - name: match
           in: query
           description: Match logic for filters
@@ -273,7 +265,32 @@ paths:
       tags:
         - Shows
       summary: Update a TV show
-      description: Update a TV show's information. All fields are optional.
+      description: |
+        Update a TV show's scalar fields and/or manage its relationships (genres, actors, studios, networks, creators).
+        
+        **Scalar Fields:** All optional. Provide only the fields you want to update.
+        
+        **Relationship Management:**
+        - For each relationship type, provide an array of objects with `operation` ("add" or "remove")
+        - **Genres:** Provide `name` and `operation`
+        - **Actors:** Provide `id`, `character_name`, and `operation`
+        - **Studios/Networks/Creators:** Provide `id` and `operation`
+        
+        At least one scalar field or one relationship operation must be provided.
+        
+        **Example Request Body:**
+        ```json
+        {
+          "tmdb_rating": 9.5,
+          "genres": [
+            { "name": "Thriller", "operation": "add" }
+          ],
+          "actors": [
+            { "id": 123, "character_name": "New Character", "operation": "add" },
+            { "id": 456, "character_name": "Old Character", "operation": "remove" }
+          ]
+        }
+        ```
       operationId: updateShow
       parameters:
         - name: id
@@ -305,8 +322,16 @@ paths:
                   message:
                     type: string
                     example: Show updated successfully
+                  notes:
+                    type: array
+                    items:
+                      type: string
+                    description: Optional notes about relationship operations (e.g., duplicates skipped)
         '400':
           $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 
     delete:
       tags:
@@ -322,19 +347,6 @@ paths:
           schema:
             type: integer
             minimum: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                  minimum: 1
-                  example: 1
       responses:
         '200':
           description: Show deleted successfully
@@ -713,19 +725,6 @@ paths:
           schema:
             type: integer
             minimum: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                  minimum: 1
-                  example: 174
       responses:
         '200':
           description: Network deleted successfully
@@ -962,19 +961,6 @@ paths:
           schema:
             type: integer
             minimum: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                  minimum: 1
-                  example: 3
       responses:
         '200':
           description: Studio deleted successfully
@@ -1274,19 +1260,6 @@ paths:
           schema:
             type: integer
             minimum: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                  minimum: 1
-                  example: 17
       responses:
         '200':
           description: Actor deleted successfully
@@ -1404,19 +1377,6 @@ paths:
           schema:
             type: integer
             minimum: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                  minimum: 1
-                  example: 1
       responses:
         '200':
           description: Creator deleted successfully
@@ -1435,22 +1395,6 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '404':
           $ref: '#/components/responses/NotFound'
-
-x-known-issues:
-  - endpoint: PATCH /api/shows/:id
-    title: General Show Update Not Working
-    description: |
-      **Issue:** This endpoint is currently not working. Implementation issues prevent it from updating show data as intended. The endpoint is completely non-functional.
-
-      **Impact:** Cannot perform general show updates through this endpoint.
-  - endpoint: GET /api/shows
-    title: Some Filters Not Working as Intended
-    description: |
-      **Issue:** Some filters in the advanced search functionality are not working as intended. Specific filter parameters may not properly filter results or may return incorrect data.
-
-      **Impact:** Search results may be incomplete or incorrect when using certain filter combinations.
-
-      **Workaround:** Test filter combinations individually to determine which work correctly. Simple searches may work better than complex filtered queries.
 
 components:
   securitySchemes:

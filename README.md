@@ -8,7 +8,7 @@ RESTful API for TV Shows Dataset providing access to comprehensive television sh
 ### Documentation: https://tcss-460-group-7-tv-shows-dataset-api-g4kq.onrender.com/api-docs
 ### Link to the Credential API: https://github.com/shinobitiger310/TCSS460-Group7-Credential-API
 ### Link to the Front End API: https://github.com/shinobitiger310/TCSS460-Group7-FrontEnd
-
+### Link to Special Feature API: https://github.com/pquaidoo/Pibble-User-DB
 ---
 
 ## Production Version Sprint Meetings
